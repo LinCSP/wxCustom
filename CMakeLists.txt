@@ -15,7 +15,16 @@ message(STATUS "wxWidgets version: ${wxWidgets_VERSION_STRING}")
 
 add_library(wxCustomization
     include/wxCustomization/wxCustomization.h
+    include/wxCustomization/Length.h
+    include/wxCustomization/Color.h
+    include/wxCustomization/StyleTypes.h
+    include/wxCustomization/StyleValue.h
+    include/wxCustomization/Style.h
     src/dummy.cpp
+    src/Length.cpp
+    src/Color.cpp
+    src/StyleValue.cpp
+    src/Style.cpp
 )
 
 add_library(wxCustomization::wxCustomization ALIAS wxCustomization)
@@ -43,7 +52,14 @@ target_compile_options(wxCustomization
 )
 
 option(WXC_BUILD_EXAMPLES "Build wxCustomization examples" ON)
+option(WXC_BUILD_TESTS "Build wxCustomization tests" ON)
 
 if(WXC_BUILD_EXAMPLES)
     add_subdirectory(examples/demo)
+endif()
+
+if(WXC_BUILD_TESTS)
+    enable_testing()
+    find_package(GTest REQUIRED)
+    add_subdirectory(tests)
 endif()

@@ -114,6 +114,17 @@ TEST(StyledControl, Focusability)
     EXPECT_FALSE(ctrl->PublicAcceptsFocusFromKeyboard());
 }
 
+TEST(StyledControl, AccessibilityLabelAndRole)
+{
+    TestStyledControl* ctrl = new TestStyledControl(gTestFrame, wxID_ANY);
+    ctrl->SetLabel("Original Label");
+    ctrl->SetAccessibleLabel("Accessible Label");
+    ctrl->SetAccessibleRole(wxROLE_SYSTEM_PUSHBUTTON);
+
+    EXPECT_EQ(ctrl->GetAccessibleLabel(), "Accessible Label");
+    EXPECT_EQ(ctrl->GetAccessibleRole(), wxROLE_SYSTEM_PUSHBUTTON);
+}
+
 TEST(StyledControl, ContentRectAccountsForBorderAndPadding)
 {
     StyleSheet sheet;

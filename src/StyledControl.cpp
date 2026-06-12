@@ -1,6 +1,7 @@
 #include "wxCustomization/StyledControl.h"
 
 #include "wxCustomization/Painter.h"
+#include "wxCustomization/StyledAccessible.h"
 #include "wxCustomization/StyleResolver.h"
 #include "wxCustomization/StyleResolverContext.h"
 
@@ -103,6 +104,9 @@ StyledControl::StyledControl(wxWindow* parent, wxWindowID id,
     : wxControl(parent, id, pos, size, style, wxDefaultValidator, name)
 {
     SetBackgroundStyle(wxBG_STYLE_PAINT);
+#if wxUSE_ACCESSIBILITY
+    SetAccessible(new StyledAccessible(this));
+#endif
 }
 
 void StyledControl::SetStyleSheet(StyleSheet* sheet)
@@ -180,6 +184,26 @@ wxString StyledControl::GetStyledControlType() const
 wxString StyledControl::GetStyledControlId() const
 {
     return GetName();
+}
+
+void StyledControl::SetAccessibleLabel(const wxString& label)
+{
+    m_accessibleLabel = label;
+}
+
+wxString StyledControl::GetAccessibleLabel() const
+{
+    return m_accessibleLabel;
+}
+
+void StyledControl::SetAccessibleRole(wxAccRole role)
+{
+    m_accessibleRole = role;
+}
+
+wxAccRole StyledControl::GetAccessibleRole() const
+{
+    return m_accessibleRole;
 }
 
 void StyledControl::OnPaint(wxPaintEvent& /*evt*/)

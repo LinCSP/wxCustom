@@ -3,6 +3,20 @@
 #include "wxCustomization/Style.h"
 #include "wxCustomization/StyleSheet.h"
 
+#include <wx/defs.h>
+
+#if wxUSE_ACCESSIBILITY
+#include <wx/access.h>
+#else
+// Fallback definitions when wxWidgets is built without accessibility support.
+// These allow the public StyledControl API to compile; the accessibility
+// adapter itself is disabled in that case.
+enum wxAccRole {
+    wxROLE_SYSTEM_CLIENT = 10,
+    wxROLE_SYSTEM_PUSHBUTTON = 11
+};
+#endif
+
 #include <wx/control.h>
 #include <wx/dcbuffer.h>
 #include <wx/event.h>
@@ -45,6 +59,14 @@ public:
     void RemoveStyleClass(const wxString& className);
     bool HasStyleClass(const wxString& className) const;
     std::vector<wxString> GetStyleClasses() const;
+
+    /// Accessibility label used by screen readers.
+    void SetAccessibleLabel(const wxString& label);
+    wxString GetAccessibleLabel() const;
+
+    /// Accessibility role used by screen readers.
+    void SetAccessibleRole(wxAccRole role);
+    wxAccRole GetAccessibleRole() const;
 
     /// Widget type used for type selectors (e.g. "StyledButton").
     virtual wxString GetStyledControlType() const;
@@ -94,6 +116,9 @@ protected:
 
     std::vector<wxString> m_styleClasses;
     std::map<wxString, wxString> m_styleProperties;
+
+    wxString m_accessibleLabel;
+    wxAccRole m_accessibleRole = wxROLE_SYSTEM_CLIENT;
 
     wxDECLARE_EVENT_TABLE();
 };

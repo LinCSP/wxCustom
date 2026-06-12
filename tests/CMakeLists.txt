@@ -11,6 +11,9 @@ add_executable(wxCustomization_tests
     test_styled_control.cpp
     test_style_engine.cpp
     test_styled_button.cpp
+    test_styled_panel.cpp
+    test_styled_label.cpp
+    test_styled_toggle_button.cpp
 )
 
 target_link_libraries(wxCustomization_tests

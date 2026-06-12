@@ -8,6 +8,54 @@
     --disabled-color: #7f8c8d;
 }
 
+StyledPanel {
+    background-color: #ffffff;
+    border-width: 1dip;
+    border-color: #bdc3c7;
+    border-style: solid;
+    border-radius: 8dip;
+    padding: 16dip;
+}
+
+StyledLabel {
+    color: #2c3e50;
+    font-size: 16dip;
+    text-align: center;
+}
+
+StyledToggleButton {
+    background-color: #ecf0f1;
+    color: #2c3e50;
+    border-width: 1dip;
+    border-color: #bdc3c7;
+    border-style: solid;
+    border-radius: 4dip;
+    padding: 8dip 16dip;
+    text-align: center;
+    min-width: 80dip;
+    min-height: 32dip;
+}
+
+StyledToggleButton:hover {
+    background-color: #d0d3d4;
+}
+
+StyledToggleButton:pressed {
+    background-color: #bfc9ca;
+}
+
+StyledToggleButton:checked {
+    background-color: var(--primary);
+    color: #ffffff;
+    border-color: var(--hover);
+}
+
+StyledToggleButton:focused {
+    outline-width: 2dip;
+    outline-color: #85c1e9;
+    outline-offset: 2dip;
+}
+
 DemoWidget {
     background-color: var(--bg);
     border-width: 2dip;

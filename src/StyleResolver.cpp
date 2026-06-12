@@ -328,6 +328,20 @@ void StyleResolver::ApplyDeclaration(Style& style,
     } else if (prop == "spacing") {
         style.spacing = LengthToPixels(resolved, context);
         style.Set(Property::Spacing);
+    } else if (prop == "text-align") {
+        const wxString s = ToLowerAscii(resolved);
+        if (s == "left") style.textAlign = TextAlign::Left;
+        else if (s == "right") style.textAlign = TextAlign::Right;
+        else if (s == "center") style.textAlign = TextAlign::Center;
+        else if (s == "justify") style.textAlign = TextAlign::Justify;
+        style.Set(Property::TextAlign);
+    } else if (prop == "text-decoration") {
+        const wxString s = ToLowerAscii(resolved);
+        if (s == "underline") style.textDecoration = TextDecoration::Underline;
+        else if (s == "overline") style.textDecoration = TextDecoration::Overline;
+        else if (s == "line-through") style.textDecoration = TextDecoration::LineThrough;
+        else style.textDecoration = TextDecoration::None;
+        style.Set(Property::TextDecoration);
     } else if (prop == "font-size") {
         const int pixels = LengthToPixels(resolved, context);
         const int points = PixelsToPoints(pixels, context);

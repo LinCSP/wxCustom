@@ -31,6 +31,9 @@ add_library(wxCustomization
     include/wxCustomization/StyledAccessible.h
     include/wxCustomization/widgets/StyledButton.h
     include/wxCustomization/widgets/StyledMessageDialog.h
+    include/wxCustomization/widgets/StyledPanel.h
+    include/wxCustomization/widgets/StyledLabel.h
+    include/wxCustomization/widgets/StyledToggleButton.h
     src/dummy.cpp
     src/Length.cpp
     src/Color.cpp
@@ -44,6 +47,9 @@ add_library(wxCustomization
     src/StyledAccessible.cpp
     src/widgets/StyledButton.cpp
     src/widgets/StyledMessageDialog.cpp
+    src/widgets/StyledPanel.cpp
+    src/widgets/StyledLabel.cpp
+    src/widgets/StyledToggleButton.cpp
 )
 
 add_library(wxCustomization::wxCustomization ALIAS wxCustomization)

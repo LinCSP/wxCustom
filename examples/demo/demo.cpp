@@ -2,11 +2,15 @@
 #include <wx/filename.h>
 #include <wx/sizer.h>
 #include <wx/stdpaths.h>
+#include <wx/tglbtn.h>
 
 #include "wxCustomization/StyleSheet.h"
 #include "wxCustomization/StyledControl.h"
 #include "wxCustomization/widgets/StyledButton.h"
 #include "wxCustomization/widgets/StyledMessageDialog.h"
+#include "wxCustomization/widgets/StyledPanel.h"
+#include "wxCustomization/widgets/StyledLabel.h"
+#include "wxCustomization/widgets/StyledToggleButton.h"
 #include "wxCustomization/wxCustomization.h"
 
 class DemoWidget : public wxCustomization::StyledControl {
@@ -46,12 +50,15 @@ public:
                   wxDefaultPosition, wxSize(800, 600))
         , m_styleSheet(styleSheet)
     {
-        wxPanel* panel = new wxPanel(this, wxID_ANY);
+        wxCustomization::StyledPanel* panel =
+            new wxCustomization::StyledPanel(this, wxID_ANY);
+        panel->SetStyleSheet(m_styleSheet);
         wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 
-        wxStaticText* label = new wxStaticText(
+        wxCustomization::StyledLabel* label = new wxCustomization::StyledLabel(
             panel, wxID_ANY,
             wxString::Format("wxCustomization %s", wxCustomization::GetVersionString()));
+        label->SetStyleSheet(m_styleSheet);
         sizer->Add(label, 0, wxALL | wxCENTER, 20);
 
         wxBoxSizer* row = new wxBoxSizer(wxHORIZONTAL);
@@ -69,6 +76,12 @@ public:
         button->Bind(wxEVT_BUTTON, &DemoFrame::OnButtonClick, this);
         sizer->Add(button, 0, wxALL | wxCENTER, 10);
 
+        wxCustomization::StyledToggleButton* toggle =
+            new wxCustomization::StyledToggleButton(panel, wxID_ANY, "Toggle me");
+        toggle->SetStyleSheet(m_styleSheet);
+        toggle->Bind(wxEVT_TOGGLEBUTTON, &DemoFrame::OnToggle, this);
+        sizer->Add(toggle, 0, wxALL | wxCENTER, 10);
+
         panel->SetSizer(sizer);
     }
 
@@ -78,6 +91,12 @@ private:
         wxCustomization::StyledMessageDialog::Show(
             this, "StyledButton works!", "wxCustomization Demo",
             wxOK | wxICON_INFORMATION, m_styleSheet);
+    }
+
+    void OnToggle(wxCommandEvent& evt)
+    {
+        const bool value = evt.GetInt() != 0;
+        wxLogMessage("Toggle is now %s", value ? "ON" : "OFF");
     }
 
     wxCustomization::StyleSheet* m_styleSheet;

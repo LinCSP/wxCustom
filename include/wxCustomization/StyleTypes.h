@@ -34,6 +34,13 @@ enum class TextAlign {
     Justify
 };
 
+enum class TextDecoration {
+    None,
+    Underline,
+    Overline,
+    LineThrough
+};
+
 enum class GradientType {
     Linear,
     Radial

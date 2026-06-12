@@ -39,6 +39,7 @@ enum class Property {
     MarginLeft,
     Font,
     TextAlign,
+    TextDecoration,
     MinWidth,
     MaxWidth,
     MinHeight,
@@ -90,6 +91,7 @@ struct Style {
     // Font
     wxFont font;
     TextAlign textAlign = TextAlign::Center;
+    TextDecoration textDecoration = TextDecoration::None;
 
     // Size constraints
     int minWidth = -1;

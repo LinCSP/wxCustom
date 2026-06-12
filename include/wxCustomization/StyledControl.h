@@ -77,6 +77,7 @@ public:
 
 protected:
     virtual void OnPaint(wxPaintEvent& evt);
+    virtual void DrawContent(wxDC& dc, const wxRect& rect);
     virtual void DrawBackground(wxDC& dc, const wxRect& rect, const Style& style);
     virtual void DrawBorder(wxDC& dc, const wxRect& rect, const Style& style);
     virtual void DrawFocusRect(wxDC& dc, const wxRect& rect, const Style& style);

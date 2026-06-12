@@ -213,6 +213,13 @@ void StyledControl::OnPaint(wxPaintEvent& /*evt*/)
 
     Painter painter;
     painter.Paint(dc, rect, m_currentStyle, this);
+    DrawContent(dc, GetContentRect());
+}
+
+void StyledControl::DrawContent(wxDC& /*dc*/, const wxRect& /*rect*/)
+{
+    // Default implementation draws no content. Derived widgets override this
+    // to render text, icons and sub-controls.
 }
 
 void StyledControl::DrawBackground(wxDC& dc, const wxRect& rect, const Style& style)

@@ -96,7 +96,12 @@ private:
     void OnToggle(wxCommandEvent& evt)
     {
         const bool value = evt.GetInt() != 0;
-        wxLogMessage("Toggle is now %s", value ? "ON" : "OFF");
+        wxCustomization::StyledMessageDialog::Show(
+            this,
+            wxString::Format("Toggle is now %s", value ? "ON" : "OFF"),
+            "Demo Information",
+            wxOK | wxICON_INFORMATION,
+            m_styleSheet);
     }
 
     wxCustomization::StyleSheet* m_styleSheet;

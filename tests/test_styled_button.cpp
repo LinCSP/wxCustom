@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <iostream>
 
 #include "wxCustomization/StyleSheet.h"
 #include "wxCustomization/widgets/StyledButton.h"
@@ -8,6 +9,7 @@
 extern wxFrame* gTestFrame;
 
 using wxCustomization::Property;
+using wxCustomization::Style;
 using wxCustomization::StyleSheet;
 using wxCustomization::StyledButton;
 
@@ -78,12 +80,17 @@ TEST(StyledButton, BestSizeAccountsForLabelAndPadding)
 {
     StyleSheet sheet;
     ASSERT_TRUE(sheet.LoadFromString(
-        "StyledButton { padding: 8px; border-width: 2px; }"));
+        "StyledButton { padding: 6px; border-width: 2px; }"));
 
     StyledButton* button = new StyledButton(gTestFrame, wxID_ANY, "OK");
     button->SetStyleSheet(&sheet);
 
     const wxSize size = button->GetBestSize();
-    EXPECT_GT(size.x, 20);
-    EXPECT_GT(size.y, 20);
+    EXPECT_GT(size.x, 28);
+    EXPECT_GT(size.y, 24);
+
+    const Style& style = button->GetCurrentStyle();
+    EXPECT_GT(style.borderWidth, 0);
+    EXPECT_GT(style.paddingTop, 0);
+    EXPECT_GT(style.paddingLeft, 0);
 }

@@ -79,20 +79,14 @@ TEST(Lexer, ColorVsId)
 TEST(Lexer, NumbersAndUnits)
 {
     auto tokens = Lexer("10px -2.5em 50%").Tokenize();
-    ASSERT_EQ(tokens.size(), 7u);
+    ASSERT_EQ(tokens.size(), 4u);
     EXPECT_EQ(tokens[0].type, Token::Type::Number);
-    EXPECT_EQ(tokens[0].value, "10");
-    EXPECT_EQ(tokens[1].type, Token::Type::Ident);
-    EXPECT_EQ(tokens[1].value, "px");
+    EXPECT_EQ(tokens[0].value, "10px");
+    EXPECT_EQ(tokens[1].type, Token::Type::Number);
+    EXPECT_EQ(tokens[1].value, "-2.5em");
     EXPECT_EQ(tokens[2].type, Token::Type::Number);
-    EXPECT_EQ(tokens[2].value, "-2.5");
-    EXPECT_EQ(tokens[3].type, Token::Type::Ident);
-    EXPECT_EQ(tokens[3].value, "em");
-    EXPECT_EQ(tokens[4].type, Token::Type::Number);
-    EXPECT_EQ(tokens[4].value, "50");
-    EXPECT_EQ(tokens[5].type, Token::Type::Ident);
-    EXPECT_EQ(tokens[5].value, "%");
-    EXPECT_EQ(tokens[6].type, Token::Type::Eof);
+    EXPECT_EQ(tokens[2].value, "50%");
+    EXPECT_EQ(tokens[3].type, Token::Type::Eof);
 }
 
 TEST(Lexer, Strings)

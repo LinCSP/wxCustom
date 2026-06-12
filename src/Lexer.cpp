@@ -192,6 +192,15 @@ Token Lexer::ReadNumber()
         value += Advance();
     }
 
+    // Consume an immediately following unit (e.g. px, dip, em, %) so that
+    // values like "8px" stay as a single token. This is important for
+    // shorthand properties such as "padding: 8px 16px".
+    if (!IsAtEnd() && (IsIdentStart(Peek()) || Peek() == '%')) {
+        while (!IsAtEnd() && (IsIdentChar(Peek()) || Peek() == '%')) {
+            value += Advance();
+        }
+    }
+
     return Token(Token::Type::Number, wxString::FromUTF8(value), startLine, startColumn);
 }
 

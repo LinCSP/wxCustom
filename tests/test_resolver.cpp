@@ -131,3 +131,39 @@ TEST(StyleResolver, SubControl)
     Style indicator = resolver.Resolve(sheet, ctx, "indicator");
     EXPECT_EQ(indicator.backgroundColor, wxColour(0xff, 0xff, 0xff));
 }
+
+TEST(StyleResolver, PaddingShorthand)
+{
+    StyleSheet sheet;
+    ASSERT_TRUE(sheet.LoadFromString(
+        "StyledButton { padding: 1px 2px 3px 4px; }"));
+
+    TestContext ctx;
+    ctx.type = "StyledButton";
+
+    StyleResolver resolver;
+    Style style = resolver.Resolve(sheet, ctx);
+
+    EXPECT_EQ(style.paddingTop, 1);
+    EXPECT_EQ(style.paddingRight, 2);
+    EXPECT_EQ(style.paddingBottom, 3);
+    EXPECT_EQ(style.paddingLeft, 4);
+}
+
+TEST(StyleResolver, MarginShorthand)
+{
+    StyleSheet sheet;
+    ASSERT_TRUE(sheet.LoadFromString(
+        "StyledButton { margin: 5px 10px; }"));
+
+    TestContext ctx;
+    ctx.type = "StyledButton";
+
+    StyleResolver resolver;
+    Style style = resolver.Resolve(sheet, ctx);
+
+    EXPECT_EQ(style.marginTop, 5);
+    EXPECT_EQ(style.marginRight, 10);
+    EXPECT_EQ(style.marginBottom, 5);
+    EXPECT_EQ(style.marginLeft, 10);
+}

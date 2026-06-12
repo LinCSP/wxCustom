@@ -44,7 +44,7 @@ TEST(StyleSheet, ParseMultipleDeclarations)
     EXPECT_EQ(rule.declarations[0].property, "background-color");
     EXPECT_EQ(rule.declarations[0].value, "#3498db");
     EXPECT_EQ(rule.declarations[1].property, "border");
-    EXPECT_EQ(rule.declarations[1].value, "1 px solid #2980b9");
+    EXPECT_EQ(rule.declarations[1].value, "1px solid #2980b9");
 }
 
 TEST(StyleSheet, ParseSelectors)

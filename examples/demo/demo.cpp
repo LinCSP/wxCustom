@@ -11,6 +11,7 @@
 #include "wxCustomization/widgets/StyledPanel.h"
 #include "wxCustomization/widgets/StyledLabel.h"
 #include "wxCustomization/widgets/StyledToggleButton.h"
+#include "wxCustomization/widgets/StyledCheckBox.h"
 #include "wxCustomization/wxCustomization.h"
 
 class DemoWidget : public wxCustomization::StyledControl {
@@ -82,6 +83,12 @@ public:
         toggle->Bind(wxEVT_TOGGLEBUTTON, &DemoFrame::OnToggle, this);
         sizer->Add(toggle, 0, wxALL | wxCENTER, 10);
 
+        wxCustomization::StyledCheckBox* checkBox =
+            new wxCustomization::StyledCheckBox(panel, wxID_ANY, "Check me");
+        checkBox->SetStyleSheet(m_styleSheet);
+        checkBox->Bind(wxEVT_CHECKBOX, &DemoFrame::OnCheckBox, this);
+        sizer->Add(checkBox, 0, wxALL | wxCENTER, 10);
+
         panel->SetSizer(sizer);
     }
 
@@ -99,6 +106,23 @@ private:
         wxCustomization::StyledMessageDialog::Show(
             this,
             wxString::Format("Toggle is now %s", value ? "ON" : "OFF"),
+            "Demo Information",
+            wxOK | wxICON_INFORMATION,
+            m_styleSheet);
+    }
+
+    void OnCheckBox(wxCommandEvent& evt)
+    {
+        const int state = evt.GetInt();
+        const wxString stateText =
+            state == static_cast<int>(wxCustomization::CheckState::Checked)
+                ? "CHECKED"
+                : (state == static_cast<int>(wxCustomization::CheckState::Indeterminate)
+                       ? "INDETERMINATE"
+                       : "UNCHECKED");
+        wxCustomization::StyledMessageDialog::Show(
+            this,
+            wxString::Format("CheckBox is now %s", stateText),
             "Demo Information",
             wxOK | wxICON_INFORMATION,
             m_styleSheet);

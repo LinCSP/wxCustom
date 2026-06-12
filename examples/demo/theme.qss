@@ -56,6 +56,49 @@ StyledToggleButton:focused {
     outline-offset: 2dip;
 }
 
+StyledCheckBox {
+    color: #2c3e50;
+    padding: 4dip;
+    spacing: 8dip;
+    text-align: left;
+}
+
+StyledCheckBox::indicator {
+    width: 18dip;
+    height: 18dip;
+    background-color: #ffffff;
+    border-width: 2dip;
+    border-color: #bdc3c7;
+    border-style: solid;
+    border-radius: 3dip;
+}
+
+StyledCheckBox::indicator:hover {
+    border-color: var(--primary);
+}
+
+StyledCheckBox::indicator:checked {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: #ffffff;
+}
+
+StyledCheckBox::indicator:indeterminate {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: #ffffff;
+}
+
+StyledCheckBox::indicator:pressed {
+    background-color: #d6eaf8;
+}
+
+StyledCheckBox:focused {
+    outline-width: 2dip;
+    outline-color: #85c1e9;
+    outline-offset: 2dip;
+}
+
 DemoWidget {
     background-color: var(--bg);
     border-width: 2dip;

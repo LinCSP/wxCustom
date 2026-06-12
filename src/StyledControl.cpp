@@ -52,6 +52,12 @@ public:
         if (s == "checked") {
             return m_control->IsChecked();
         }
+        if (s == "unchecked") {
+            return !m_control->IsChecked() && !m_control->IsIndeterminate();
+        }
+        if (s == "indeterminate") {
+            return m_control->IsIndeterminate();
+        }
         return false;
     }
 
@@ -122,6 +128,8 @@ StyleSheet* StyledControl::GetStyleSheet() const
 
 void StyledControl::ApplyStyle(const wxString& state)
 {
+    m_currentState = state;
+
     if (m_styleSheet != nullptr) {
         StyledControlContext context(this, state);
         StyleResolver resolver;
@@ -360,6 +368,17 @@ void StyledControl::Activate()
 {
     // Default implementation does nothing. Derived widgets override this
     // to emit command events or toggle state.
+}
+
+Style StyledControl::GetSubControlStyle(const wxString& subControl) const
+{
+    if (m_styleSheet == nullptr) {
+        return Style();
+    }
+
+    StyledControlContext context(this, m_currentState);
+    StyleResolver resolver;
+    return resolver.Resolve(*m_styleSheet, context, subControl, m_currentState);
 }
 
 wxSize StyledControl::DoGetBestSize() const

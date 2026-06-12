@@ -13,7 +13,8 @@
 // adapter itself is disabled in that case.
 enum wxAccRole {
     wxROLE_SYSTEM_CLIENT = 10,
-    wxROLE_SYSTEM_PUSHBUTTON = 11
+    wxROLE_SYSTEM_PUSHBUTTON = 11,
+    wxROLE_SYSTEM_CHECKBUTTON = 12
 };
 #endif
 
@@ -49,6 +50,7 @@ public:
     bool IsPressed() const noexcept { return m_pressed; }
     bool IsFocused() const noexcept { return m_focused; }
     bool IsChecked() const noexcept { return m_checked; }
+    virtual bool IsIndeterminate() const { return false; }
 
     /// Dynamic properties used by attribute selectors `[name="value"]`.
     void SetStyleProperty(const wxString& name, const wxString& value);
@@ -74,6 +76,9 @@ public:
     virtual wxString GetStyledControlId() const;
 
     const Style& GetCurrentStyle() const { return m_currentStyle; }
+
+    /// Resolve a sub-control style (e.g. `::indicator`) from the current stylesheet.
+    Style GetSubControlStyle(const wxString& subControl) const;
 
 protected:
     virtual void OnPaint(wxPaintEvent& evt);
@@ -111,6 +116,7 @@ protected:
 protected:
     StyleSheet* m_styleSheet = nullptr;
     Style m_currentStyle;
+    wxString m_currentState;
 
     bool m_hovered = false;
     bool m_pressed = false;

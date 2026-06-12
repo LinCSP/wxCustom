@@ -34,6 +34,7 @@ add_library(wxCustomization
     include/wxCustomization/widgets/StyledPanel.h
     include/wxCustomization/widgets/StyledLabel.h
     include/wxCustomization/widgets/StyledToggleButton.h
+    include/wxCustomization/widgets/StyledCheckBox.h
     src/dummy.cpp
     src/Length.cpp
     src/Color.cpp
@@ -50,6 +51,7 @@ add_library(wxCustomization
     src/widgets/StyledPanel.cpp
     src/widgets/StyledLabel.cpp
     src/widgets/StyledToggleButton.cpp
+    src/widgets/StyledCheckBox.cpp
 )
 
 add_library(wxCustomization::wxCustomization ALIAS wxCustomization)

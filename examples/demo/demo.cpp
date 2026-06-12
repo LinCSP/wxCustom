@@ -1,41 +1,11 @@
 #include <wx/wx.h>
+#include <wx/filename.h>
 #include <wx/sizer.h>
+#include <wx/stdpaths.h>
 
 #include "wxCustomization/StyleSheet.h"
 #include "wxCustomization/StyledControl.h"
 #include "wxCustomization/wxCustomization.h"
-
-namespace {
-
-const char* gDemoStyle =
-    ":root {\n"
-    "  --primary: #3498db;\n"
-    "  --hover: #2980b9;\n"
-    "  --bg: #ecf0f1;\n"
-    "}\n"
-    "DemoWidget {\n"
-    "  background-color: var(--bg);\n"
-    "  border-width: 2dip;\n"
-    "  border-color: #bdc3c7;\n"
-    "  border-style: solid;\n"
-    "  border-radius: 6dip;\n"
-    "  color: #2c3e50;\n"
-    "  padding: 8dip;\n"
-    "  min-width: 80dip;\n"
-    "  min-height: 32dip;\n"
-    "}\n"
-    "DemoWidget:hover {\n"
-    "  background-color: var(--hover);\n"
-    "  border-color: var(--primary);\n"
-    "  color: #ffffff;\n"
-    "}\n"
-    "DemoWidget:focused {\n"
-    "  outline-width: 3dip;\n"
-    "  outline-color: var(--primary);\n"
-    "  outline-offset: 2dip;\n"
-    "}\n";
-
-} // namespace
 
 class DemoWidget : public wxCustomization::StyledControl {
 public:
@@ -73,7 +43,7 @@ public:
         : wxFrame(nullptr, wxID_ANY, "wxCustomization Demo",
                   wxDefaultPosition, wxSize(800, 600))
     {
-        m_styleSheet.LoadFromString(gDemoStyle);
+        LoadTheme();
 
         wxPanel* panel = new wxPanel(this, wxID_ANY);
         wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
@@ -96,6 +66,16 @@ public:
     }
 
 private:
+    void LoadTheme()
+    {
+        wxFileName stylePath(wxStandardPaths::Get().GetExecutablePath());
+        stylePath.SetFullName("theme.qss");
+
+        if (!m_styleSheet.Load(stylePath.GetFullPath())) {
+            wxLogWarning("Failed to load theme file: %s", stylePath.GetFullPath());
+        }
+    }
+
     wxCustomization::StyleSheet m_styleSheet;
 };
 

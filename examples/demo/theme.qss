@@ -1,0 +1,29 @@
+:root {
+    --primary: #3498db;
+    --hover: #2980b9;
+    --bg: #ecf0f1;
+}
+
+DemoWidget {
+    background-color: var(--bg);
+    border-width: 2dip;
+    border-color: #bdc3c7;
+    border-style: solid;
+    border-radius: 6dip;
+    color: #2c3e50;
+    padding: 8dip;
+    min-width: 80dip;
+    min-height: 32dip;
+}
+
+DemoWidget:hover {
+    background-color: var(--hover);
+    border-color: var(--primary);
+    color: #ffffff;
+}
+
+DemoWidget:focused {
+    outline-width: 3dip;
+    outline-color: var(--primary);
+    outline-offset: 2dip;
+}

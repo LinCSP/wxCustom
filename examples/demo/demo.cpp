@@ -6,6 +6,7 @@
 #include "wxCustomization/StyleSheet.h"
 #include "wxCustomization/StyledControl.h"
 #include "wxCustomization/widgets/StyledButton.h"
+#include "wxCustomization/widgets/StyledMessageDialog.h"
 #include "wxCustomization/wxCustomization.h"
 
 class DemoWidget : public wxCustomization::StyledControl {
@@ -74,7 +75,9 @@ public:
 private:
     void OnButtonClick(wxCommandEvent& /*evt*/)
     {
-        wxMessageBox("StyledButton works!", "wxCustomization Demo", wxOK | wxICON_INFORMATION, this);
+        wxCustomization::StyledMessageDialog::Show(
+            this, "StyledButton works!", "wxCustomization Demo",
+            wxOK | wxICON_INFORMATION, m_styleSheet);
     }
 
     wxCustomization::StyleSheet* m_styleSheet;

@@ -1,9 +1,11 @@
 #include "wxCustomization/Painter.h"
 
 #include <wx/settings.h>
+#include <wx/graphics.h>
 
 #include <algorithm>
 #include <cmath>
+#include <memory>
 
 namespace wxCustomization {
 
@@ -245,6 +247,20 @@ void Painter::DrawRoundedRect(wxDC& dc, const wxRect& rect, int radius,
     if (r > 0) {
         const int half = std::min(rect.width, rect.height) / 2;
         r = std::min(r, half);
+    }
+
+    // Use wxGraphicsContext when available so that rounded rectangles are
+    // filled cleanly (including the corners) and opacity works correctly.
+    std::unique_ptr<wxGraphicsContext> gc(wxGraphicsContext::CreateFromUnknownDC(dc));
+    if (gc) {
+        gc->SetBrush(brush);
+        gc->SetPen(pen);
+        if (r > 0) {
+            gc->DrawRoundedRectangle(rect.x, rect.y, rect.width, rect.height, r);
+        } else {
+            gc->DrawRectangle(rect.x, rect.y, rect.width, rect.height);
+        }
+        return;
     }
 
     dc.SetBrush(brush);

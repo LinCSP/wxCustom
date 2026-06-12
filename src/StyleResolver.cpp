@@ -325,6 +325,9 @@ void StyleResolver::ApplyDeclaration(Style& style,
     } else if (prop == "margin-left") {
         style.marginLeft = LengthToPixels(resolved, context);
         style.Set(Property::MarginLeft);
+    } else if (prop == "spacing") {
+        style.spacing = LengthToPixels(resolved, context);
+        style.Set(Property::Spacing);
     } else if (prop == "font-size") {
         const int pixels = LengthToPixels(resolved, context);
         const int points = PixelsToPoints(pixels, context);

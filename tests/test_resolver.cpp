@@ -167,3 +167,18 @@ TEST(StyleResolver, MarginShorthand)
     EXPECT_EQ(style.marginBottom, 5);
     EXPECT_EQ(style.marginLeft, 10);
 }
+
+TEST(StyleResolver, SpacingProperty)
+{
+    StyleSheet sheet;
+    ASSERT_TRUE(sheet.LoadFromString(
+        "StyledButton { spacing: 12px; }"));
+
+    TestContext ctx;
+    ctx.type = "StyledButton";
+
+    StyleResolver resolver;
+    Style style = resolver.Resolve(sheet, ctx);
+
+    EXPECT_EQ(style.spacing, 12);
+}

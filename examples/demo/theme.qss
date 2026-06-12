@@ -64,3 +64,15 @@ StyledButton:disabled {
     border-color: var(--disabled-border);
     color: var(--disabled-color);
 }
+
+StyledMessageDialog {
+    background-color: #ffffff;
+    color: #2c3e50;
+    border-width: 1dip;
+    border-color: #bdc3c7;
+    border-style: solid;
+    border-radius: 8dip;
+    padding: 24dip;
+    font-size: 12dip;
+    spacing: 16dip;
+}

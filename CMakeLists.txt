@@ -30,6 +30,7 @@ add_library(wxCustomization
     include/wxCustomization/StyledControl.h
     include/wxCustomization/StyledAccessible.h
     include/wxCustomization/widgets/StyledButton.h
+    include/wxCustomization/widgets/StyledMessageDialog.h
     src/dummy.cpp
     src/Length.cpp
     src/Color.cpp
@@ -42,6 +43,7 @@ add_library(wxCustomization
     src/StyledControl.cpp
     src/StyledAccessible.cpp
     src/widgets/StyledButton.cpp
+    src/widgets/StyledMessageDialog.cpp
 )
 
 add_library(wxCustomization::wxCustomization ALIAS wxCustomization)

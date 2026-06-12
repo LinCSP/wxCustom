@@ -39,12 +39,11 @@ private:
 
 class DemoFrame : public wxFrame {
 public:
-    DemoFrame()
+    DemoFrame(wxCustomization::StyleSheet* styleSheet)
         : wxFrame(nullptr, wxID_ANY, "wxCustomization Demo",
                   wxDefaultPosition, wxSize(800, 600))
+        , m_styleSheet(styleSheet)
     {
-        LoadTheme();
-
         wxPanel* panel = new wxPanel(this, wxID_ANY);
         wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 
@@ -57,7 +56,7 @@ public:
         for (int i = 1; i <= 3; ++i) {
             DemoWidget* widget = new DemoWidget(panel, wxID_ANY,
                                                 wxString::Format("Widget %d", i));
-            widget->SetStyleSheet(&m_styleSheet);
+            widget->SetStyleSheet(m_styleSheet);
             row->Add(widget, 0, wxALL, 10);
         }
         sizer->Add(row, 1, wxALIGN_CENTER);
@@ -66,27 +65,31 @@ public:
     }
 
 private:
-    void LoadTheme()
-    {
-        wxFileName stylePath(wxStandardPaths::Get().GetExecutablePath());
-        stylePath.SetFullName("theme.qss");
-
-        if (!m_styleSheet.Load(stylePath.GetFullPath())) {
-            wxLogWarning("Failed to load theme file: %s", stylePath.GetFullPath());
-        }
-    }
-
-    wxCustomization::StyleSheet m_styleSheet;
+    wxCustomization::StyleSheet* m_styleSheet;
 };
 
 class DemoApp : public wxApp {
 public:
     bool OnInit() override
     {
-        DemoFrame* frame = new DemoFrame();
+        if (!LoadTheme()) {
+            wxLogWarning("Failed to load theme file");
+        }
+
+        DemoFrame* frame = new DemoFrame(&m_styleSheet);
         frame->Show(true);
         return true;
     }
+
+private:
+    bool LoadTheme()
+    {
+        wxFileName stylePath(wxStandardPaths::Get().GetExecutablePath());
+        stylePath.SetFullName("theme.qss");
+        return m_styleSheet.Load(stylePath.GetFullPath());
+    }
+
+    wxCustomization::StyleSheet m_styleSheet;
 };
 
 wxIMPLEMENT_APP(DemoApp);

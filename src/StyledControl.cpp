@@ -129,7 +129,10 @@ void StyledControl::ApplyStyle(const wxString& state)
     } else {
         m_currentStyle = Style();
     }
-    Refresh();
+
+    if (!IsBeingDeleted()) {
+        Refresh();
+    }
 }
 
 void StyledControl::UpdateStyle()

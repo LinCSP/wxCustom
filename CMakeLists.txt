@@ -26,6 +26,7 @@ add_library(wxCustomization
     include/wxCustomization/StyleSheet.h
     include/wxCustomization/StyleResolverContext.h
     include/wxCustomization/StyleResolver.h
+    include/wxCustomization/Painter.h
     src/dummy.cpp
     src/Length.cpp
     src/Color.cpp
@@ -34,6 +35,7 @@ add_library(wxCustomization
     src/Lexer.cpp
     src/StyleSheet.cpp
     src/StyleResolver.cpp
+    src/Painter.cpp
 )
 
 add_library(wxCustomization::wxCustomization ALIAS wxCustomization)

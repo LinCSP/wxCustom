@@ -20,11 +20,17 @@ add_library(wxCustomization
     include/wxCustomization/StyleTypes.h
     include/wxCustomization/StyleValue.h
     include/wxCustomization/Style.h
+    include/wxCustomization/Lexer.h
+    include/wxCustomization/StyleSelector.h
+    include/wxCustomization/StyleRule.h
+    include/wxCustomization/StyleSheet.h
     src/dummy.cpp
     src/Length.cpp
     src/Color.cpp
     src/StyleValue.cpp
     src/Style.cpp
+    src/Lexer.cpp
+    src/StyleSheet.cpp
 )
 
 add_library(wxCustomization::wxCustomization ALIAS wxCustomization)

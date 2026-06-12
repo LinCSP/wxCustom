@@ -4,6 +4,8 @@ add_executable(wxCustomization_tests
     test_color.cpp
     test_style_value.cpp
     test_style.cpp
+    test_lexer.cpp
+    test_stylesheet.cpp
 )
 
 target_link_libraries(wxCustomization_tests

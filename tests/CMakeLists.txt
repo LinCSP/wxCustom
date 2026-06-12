@@ -8,6 +8,7 @@ add_executable(wxCustomization_tests
     test_stylesheet.cpp
     test_resolver.cpp
     test_painter.cpp
+    test_styled_control.cpp
 )
 
 target_link_libraries(wxCustomization_tests

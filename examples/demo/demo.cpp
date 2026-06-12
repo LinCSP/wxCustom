@@ -12,6 +12,7 @@
 #include "wxCustomization/widgets/StyledLabel.h"
 #include "wxCustomization/widgets/StyledToggleButton.h"
 #include "wxCustomization/widgets/StyledCheckBox.h"
+#include "wxCustomization/widgets/StyledRadioButton.h"
 #include "wxCustomization/wxCustomization.h"
 
 class DemoWidget : public wxCustomization::StyledControl {
@@ -89,6 +90,23 @@ public:
         checkBox->Bind(wxEVT_CHECKBOX, &DemoFrame::OnCheckBox, this);
         sizer->Add(checkBox, 0, wxALL | wxCENTER, 10);
 
+        wxBoxSizer* radioSizer = new wxBoxSizer(wxHORIZONTAL);
+        wxCustomization::StyledRadioButton* radio1 =
+            new wxCustomization::StyledRadioButton(panel, wxID_ANY, "Radio 1",
+                                                   wxDefaultPosition, wxDefaultSize,
+                                                   wxRB_GROUP);
+        radio1->SetStyleSheet(m_styleSheet);
+        radio1->Bind(wxEVT_RADIOBUTTON, &DemoFrame::OnRadio, this);
+        radioSizer->Add(radio1, 0, wxALL, 10);
+
+        wxCustomization::StyledRadioButton* radio2 =
+            new wxCustomization::StyledRadioButton(panel, wxID_ANY, "Radio 2");
+        radio2->SetStyleSheet(m_styleSheet);
+        radio2->Bind(wxEVT_RADIOBUTTON, &DemoFrame::OnRadio, this);
+        radioSizer->Add(radio2, 0, wxALL, 10);
+
+        sizer->Add(radioSizer, 0, wxALIGN_CENTER);
+
         panel->SetSizer(sizer);
     }
 
@@ -123,6 +141,18 @@ private:
         wxCustomization::StyledMessageDialog::Show(
             this,
             wxString::Format("CheckBox is now %s", stateText),
+            "Demo Information",
+            wxOK | wxICON_INFORMATION,
+            m_styleSheet);
+    }
+
+    void OnRadio(wxCommandEvent& evt)
+    {
+        wxWindow* source = dynamic_cast<wxWindow*>(evt.GetEventObject());
+        const wxString label = source ? source->GetLabel() : wxString("Unknown");
+        wxCustomization::StyledMessageDialog::Show(
+            this,
+            wxString::Format("Selected: %s", label),
             "Demo Information",
             wxOK | wxICON_INFORMATION,
             m_styleSheet);

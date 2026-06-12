@@ -15,6 +15,7 @@ add_executable(wxCustomization_tests
     test_styled_label.cpp
     test_styled_toggle_button.cpp
     test_styled_checkbox.cpp
+    test_styled_radiobutton.cpp
 )
 
 target_link_libraries(wxCustomization_tests

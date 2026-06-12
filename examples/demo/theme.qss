@@ -99,6 +99,42 @@ StyledCheckBox:focused {
     outline-offset: 2dip;
 }
 
+StyledRadioButton {
+    color: #2c3e50;
+    padding: 4dip;
+    spacing: 8dip;
+    text-align: left;
+}
+
+StyledRadioButton::indicator {
+    width: 18dip;
+    height: 18dip;
+    background-color: #ffffff;
+    border-width: 2dip;
+    border-color: #bdc3c7;
+    border-style: solid;
+    border-radius: 50%;
+}
+
+StyledRadioButton::indicator:hover {
+    border-color: var(--primary);
+}
+
+StyledRadioButton::indicator:checked {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+StyledRadioButton::indicator:pressed {
+    background-color: #d6eaf8;
+}
+
+StyledRadioButton:focused {
+    outline-width: 2dip;
+    outline-color: #85c1e9;
+    outline-offset: 2dip;
+}
+
 DemoWidget {
     background-color: var(--bg);
     border-width: 2dip;

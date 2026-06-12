@@ -6,6 +6,7 @@ add_executable(wxCustomization_tests
     test_style.cpp
     test_lexer.cpp
     test_stylesheet.cpp
+    test_resolver.cpp
 )
 
 target_link_libraries(wxCustomization_tests

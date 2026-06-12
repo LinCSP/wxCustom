@@ -131,6 +131,7 @@ void StyledControl::ApplyStyle(const wxString& state)
     }
 
     if (!IsBeingDeleted()) {
+        InvalidateBestSize();
         Refresh();
     }
 }
@@ -347,6 +348,12 @@ bool StyledControl::AcceptsFocus() const
 bool StyledControl::AcceptsFocusFromKeyboard() const
 {
     return AcceptsFocus();
+}
+
+void StyledControl::DoEnable(bool enable)
+{
+    wxControl::DoEnable(enable);
+    ApplyStyle(m_pressed ? wxString("pressed") : (m_hovered ? wxString("hover") : wxString()));
 }
 
 void StyledControl::Activate()

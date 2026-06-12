@@ -5,6 +5,7 @@
 
 #include "wxCustomization/StyleSheet.h"
 #include "wxCustomization/StyledControl.h"
+#include "wxCustomization/widgets/StyledButton.h"
 #include "wxCustomization/wxCustomization.h"
 
 class DemoWidget : public wxCustomization::StyledControl {
@@ -59,12 +60,23 @@ public:
             widget->SetStyleSheet(m_styleSheet);
             row->Add(widget, 0, wxALL, 10);
         }
-        sizer->Add(row, 1, wxALIGN_CENTER);
+        sizer->Add(row, 0, wxALIGN_CENTER);
+
+        wxCustomization::StyledButton* button =
+            new wxCustomization::StyledButton(panel, wxID_ANY, "Click me");
+        button->SetStyleSheet(m_styleSheet);
+        button->Bind(wxEVT_BUTTON, &DemoFrame::OnButtonClick, this);
+        sizer->Add(button, 0, wxALL | wxCENTER, 10);
 
         panel->SetSizer(sizer);
     }
 
 private:
+    void OnButtonClick(wxCommandEvent& /*evt*/)
+    {
+        wxMessageBox("StyledButton works!", "wxCustomization Demo", wxOK | wxICON_INFORMATION, this);
+    }
+
     wxCustomization::StyleSheet* m_styleSheet;
 };
 

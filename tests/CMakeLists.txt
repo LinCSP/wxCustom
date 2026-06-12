@@ -10,6 +10,7 @@ add_executable(wxCustomization_tests
     test_painter.cpp
     test_styled_control.cpp
     test_style_engine.cpp
+    test_styled_button.cpp
 )
 
 target_link_libraries(wxCustomization_tests

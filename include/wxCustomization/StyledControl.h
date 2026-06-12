@@ -101,6 +101,8 @@ protected:
     bool AcceptsFocus() const override;
     bool AcceptsFocusFromKeyboard() const override;
 
+    void DoEnable(bool enable) override;
+
     /// Action triggered by Space/Enter or mouse click. Override in derived classes.
     virtual void Activate();
 

@@ -1,7 +1,11 @@
 :root {
     --primary: #3498db;
     --hover: #2980b9;
+    --pressed: #1c6ea4;
     --bg: #ecf0f1;
+    --disabled-bg: #bdc3c7;
+    --disabled-border: #95a5a6;
+    --disabled-color: #7f8c8d;
 }
 
 DemoWidget {
@@ -26,4 +30,37 @@ DemoWidget:focused {
     outline-width: 3dip;
     outline-color: var(--primary);
     outline-offset: 2dip;
+}
+
+StyledButton {
+    background-color: var(--primary);
+    color: #ffffff;
+    border-width: 1dip;
+    border-color: var(--hover);
+    border-style: solid;
+    border-radius: 4dip;
+    padding: 8dip 16dip;
+    text-align: center;
+    min-width: 80dip;
+    min-height: 32dip;
+}
+
+StyledButton:hover {
+    background-color: var(--hover);
+}
+
+StyledButton:pressed {
+    background-color: var(--pressed);
+}
+
+StyledButton:focused {
+    outline-width: 2dip;
+    outline-color: #85c1e9;
+    outline-offset: 2dip;
+}
+
+StyledButton:disabled {
+    background-color: var(--disabled-bg);
+    border-color: var(--disabled-border);
+    color: var(--disabled-color);
 }

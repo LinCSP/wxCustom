@@ -29,6 +29,7 @@ add_library(wxCustomization
     include/wxCustomization/Painter.h
     include/wxCustomization/StyledControl.h
     include/wxCustomization/StyledAccessible.h
+    include/wxCustomization/widgets/StyledButton.h
     src/dummy.cpp
     src/Length.cpp
     src/Color.cpp
@@ -40,6 +41,7 @@ add_library(wxCustomization
     src/Painter.cpp
     src/StyledControl.cpp
     src/StyledAccessible.cpp
+    src/widgets/StyledButton.cpp
 )
 
 add_library(wxCustomization::wxCustomization ALIAS wxCustomization)

@@ -245,6 +245,41 @@ StyledButton:disabled {
     color: var(--disabled-color);
 }
 
+StyledLineEdit {
+    background-color: #ffffff;
+    color: #2c3e50;
+    border-width: 1dip;
+    border-color: #bdc3c7;
+    border-style: solid;
+    border-radius: 4dip;
+    padding: 6dip 8dip;
+    font-size: 12dip;
+    min-width: 120dip;
+    min-height: 24dip;
+}
+
+StyledLineEdit:hover {
+    border-color: #3498db;
+}
+
+StyledLineEdit:focused {
+    border-color: var(--primary);
+    outline-width: 2dip;
+    outline-color: #85c1e9;
+    outline-offset: 2dip;
+}
+
+StyledLineEdit:disabled {
+    background-color: #ecf0f1;
+    border-color: #bdc3c7;
+    color: var(--disabled-color);
+}
+
+StyledLineEdit:read-only {
+    background-color: #f4f6f7;
+    color: #7f8c8d;
+}
+
 StyledMessageDialog {
     background-color: #ffffff;
     color: #2c3e50;

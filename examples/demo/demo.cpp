@@ -13,6 +13,7 @@
 #include "wxCustomization/widgets/StyledToggleButton.h"
 #include "wxCustomization/widgets/StyledCheckBox.h"
 #include "wxCustomization/widgets/StyledRadioButton.h"
+#include "wxCustomization/widgets/StyledLineEdit.h"
 #include "wxCustomization/wxCustomization.h"
 
 namespace {
@@ -135,6 +136,22 @@ public:
 
         sizer->Add(radioRow, 0, wxLEFT | wxRIGHT, 8);
 
+        sizer->Add(CreateHeader(panel, m_styleSheet, "StyledLineEdit"), 0,
+                   wxLEFT | wxRIGHT | wxTOP, 16);
+
+        wxBoxSizer* editRow = new wxBoxSizer(wxHORIZONTAL);
+        m_lineEdit = new wxCustomization::StyledLineEdit(panel, wxID_ANY, "Type here...");
+        m_lineEdit->SetStyleSheet(m_styleSheet);
+        m_lineEdit->Bind(wxEVT_TEXT, &DemoFrame::OnLineEditText, this);
+        m_lineEdit->Bind(wxEVT_TEXT_ENTER, &DemoFrame::OnLineEditEnter, this);
+        editRow->Add(m_lineEdit, 1, wxALL | wxALIGN_CENTER_VERTICAL, 8);
+
+        m_lineEditValue = new wxCustomization::StyledLabel(panel, wxID_ANY, "Value: Type here...");
+        m_lineEditValue->SetStyleSheet(m_styleSheet);
+        editRow->Add(m_lineEditValue, 1, wxALL | wxALIGN_CENTER_VERTICAL, 8);
+
+        sizer->Add(editRow, 0, wxLEFT | wxRIGHT | wxEXPAND, 8);
+
         m_disableButton =
             new wxCustomization::StyledButton(panel, wxID_ANY, "Disable all widgets");
         m_disableButton->SetStyleSheet(m_styleSheet);
@@ -192,6 +209,23 @@ private:
             m_styleSheet);
     }
 
+    void OnLineEditText(wxCommandEvent& evt)
+    {
+        const wxString value = evt.GetString();
+        m_lineEditValue->SetLabel(wxString::Format("Value: %s", value));
+        Layout();
+    }
+
+    void OnLineEditEnter(wxCommandEvent& evt)
+    {
+        wxCustomization::StyledMessageDialog::Show(
+            this,
+            wxString::Format("Entered: %s", evt.GetString()),
+            "Demo Information",
+            wxOK | wxICON_INFORMATION,
+            m_styleSheet);
+    }
+
     void OnToggleDisabled(wxCommandEvent& /*evt*/)
     {
         m_allDisabled = !m_allDisabled;
@@ -202,6 +236,7 @@ private:
         m_indeterminateCheck->Enable(!m_allDisabled);
         m_radio1->Enable(!m_allDisabled);
         m_radio2->Enable(!m_allDisabled);
+        m_lineEdit->Enable(!m_allDisabled);
 
         m_disableButton->SetLabel(m_allDisabled ? "Enable all widgets" : "Disable all widgets");
         Layout();
@@ -213,6 +248,8 @@ private:
     wxCustomization::StyledToggleButton* m_toggle = nullptr;
     wxCustomization::StyledCheckBox* m_checkBox = nullptr;
     wxCustomization::StyledCheckBox* m_indeterminateCheck = nullptr;
+    wxCustomization::StyledLineEdit* m_lineEdit = nullptr;
+    wxCustomization::StyledLabel* m_lineEditValue = nullptr;
     wxCustomization::StyledRadioButton* m_radio1 = nullptr;
     wxCustomization::StyledRadioButton* m_radio2 = nullptr;
     wxCustomization::StyledButton* m_disableButton = nullptr;

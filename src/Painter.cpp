@@ -151,7 +151,18 @@ void Painter::DrawBorder(wxDC& dc, const wxRect& rect, const Style& style)
         style.opacity);
     const wxPen pen(colour, width, BorderStyleToPenStyle(style.borderStyle));
 
-    DrawRoundedRect(dc, rect, style.borderRadius,
+    // Inset the rectangle so that the stroke stays fully inside the widget's
+    // clipping region. Without this, a 1-pixel stroke centered on the boundary
+    // can be clipped on the right/bottom edges, especially for widgets that
+    // are stretched to the edge of their allocated area.
+    wxRect borderRect = rect;
+    const int inset = (width + 1) / 2;
+    borderRect.Deflate(inset);
+    if (borderRect.width <= 0 || borderRect.height <= 0) {
+        return;
+    }
+
+    DrawRoundedRect(dc, borderRect, style.borderRadius,
                     *wxTRANSPARENT_BRUSH, pen);
 }
 

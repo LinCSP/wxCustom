@@ -58,6 +58,9 @@ public:
         if (s == "indeterminate") {
             return m_control->IsIndeterminate();
         }
+        if (s == "read-only") {
+            return m_control->IsReadOnly();
+        }
         return false;
     }
 
@@ -107,7 +110,9 @@ wxEND_EVENT_TABLE()
 StyledControl::StyledControl(wxWindow* parent, wxWindowID id,
                              const wxPoint& pos, const wxSize& size,
                              long style, const wxString& name)
-    : wxControl(parent, id, pos, size, style | wxBORDER_NONE, wxDefaultValidator, name)
+    : wxControl(parent, id, pos, size,
+                style | wxBORDER_NONE | wxFULL_REPAINT_ON_RESIZE,
+                wxDefaultValidator, name)
 {
     SetBackgroundStyle(wxBG_STYLE_PAINT);
 #if wxUSE_ACCESSIBILITY

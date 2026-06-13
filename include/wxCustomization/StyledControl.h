@@ -15,7 +15,8 @@ enum wxAccRole {
     wxROLE_SYSTEM_CLIENT = 10,
     wxROLE_SYSTEM_PUSHBUTTON = 11,
     wxROLE_SYSTEM_CHECKBUTTON = 12,
-    wxROLE_SYSTEM_RADIOBUTTON = 13
+    wxROLE_SYSTEM_RADIOBUTTON = 13,
+    wxROLE_SYSTEM_TEXT = 42
 };
 #endif
 
@@ -52,6 +53,7 @@ public:
     bool IsFocused() const noexcept { return m_focused; }
     bool IsChecked() const noexcept { return m_checked; }
     virtual bool IsIndeterminate() const { return false; }
+    virtual bool IsReadOnly() const { return false; }
 
     /// Dynamic properties used by attribute selectors `[name="value"]`.
     void SetStyleProperty(const wxString& name, const wxString& value);

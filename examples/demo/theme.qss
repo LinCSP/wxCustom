@@ -6,6 +6,23 @@
     --disabled-bg: #bdc3c7;
     --disabled-border: #95a5a6;
     --disabled-color: #7f8c8d;
+    --panel-bg: #ffffff;
+    --text: #2c3e50;
+}
+
+.title {
+    color: var(--text);
+    font-size: 24dip;
+    font-weight: bold;
+    text-align: center;
+}
+
+.section-header {
+    color: var(--primary);
+    font-size: 12dip;
+    font-weight: bold;
+    text-align: left;
+    text-transform: uppercase;
 }
 
 StyledPanel {
@@ -56,6 +73,12 @@ StyledToggleButton:focused {
     outline-offset: 2dip;
 }
 
+StyledToggleButton:disabled {
+    background-color: var(--disabled-bg);
+    border-color: var(--disabled-border);
+    color: var(--disabled-color);
+}
+
 StyledCheckBox {
     color: #2c3e50;
     padding: 4dip;
@@ -99,6 +122,22 @@ StyledCheckBox:focused {
     outline-offset: 2dip;
 }
 
+StyledCheckBox:disabled {
+    color: var(--disabled-color);
+}
+
+StyledCheckBox::indicator:disabled {
+    background-color: #e5e8e8;
+    border-color: var(--disabled-border);
+}
+
+StyledCheckBox::indicator:disabled:checked,
+StyledCheckBox::indicator:disabled:indeterminate {
+    background-color: #aed6f1;
+    border-color: #85c1e9;
+    color: #ffffff;
+}
+
 StyledRadioButton {
     color: #2c3e50;
     padding: 4dip;
@@ -133,6 +172,20 @@ StyledRadioButton:focused {
     outline-width: 2dip;
     outline-color: #85c1e9;
     outline-offset: 2dip;
+}
+
+StyledRadioButton:disabled {
+    color: var(--disabled-color);
+}
+
+StyledRadioButton::indicator:disabled {
+    background-color: #e5e8e8;
+    border-color: var(--disabled-border);
+}
+
+StyledRadioButton::indicator:disabled:checked {
+    border-color: #85c1e9;
+    color: #aed6f1;
 }
 
 DemoWidget {

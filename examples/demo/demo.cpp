@@ -15,97 +15,131 @@
 #include "wxCustomization/widgets/StyledRadioButton.h"
 #include "wxCustomization/wxCustomization.h"
 
-class DemoWidget : public wxCustomization::StyledControl {
-public:
-    DemoWidget(wxWindow* parent, wxWindowID id, const wxString& label)
-        : wxCustomization::StyledControl(parent, id, wxDefaultPosition, wxSize(120, 40))
-        , m_label(label)
-    {
-        SetLabel(label);
-    }
+namespace {
 
-    wxString GetStyledControlType() const override { return "DemoWidget"; }
+/// A small helper label used as section header in the demo.
+wxCustomization::StyledLabel* CreateHeader(wxWindow* parent,
+                                           wxCustomization::StyleSheet* sheet,
+                                           const wxString& text)
+{
+    wxCustomization::StyledLabel* label =
+        new wxCustomization::StyledLabel(parent, wxID_ANY, text);
+    label->SetStyleSheet(sheet);
+    label->AddStyleClass("section-header");
+    return label;
+}
 
-protected:
-    void DrawContent(wxDC& dc, const wxRect& rect) override
-    {
-        const wxCustomization::Style& style = GetCurrentStyle();
-        dc.SetFont(style.font.IsOk() ? style.font
-                                     : wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
-        dc.SetTextForeground(style.color.IsOk() ? style.color : *wxBLACK);
-        dc.DrawLabel(m_label, wxNullBitmap, rect, wxALIGN_CENTER);
-    }
-
-    wxSize DoGetBestSize() const override
-    {
-        return wxSize(120, 40);
-    }
-
-private:
-    wxString m_label;
-};
+} // namespace
 
 class DemoFrame : public wxFrame {
 public:
     DemoFrame(wxCustomization::StyleSheet* styleSheet)
         : wxFrame(nullptr, wxID_ANY, "wxCustomization Demo",
-                  wxDefaultPosition, wxSize(800, 600))
+                  wxDefaultPosition, wxSize(900, 700))
         , m_styleSheet(styleSheet)
     {
         wxCustomization::StyledPanel* panel =
             new wxCustomization::StyledPanel(this, wxID_ANY);
         panel->SetStyleSheet(m_styleSheet);
+
         wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 
-        wxCustomization::StyledLabel* label = new wxCustomization::StyledLabel(
+        wxCustomization::StyledLabel* title = new wxCustomization::StyledLabel(
             panel, wxID_ANY,
             wxString::Format("wxCustomization %s", wxCustomization::GetVersionString()));
-        label->SetStyleSheet(m_styleSheet);
-        sizer->Add(label, 0, wxALL | wxCENTER, 20);
+        title->SetStyleSheet(m_styleSheet);
+        title->AddStyleClass("title");
+        sizer->Add(title, 0, wxALL | wxALIGN_CENTER_HORIZONTAL, 20);
 
-        wxBoxSizer* row = new wxBoxSizer(wxHORIZONTAL);
-        for (int i = 1; i <= 3; ++i) {
-            DemoWidget* widget = new DemoWidget(panel, wxID_ANY,
-                                                wxString::Format("Widget %d", i));
-            widget->SetStyleSheet(m_styleSheet);
-            row->Add(widget, 0, wxALL, 10);
-        }
-        sizer->Add(row, 0, wxALIGN_CENTER);
+        sizer->Add(CreateHeader(panel, m_styleSheet, "StyledButton"), 0,
+                   wxLEFT | wxRIGHT | wxTOP, 16);
 
-        wxCustomization::StyledButton* button =
-            new wxCustomization::StyledButton(panel, wxID_ANY, "Click me");
-        button->SetStyleSheet(m_styleSheet);
-        button->Bind(wxEVT_BUTTON, &DemoFrame::OnButtonClick, this);
-        sizer->Add(button, 0, wxALL | wxCENTER, 10);
+        wxBoxSizer* buttonRow = new wxBoxSizer(wxHORIZONTAL);
+        m_button = new wxCustomization::StyledButton(panel, wxID_ANY, "Click me");
+        m_button->SetStyleSheet(m_styleSheet);
+        m_button->Bind(wxEVT_BUTTON, &DemoFrame::OnButtonClick, this);
+        buttonRow->Add(m_button, 0, wxALL, 8);
 
-        wxCustomization::StyledToggleButton* toggle =
-            new wxCustomization::StyledToggleButton(panel, wxID_ANY, "Toggle me");
-        toggle->SetStyleSheet(m_styleSheet);
-        toggle->Bind(wxEVT_TOGGLEBUTTON, &DemoFrame::OnToggle, this);
-        sizer->Add(toggle, 0, wxALL | wxCENTER, 10);
+        wxCustomization::StyledButton* disabledButton =
+            new wxCustomization::StyledButton(panel, wxID_ANY, "Disabled");
+        disabledButton->SetStyleSheet(m_styleSheet);
+        disabledButton->Disable();
+        buttonRow->Add(disabledButton, 0, wxALL, 8);
 
-        wxCustomization::StyledCheckBox* checkBox =
-            new wxCustomization::StyledCheckBox(panel, wxID_ANY, "Check me");
-        checkBox->SetStyleSheet(m_styleSheet);
-        checkBox->Bind(wxEVT_CHECKBOX, &DemoFrame::OnCheckBox, this);
-        sizer->Add(checkBox, 0, wxALL | wxCENTER, 10);
+        sizer->Add(buttonRow, 0, wxLEFT | wxRIGHT, 8);
 
-        wxBoxSizer* radioSizer = new wxBoxSizer(wxHORIZONTAL);
-        wxCustomization::StyledRadioButton* radio1 =
-            new wxCustomization::StyledRadioButton(panel, wxID_ANY, "Radio 1",
-                                                   wxDefaultPosition, wxDefaultSize,
-                                                   wxRB_GROUP);
-        radio1->SetStyleSheet(m_styleSheet);
-        radio1->Bind(wxEVT_RADIOBUTTON, &DemoFrame::OnRadio, this);
-        radioSizer->Add(radio1, 0, wxALL, 10);
+        sizer->Add(CreateHeader(panel, m_styleSheet, "StyledToggleButton"), 0,
+                   wxLEFT | wxRIGHT | wxTOP, 16);
 
-        wxCustomization::StyledRadioButton* radio2 =
-            new wxCustomization::StyledRadioButton(panel, wxID_ANY, "Radio 2");
-        radio2->SetStyleSheet(m_styleSheet);
-        radio2->Bind(wxEVT_RADIOBUTTON, &DemoFrame::OnRadio, this);
-        radioSizer->Add(radio2, 0, wxALL, 10);
+        wxBoxSizer* toggleRow = new wxBoxSizer(wxHORIZONTAL);
+        m_toggle = new wxCustomization::StyledToggleButton(panel, wxID_ANY, "Toggle me");
+        m_toggle->SetStyleSheet(m_styleSheet);
+        m_toggle->Bind(wxEVT_TOGGLEBUTTON, &DemoFrame::OnToggle, this);
+        toggleRow->Add(m_toggle, 0, wxALL, 8);
 
-        sizer->Add(radioSizer, 0, wxALIGN_CENTER);
+        wxCustomization::StyledToggleButton* disabledToggle =
+            new wxCustomization::StyledToggleButton(panel, wxID_ANY, "Disabled ON");
+        disabledToggle->SetValue(true);
+        disabledToggle->SetStyleSheet(m_styleSheet);
+        disabledToggle->Disable();
+        toggleRow->Add(disabledToggle, 0, wxALL, 8);
+
+        sizer->Add(toggleRow, 0, wxLEFT | wxRIGHT, 8);
+
+        sizer->Add(CreateHeader(panel, m_styleSheet, "StyledCheckBox"), 0,
+                   wxLEFT | wxRIGHT | wxTOP, 16);
+
+        wxBoxSizer* checkRow = new wxBoxSizer(wxHORIZONTAL);
+        m_checkBox = new wxCustomization::StyledCheckBox(panel, wxID_ANY, "Check me");
+        m_checkBox->SetStyleSheet(m_styleSheet);
+        m_checkBox->Bind(wxEVT_CHECKBOX, &DemoFrame::OnCheckBox, this);
+        checkRow->Add(m_checkBox, 0, wxALL, 8);
+
+        wxCustomization::StyledCheckBox* disabledCheck =
+            new wxCustomization::StyledCheckBox(panel, wxID_ANY, "Disabled checked");
+        disabledCheck->SetValue(true);
+        disabledCheck->SetStyleSheet(m_styleSheet);
+        disabledCheck->Disable();
+        checkRow->Add(disabledCheck, 0, wxALL, 8);
+
+        m_indeterminateCheck =
+            new wxCustomization::StyledCheckBox(panel, wxID_ANY, "Indeterminate");
+        m_indeterminateCheck->Set3StateValue(wxCustomization::CheckState::Indeterminate);
+        m_indeterminateCheck->SetStyleSheet(m_styleSheet);
+        checkRow->Add(m_indeterminateCheck, 0, wxALL, 8);
+
+        sizer->Add(checkRow, 0, wxLEFT | wxRIGHT, 8);
+
+        sizer->Add(CreateHeader(panel, m_styleSheet, "StyledRadioButton"), 0,
+                   wxLEFT | wxRIGHT | wxTOP, 16);
+
+        wxBoxSizer* radioRow = new wxBoxSizer(wxHORIZONTAL);
+        m_radio1 = new wxCustomization::StyledRadioButton(panel, wxID_ANY, "Radio 1",
+                                                          wxDefaultPosition, wxDefaultSize,
+                                                          wxRB_GROUP);
+        m_radio1->SetStyleSheet(m_styleSheet);
+        m_radio1->Bind(wxEVT_RADIOBUTTON, &DemoFrame::OnRadio, this);
+        radioRow->Add(m_radio1, 0, wxALL, 8);
+
+        m_radio2 = new wxCustomization::StyledRadioButton(panel, wxID_ANY, "Radio 2");
+        m_radio2->SetStyleSheet(m_styleSheet);
+        m_radio2->Bind(wxEVT_RADIOBUTTON, &DemoFrame::OnRadio, this);
+        radioRow->Add(m_radio2, 0, wxALL, 8);
+
+        wxCustomization::StyledRadioButton* disabledRadio =
+            new wxCustomization::StyledRadioButton(panel, wxID_ANY, "Disabled selected");
+        disabledRadio->SetValue(true);
+        disabledRadio->SetStyleSheet(m_styleSheet);
+        disabledRadio->Disable();
+        radioRow->Add(disabledRadio, 0, wxALL, 8);
+
+        sizer->Add(radioRow, 0, wxLEFT | wxRIGHT, 8);
+
+        m_disableButton =
+            new wxCustomization::StyledButton(panel, wxID_ANY, "Disable all widgets");
+        m_disableButton->SetStyleSheet(m_styleSheet);
+        m_disableButton->Bind(wxEVT_BUTTON, &DemoFrame::OnToggleDisabled, this);
+        sizer->Add(m_disableButton, 0, wxALL | wxALIGN_CENTER_HORIZONTAL, 24);
 
         panel->SetSizer(sizer);
     }
@@ -158,7 +192,32 @@ private:
             m_styleSheet);
     }
 
+    void OnToggleDisabled(wxCommandEvent& /*evt*/)
+    {
+        m_allDisabled = !m_allDisabled;
+
+        m_button->Enable(!m_allDisabled);
+        m_toggle->Enable(!m_allDisabled);
+        m_checkBox->Enable(!m_allDisabled);
+        m_indeterminateCheck->Enable(!m_allDisabled);
+        m_radio1->Enable(!m_allDisabled);
+        m_radio2->Enable(!m_allDisabled);
+
+        m_disableButton->SetLabel(m_allDisabled ? "Enable all widgets" : "Disable all widgets");
+        Layout();
+    }
+
     wxCustomization::StyleSheet* m_styleSheet;
+
+    wxCustomization::StyledButton* m_button = nullptr;
+    wxCustomization::StyledToggleButton* m_toggle = nullptr;
+    wxCustomization::StyledCheckBox* m_checkBox = nullptr;
+    wxCustomization::StyledCheckBox* m_indeterminateCheck = nullptr;
+    wxCustomization::StyledRadioButton* m_radio1 = nullptr;
+    wxCustomization::StyledRadioButton* m_radio2 = nullptr;
+    wxCustomization::StyledButton* m_disableButton = nullptr;
+
+    bool m_allDisabled = false;
 };
 
 class DemoApp : public wxApp {

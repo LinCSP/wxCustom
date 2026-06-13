@@ -107,7 +107,7 @@ wxEND_EVENT_TABLE()
 StyledControl::StyledControl(wxWindow* parent, wxWindowID id,
                              const wxPoint& pos, const wxSize& size,
                              long style, const wxString& name)
-    : wxControl(parent, id, pos, size, style, wxDefaultValidator, name)
+    : wxControl(parent, id, pos, size, style | wxBORDER_NONE, wxDefaultValidator, name)
 {
     SetBackgroundStyle(wxBG_STYLE_PAINT);
 #if wxUSE_ACCESSIBILITY

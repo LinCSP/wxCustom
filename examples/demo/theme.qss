@@ -289,6 +289,7 @@ StyledComboBox {
     border-radius: 4dip;
     padding: 6dip 4dip 6dip 8dip;
     font-size: 12dip;
+    text-align: left;
     min-width: 120dip;
     min-height: 24dip;
 }
@@ -325,6 +326,7 @@ StyledComboBox::item {
     background-color: #ffffff;
     color: #2c3e50;
     padding: 6dip 8dip;
+    text-align: left;
 }
 
 StyledComboBox::item:hover {

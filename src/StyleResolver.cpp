@@ -3,6 +3,10 @@
 #include "wxCustomization/Color.h"
 #include "wxCustomization/Length.h"
 
+#include <wx/bitmap.h>
+#include <wx/filename.h>
+#include <wx/image.h>
+
 #include <algorithm>
 #include <cctype>
 #include <cmath>
@@ -52,6 +56,34 @@ int PixelsToPoints(int pixels, const wxWindow* context)
         return pixels;
     }
     return static_cast<int>(std::round(pixels * 72.0 / ppi));
+}
+
+wxBitmap LoadBitmapFromUrl(const wxString& value)
+{
+    wxString path = value;
+    path.Trim(true).Trim(false);
+
+    if (path.Lower().StartsWith("url(") && path.EndsWith(")")) {
+        path = path.Mid(4, path.length() - 5);
+    }
+
+    if ((path.StartsWith("\"") && path.EndsWith("\"")) ||
+        (path.StartsWith("'") && path.EndsWith("'"))) {
+        path = path.Mid(1, path.length() - 2);
+    }
+
+    path.Trim(true).Trim(false);
+
+    if (path.empty()) {
+        return wxBitmap();
+    }
+
+    wxImage image;
+    if (image.LoadFile(path)) {
+        return wxBitmap(image);
+    }
+
+    return wxBitmap();
 }
 
 } // namespace
@@ -121,8 +153,13 @@ bool StyleResolver::MatchesSimpleSelector(const SimpleSelector& sel,
                                           const wxString& subControl,
                                           const wxString& state) const
 {
-    // Sub-control must match if specified.
-    if (!sel.subControl.empty() && sel.subControl != subControl) {
+    // Sub-control matching is strict: when resolving a sub-control, only
+    // selectors that explicitly target that sub-control match, and vice versa.
+    if (!subControl.empty()) {
+        if (sel.subControl != subControl) {
+            return false;
+        }
+    } else if (!sel.subControl.empty()) {
         return false;
     }
 
@@ -365,6 +402,19 @@ void StyleResolver::ApplyDeclaration(Style& style,
     } else if (prop == "max-height") {
         style.maxHeight = LengthToPixels(resolved, context);
         style.Set(Property::MaxHeight);
+    } else if (prop == "icon" || prop == "image") {
+        style.icon = LoadBitmapFromUrl(resolved);
+        style.Set(Property::Icon);
+    } else if (prop == "icon-size") {
+        const auto parts = SplitWhitespace(resolved);
+        if (parts.size() >= 2) {
+            style.iconSize = wxSize(LengthToPixels(parts[0], context),
+                                    LengthToPixels(parts[1], context));
+        } else if (!parts.empty()) {
+            const int s = LengthToPixels(parts[0], context);
+            style.iconSize = wxSize(s, s);
+        }
+        style.Set(Property::IconSize);
     }
 }
 

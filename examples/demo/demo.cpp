@@ -14,6 +14,7 @@
 #include "wxCustomization/widgets/StyledCheckBox.h"
 #include "wxCustomization/widgets/StyledRadioButton.h"
 #include "wxCustomization/widgets/StyledLineEdit.h"
+#include "wxCustomization/widgets/StyledComboBox.h"
 #include "wxCustomization/wxCustomization.h"
 
 namespace {
@@ -152,6 +153,26 @@ public:
 
         sizer->Add(editRow, 0, wxLEFT | wxRIGHT | wxEXPAND, 8);
 
+        sizer->Add(CreateHeader(panel, m_styleSheet, "StyledComboBox"), 0,
+                   wxLEFT | wxRIGHT | wxTOP, 16);
+
+        wxBoxSizer* comboRow = new wxBoxSizer(wxHORIZONTAL);
+        wxArrayString choices;
+        choices.Add("Option 1");
+        choices.Add("Option 2");
+        choices.Add("Option 3");
+        m_comboBox = new wxCustomization::StyledComboBox(panel, wxID_ANY, choices);
+        m_comboBox->SetStyleSheet(m_styleSheet);
+        m_comboBox->SetSelection(0);
+        m_comboBox->Bind(wxEVT_COMBOBOX, &DemoFrame::OnComboBox, this);
+        comboRow->Add(m_comboBox, 1, wxALL | wxALIGN_CENTER_VERTICAL, 8);
+
+        m_comboBoxValue = new wxCustomization::StyledLabel(panel, wxID_ANY, "Selected: Option 1");
+        m_comboBoxValue->SetStyleSheet(m_styleSheet);
+        comboRow->Add(m_comboBoxValue, 1, wxALL | wxALIGN_CENTER_VERTICAL, 8);
+
+        sizer->Add(comboRow, 0, wxLEFT | wxRIGHT | wxEXPAND, 8);
+
         m_disableButton =
             new wxCustomization::StyledButton(panel, wxID_ANY, "Disable all widgets");
         m_disableButton->SetStyleSheet(m_styleSheet);
@@ -226,6 +247,13 @@ private:
             m_styleSheet);
     }
 
+    void OnComboBox(wxCommandEvent& evt)
+    {
+        const wxString value = evt.GetString();
+        m_comboBoxValue->SetLabel(wxString::Format("Selected: %s", value));
+        Layout();
+    }
+
     void OnToggleDisabled(wxCommandEvent& /*evt*/)
     {
         m_allDisabled = !m_allDisabled;
@@ -237,6 +265,7 @@ private:
         m_radio1->Enable(!m_allDisabled);
         m_radio2->Enable(!m_allDisabled);
         m_lineEdit->Enable(!m_allDisabled);
+        m_comboBox->Enable(!m_allDisabled);
 
         m_disableButton->SetLabel(m_allDisabled ? "Enable all widgets" : "Disable all widgets");
         Layout();
@@ -250,6 +279,8 @@ private:
     wxCustomization::StyledCheckBox* m_indeterminateCheck = nullptr;
     wxCustomization::StyledLineEdit* m_lineEdit = nullptr;
     wxCustomization::StyledLabel* m_lineEditValue = nullptr;
+    wxCustomization::StyledComboBox* m_comboBox = nullptr;
+    wxCustomization::StyledLabel* m_comboBoxValue = nullptr;
     wxCustomization::StyledRadioButton* m_radio1 = nullptr;
     wxCustomization::StyledRadioButton* m_radio2 = nullptr;
     wxCustomization::StyledButton* m_disableButton = nullptr;

@@ -83,6 +83,9 @@ public:
     /// Resolve a sub-control style (e.g. `::indicator`) from the current stylesheet.
     Style GetSubControlStyle(const wxString& subControl) const;
 
+    /// Resolve a sub-control style for a specific transient state.
+    Style GetSubControlStyle(const wxString& subControl, const wxString& state) const;
+
 protected:
     virtual void OnPaint(wxPaintEvent& evt);
     virtual void DrawContent(wxDC& dc, const wxRect& rect);

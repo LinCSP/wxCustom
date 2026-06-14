@@ -280,6 +280,62 @@ StyledLineEdit:read-only {
     color: #7f8c8d;
 }
 
+StyledComboBox {
+    background-color: #ffffff;
+    color: #2c3e50;
+    border-width: 1dip;
+    border-color: #bdc3c7;
+    border-style: solid;
+    border-radius: 4dip;
+    padding: 6dip 4dip 6dip 8dip;
+    font-size: 12dip;
+    min-width: 120dip;
+    min-height: 24dip;
+}
+
+StyledComboBox:hover {
+    border-color: #3498db;
+}
+
+StyledComboBox:focused {
+    border-color: var(--primary);
+    outline-width: 2dip;
+    outline-color: #85c1e9;
+    outline-offset: 2dip;
+}
+
+StyledComboBox:disabled {
+    background-color: #ecf0f1;
+    border-color: #bdc3c7;
+    color: var(--disabled-color);
+}
+
+StyledComboBox::drop-down {
+    width: 20dip;
+    background-color: transparent;
+}
+
+StyledComboBox::down-arrow {
+    color: #7f8c8d;
+    /* border-width controls the thickness of the chevron lines. */
+    border-width: 2dip;
+}
+
+StyledComboBox::item {
+    background-color: #ffffff;
+    color: #2c3e50;
+    padding: 6dip 8dip;
+}
+
+StyledComboBox::item:hover {
+    background-color: #eaf2f8;
+}
+
+StyledComboBox::item:selected {
+    background-color: var(--primary);
+    color: #ffffff;
+}
+
 StyledMessageDialog {
     background-color: #ffffff;
     color: #2c3e50;

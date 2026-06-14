@@ -377,13 +377,18 @@ void StyledControl::Activate()
 
 Style StyledControl::GetSubControlStyle(const wxString& subControl) const
 {
+    return GetSubControlStyle(subControl, m_currentState);
+}
+
+Style StyledControl::GetSubControlStyle(const wxString& subControl, const wxString& state) const
+{
     if (m_styleSheet == nullptr) {
         return Style();
     }
 
-    StyledControlContext context(this, m_currentState);
+    StyledControlContext context(this, state);
     StyleResolver resolver;
-    return resolver.Resolve(*m_styleSheet, context, subControl, m_currentState);
+    return resolver.Resolve(*m_styleSheet, context, subControl, state);
 }
 
 wxSize StyledControl::DoGetBestSize() const

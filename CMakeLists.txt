@@ -38,6 +38,7 @@ add_library(wxCustomization
     include/wxCustomization/widgets/StyledRadioButton.h
     include/wxCustomization/widgets/StyledLineEdit.h
     include/wxCustomization/widgets/StyledComboBox.h
+    include/wxCustomization/widgets/StyledSlider.h
     src/dummy.cpp
     src/Length.cpp
     src/Color.cpp
@@ -58,6 +59,7 @@ add_library(wxCustomization
     src/widgets/StyledRadioButton.cpp
     src/widgets/StyledLineEdit.cpp
     src/widgets/StyledComboBox.cpp
+    src/widgets/StyledSlider.cpp
 )
 
 add_library(wxCustomization::wxCustomization ALIAS wxCustomization)

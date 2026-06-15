@@ -81,6 +81,9 @@ StyledCheckBox::indicator:checked {
 | `StyledComboBox` | `::drop-down` | Кнопка раскрытия списка |
 | `StyledComboBox` | `::down-arrow` | Стрелка в кнопке |
 | `StyledComboBox` | `::item` | Элемент popup-списка |
+| `StyledSlider` | `::groove` | Дорожка слайдера |
+| `StyledSlider` | `::sub-page` | Заполненная часть дорожки |
+| `StyledSlider` | `::handle` | Ручка слайдера |
 
 ## CSS-переменные
 
@@ -118,6 +121,8 @@ StyledButton:hover {
 - `border`, `border-width`, `border-style`, `border-color`, `border-radius`
 - `border-top-width`, `border-right-width`, `border-bottom-width`, `border-left-width`
 - `outline-width`, `outline-color`, `outline-offset`
+
+> **Примечание:** `border-radius` поддерживает проценты (`50%`), которые интерпретируются относительно меньшей стороны элемента. Для квадратного элемента `border-radius: 50%` превращает его в круг.
 
 ### Отступы и размеры
 

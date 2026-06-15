@@ -9,7 +9,7 @@ wxCustomization предоставляет собственные виджеты
 ## Возможности
 
 - CSS/QSS-подобный язык стилей с переменными, псевдо-состояниями и sub-control'ами.
-- Полностью кастомизируемые виджеты: Panel, Label, Button, ToggleButton, CheckBox, RadioButton, LineEdit, ComboBox и другие.
+- Полностью кастомизируемые виджеты: Panel, Label, Button, ToggleButton, CheckBox, RadioButton, LineEdit, ComboBox, Slider и другие.
 - Поддержка фона, градиентов, рамок, скруглений, иконок, шрифтов и outline.
 - DPI-независимые размеры (`dip`, `pt`).
 - Unit-тесты на GoogleTest.

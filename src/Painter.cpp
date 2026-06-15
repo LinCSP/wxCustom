@@ -255,6 +255,10 @@ void Painter::DrawRoundedRect(wxDC& dc, const wxRect& rect, int radius,
     }
 
     int r = radius;
+    if (r < 0) {
+        // Percentage radius: interpret as a percentage of the smaller dimension.
+        r = std::min(rect.width, rect.height) * (-r) / 100;
+    }
     if (r > 0) {
         const int half = std::min(rect.width, rect.height) / 2;
         r = std::min(r, half);

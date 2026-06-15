@@ -291,7 +291,20 @@ void StyleResolver::ApplyDeclaration(Style& style,
         else if (s == "outset") style.borderStyle = BorderStyle::Outset;
         style.Set(Property::BorderStyle);
     } else if (prop == "border-radius") {
-        style.borderRadius = LengthToPixels(resolved, context);
+        // Percentages are stored as negative values and interpreted at paint
+        // time relative to the rendered element's dimensions.
+        if (!resolved.IsEmpty() && resolved.Last() == '%') {
+            wxString numStr = resolved.Left(resolved.Length() - 1);
+            numStr.Trim().Trim(false);
+            try {
+                const double pct = std::stod(numStr.ToStdString());
+                style.borderRadius = -static_cast<int>(std::round(pct));
+            } catch (...) {
+                style.borderRadius = 0;
+            }
+        } else {
+            style.borderRadius = LengthToPixels(resolved, context);
+        }
         style.Set(Property::BorderRadius);
     } else if (prop == "outline-width") {
         style.outlineWidth = LengthToPixels(resolved, context);

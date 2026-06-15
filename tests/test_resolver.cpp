@@ -182,3 +182,33 @@ TEST(StyleResolver, SpacingProperty)
 
     EXPECT_EQ(style.spacing, 12);
 }
+
+TEST(StyleResolver, BorderRadiusPercentageIsStoredAsNegative)
+{
+    StyleSheet sheet;
+    ASSERT_TRUE(sheet.LoadFromString(
+        "StyledButton { border-radius: 50%; }"));
+
+    TestContext ctx;
+    ctx.type = "StyledButton";
+
+    StyleResolver resolver;
+    Style style = resolver.Resolve(sheet, ctx);
+
+    EXPECT_EQ(style.borderRadius, -50);
+}
+
+TEST(StyleResolver, BorderRadiusPixelValueIsStoredAsPixels)
+{
+    StyleSheet sheet;
+    ASSERT_TRUE(sheet.LoadFromString(
+        "StyledButton { border-radius: 8px; }"));
+
+    TestContext ctx;
+    ctx.type = "StyledButton";
+
+    StyleResolver resolver;
+    Style style = resolver.Resolve(sheet, ctx);
+
+    EXPECT_EQ(style.borderRadius, 8);
+}

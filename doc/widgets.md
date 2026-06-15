@@ -190,6 +190,38 @@ StyledComboBox::down-arrow {
 }
 ```
 
+## StyledSlider
+
+Слайдер с настраиваемой дорожкой (`::groove`), заполненной областью (`::sub-page`) и ручкой (`::handle`).
+
+```cpp
+auto* slider = new wxCustomization::StyledSlider(parent, wxID_ANY, 25, 0, 100);
+slider->Bind(wxEVT_SLIDER, &MyFrame::OnSlider, this);
+```
+
+```css
+StyledSlider::groove {
+    background-color: #bdc3c7;
+    border-radius: 2dip;
+    height: 4dip;
+}
+
+StyledSlider::sub-page {
+    background-color: #3498db;
+    border-radius: 2dip;
+}
+
+StyledSlider::handle {
+    width: 18dip;
+    height: 18dip;
+    background-color: #0d6efd;
+    border-radius: 50%;
+}
+
+StyledSlider::handle:hover { background-color: #0b5ed7; }
+StyledSlider::handle:pressed { background-color: #0a58ca; }
+```
+
 ## StyledMessageDialog
 
 Стилизованное диалоговое окно.

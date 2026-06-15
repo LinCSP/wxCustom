@@ -18,6 +18,7 @@ add_executable(wxCustomization_tests
     test_styled_radiobutton.cpp
     test_styled_line_edit.cpp
     test_styled_combobox.cpp
+    test_styled_slider.cpp
 )
 
 target_link_libraries(wxCustomization_tests

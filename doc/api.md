@@ -139,6 +139,26 @@ int GetSelection() const;
 wxString GetValue() const;
 ```
 
+## StyledSlider
+
+```cpp
+StyledSlider(wxWindow* parent, wxWindowID id = wxID_ANY,
+             int value = 0, int minValue = 0, int maxValue = 100,
+             const wxPoint& pos = wxDefaultPosition,
+             const wxSize& size = wxDefaultSize,
+             long style = wxSL_HORIZONTAL,
+             const wxString& name = wxControlNameStr);
+
+void SetValue(int value);
+int GetValue() const;
+
+void SetRange(int minValue, int maxValue);
+int GetMin() const;
+int GetMax() const;
+
+bool IsVertical() const;
+```
+
 ## События
 
 | Виджет | Событие |
@@ -149,3 +169,4 @@ wxString GetValue() const;
 | `StyledRadioButton` | `wxEVT_RADIOBUTTON` |
 | `StyledLineEdit` | `wxEVT_TEXT`, `wxEVT_TEXT_ENTER` |
 | `StyledComboBox` | `wxEVT_COMBOBOX` |
+| `StyledSlider` | `wxEVT_SLIDER` |

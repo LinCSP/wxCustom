@@ -84,6 +84,8 @@ StyledCheckBox::indicator:checked {
 | `StyledSlider` | `::groove` | Дорожка слайдера |
 | `StyledSlider` | `::sub-page` | Заполненная часть дорожки |
 | `StyledSlider` | `::handle` | Ручка слайдера |
+| `StyledProgressBar` | `::groove` | Дорожка прогресс-бара |
+| `StyledProgressBar` | `::chunk` | Заполненная часть прогресс-бара |
 
 ## CSS-переменные
 

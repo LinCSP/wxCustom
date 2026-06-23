@@ -222,6 +222,36 @@ StyledSlider::handle:hover { background-color: #0b5ed7; }
 StyledSlider::handle:pressed { background-color: #0a58ca; }
 ```
 
+## StyledProgressBar
+
+Индикатор прогресса с настраиваемой дорожкой (`::groove`) и заполненной областью (`::chunk`).
+
+```cpp
+auto* bar = new wxCustomization::StyledProgressBar(parent, wxID_ANY, 25, 0, 100);
+bar->SetValue(50);
+bar->SetIndeterminate(true);
+```
+
+```css
+StyledProgressBar {
+    min-height: 24dip;
+    color: #2c3e50;
+    font-size: 10dip;
+    text-align: center;
+}
+
+StyledProgressBar::groove {
+    background-color: #e9ecef;
+    border-radius: 4dip;
+    height: 16dip;
+}
+
+StyledProgressBar::chunk {
+    background-color: #0d6efd;
+    border-radius: 4dip;
+}
+```
+
 ## StyledMessageDialog
 
 Стилизованное диалоговое окно.

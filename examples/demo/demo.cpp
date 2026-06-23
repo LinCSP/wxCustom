@@ -16,6 +16,7 @@
 #include "wxCustomization/widgets/StyledLineEdit.h"
 #include "wxCustomization/widgets/StyledComboBox.h"
 #include "wxCustomization/widgets/StyledSlider.h"
+#include "wxCustomization/widgets/StyledProgressBar.h"
 #include "wxCustomization/wxCustomization.h"
 
 namespace {
@@ -38,7 +39,7 @@ class DemoFrame : public wxFrame {
 public:
     DemoFrame(wxCustomization::StyleSheet* styleSheet)
         : wxFrame(nullptr, wxID_ANY, "wxCustomization Demo",
-                  wxDefaultPosition, wxSize(900, 700))
+                  wxDefaultPosition, wxSize(900, 900))
         , m_styleSheet(styleSheet)
     {
         wxCustomization::StyledPanel* panel =
@@ -196,6 +197,22 @@ public:
 
         sizer->Add(sliderRow, 0, wxLEFT | wxRIGHT | wxEXPAND, 8);
 
+        sizer->Add(CreateHeader(panel, m_styleSheet, "StyledProgressBar"), 0,
+                   wxLEFT | wxRIGHT | wxTOP, 16);
+
+        wxBoxSizer* progressRow = new wxBoxSizer(wxHORIZONTAL);
+        m_progressBar = new wxCustomization::StyledProgressBar(panel, wxID_ANY, 25, 0, 100);
+        m_progressBar->SetStyleSheet(m_styleSheet);
+        progressRow->Add(m_progressBar, 1, wxALL | wxALIGN_CENTER_VERTICAL, 8);
+
+        wxCustomization::StyledProgressBar* indeterminateBar =
+            new wxCustomization::StyledProgressBar(panel, wxID_ANY, 0, 0, 100);
+        indeterminateBar->SetStyleSheet(m_styleSheet);
+        indeterminateBar->SetIndeterminate(true);
+        progressRow->Add(indeterminateBar, 1, wxALL | wxALIGN_CENTER_VERTICAL, 8);
+
+        sizer->Add(progressRow, 0, wxLEFT | wxRIGHT | wxEXPAND, 8);
+
         m_disableButton =
             new wxCustomization::StyledButton(panel, wxID_ANY, "Disable all widgets");
         m_disableButton->SetStyleSheet(m_styleSheet);
@@ -281,6 +298,7 @@ private:
     {
         const int value = evt.GetInt();
         m_sliderValue->SetLabel(wxString::Format("Value: %d", value));
+        m_progressBar->SetValue(value);
         Layout();
     }
 
@@ -297,6 +315,7 @@ private:
         m_lineEdit->Enable(!m_allDisabled);
         m_comboBox->Enable(!m_allDisabled);
         m_slider->Enable(!m_allDisabled);
+        m_progressBar->Enable(!m_allDisabled);
 
         m_disableButton->SetLabel(m_allDisabled ? "Enable all widgets" : "Disable all widgets");
         Layout();
@@ -314,6 +333,7 @@ private:
     wxCustomization::StyledLabel* m_comboBoxValue = nullptr;
     wxCustomization::StyledSlider* m_slider = nullptr;
     wxCustomization::StyledLabel* m_sliderValue = nullptr;
+    wxCustomization::StyledProgressBar* m_progressBar = nullptr;
     wxCustomization::StyledRadioButton* m_radio1 = nullptr;
     wxCustomization::StyledRadioButton* m_radio2 = nullptr;
     wxCustomization::StyledButton* m_disableButton = nullptr;

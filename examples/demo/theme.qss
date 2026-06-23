@@ -378,6 +378,28 @@ StyledSlider:disabled {
     opacity: 0.65;
 }
 
+StyledProgressBar {
+    min-height: 24dip;
+    color: #2c3e50;
+    font-size: 10dip;
+    font-weight: bold;
+}
+
+StyledProgressBar::groove {
+    background-color: #e9ecef;
+    border-radius: 4dip;
+    height: 16dip;
+}
+
+StyledProgressBar::chunk {
+    background-color: #0d6efd;
+    border-radius: 4dip;
+}
+
+StyledProgressBar:disabled {
+    opacity: 0.65;
+}
+
 StyledMessageDialog {
     background-color: #ffffff;
     color: #2c3e50;

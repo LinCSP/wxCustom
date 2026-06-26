@@ -48,6 +48,14 @@ ctest --output-on-failure
 
 Файл `theme.qss` копируется рядом с бинарником автоматически при сборке. Demo загружает его относительно исполняемого файла.
 
+Demo разделено на три вкладки:
+
+- **Buttons** — `StyledButton`, `StyledToggleButton`, `StyledCheckBox`, `StyledRadioButton`.
+- **Input** — `StyledLineEdit`, `StyledComboBox`, `StyledSlider`.
+- **Progress** — `StyledProgressBar`.
+
+Вкладки реализованы кастомным tab bar на базе `StyledButton` до появления полноценного `StyledTabWidget`.
+
 ## Сборка с отладкой
 
 ```bash

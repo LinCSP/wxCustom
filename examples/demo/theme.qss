@@ -411,3 +411,61 @@ StyledMessageDialog {
     font-size: 12dip;
     spacing: 16dip;
 }
+
+/* Custom tab bar styles used in the demo before StyledTabWidget exists. */
+StyledPanel.tab-bar {
+    background-color: transparent;
+    border-width: 0dip;
+    border-bottom-width: 1dip;
+    border-color: #bdc3c7;
+    border-style: solid;
+    border-radius: 0dip;
+    padding: 0dip;
+}
+
+StyledPanel.tab-content {
+    background-color: #ffffff;
+    border-width: 0dip;
+    border-radius: 0dip;
+    padding: 0dip;
+}
+
+StyledButton.tab {
+    background-color: #f8f9fa;
+    color: #2c3e50;
+    border-width: 1dip;
+    border-color: #dee2e6;
+    border-style: solid;
+    border-radius: 4dip;
+    border-bottom-width: 0dip;
+    padding: 8dip 16dip;
+    text-align: center;
+    min-width: 80dip;
+    min-height: 32dip;
+}
+
+StyledButton.tab:hover {
+    background-color: #e9ecef;
+    border-color: #ced4da;
+}
+
+StyledButton.tab:pressed {
+    background-color: #dee2e6;
+}
+
+StyledButton.tab:focused {
+    outline-width: 2dip;
+    outline-color: #85c1e9;
+    outline-offset: 2dip;
+}
+
+StyledButton.tab.tab-active {
+    background-color: var(--primary);
+    color: #ffffff;
+    border-color: var(--hover);
+}
+
+StyledButton.tab.tab-active:hover {
+    background-color: var(--hover);
+    border-color: var(--pressed);
+}

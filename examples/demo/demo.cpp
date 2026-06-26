@@ -39,50 +39,139 @@ class DemoFrame : public wxFrame {
 public:
     DemoFrame(wxCustomization::StyleSheet* styleSheet)
         : wxFrame(nullptr, wxID_ANY, "wxCustomization Demo",
-                  wxDefaultPosition, wxSize(900, 900))
+                  wxDefaultPosition, wxSize(900, 700))
         , m_styleSheet(styleSheet)
     {
-        wxCustomization::StyledPanel* panel =
+        wxCustomization::StyledPanel* rootPanel =
             new wxCustomization::StyledPanel(this, wxID_ANY);
-        panel->SetStyleSheet(m_styleSheet);
+        rootPanel->SetStyleSheet(m_styleSheet);
 
-        wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+        wxBoxSizer* rootSizer = new wxBoxSizer(wxVERTICAL);
 
         wxCustomization::StyledLabel* title = new wxCustomization::StyledLabel(
-            panel, wxID_ANY,
+            rootPanel, wxID_ANY,
             wxString::Format("wxCustomization %s", wxCustomization::GetVersionString()));
         title->SetStyleSheet(m_styleSheet);
         title->AddStyleClass("title");
-        sizer->Add(title, 0, wxALL | wxALIGN_CENTER_HORIZONTAL, 20);
+        rootSizer->Add(title, 0, wxALL | wxALIGN_CENTER_HORIZONTAL, 20);
 
-        sizer->Add(CreateHeader(panel, m_styleSheet, "StyledButton"), 0,
+        // Custom tab bar.
+        wxCustomization::StyledPanel* tabBar =
+            new wxCustomization::StyledPanel(rootPanel, wxID_ANY);
+        tabBar->SetStyleSheet(m_styleSheet);
+        tabBar->AddStyleClass("tab-bar");
+
+        wxBoxSizer* tabSizer = new wxBoxSizer(wxHORIZONTAL);
+
+        m_tabButtons[0] = CreateTabButton(tabBar, "Buttons", 0);
+        m_tabButtons[1] = CreateTabButton(tabBar, "Input", 1);
+        m_tabButtons[2] = CreateTabButton(tabBar, "Progress", 2);
+
+        tabSizer->Add(m_tabButtons[0], 0, wxRIGHT, 4);
+        tabSizer->Add(m_tabButtons[1], 0, wxRIGHT, 4);
+        tabSizer->Add(m_tabButtons[2], 0, wxRIGHT, 0);
+        tabBar->SetSizer(tabSizer);
+
+        rootSizer->Add(tabBar, 0, wxLEFT | wxRIGHT | wxEXPAND, 20);
+
+        // Content panel holding the tab pages.
+        wxCustomization::StyledPanel* contentPanel =
+            new wxCustomization::StyledPanel(rootPanel, wxID_ANY);
+        contentPanel->SetStyleSheet(m_styleSheet);
+        contentPanel->AddStyleClass("tab-content");
+
+        wxBoxSizer* contentSizer = new wxBoxSizer(wxVERTICAL);
+
+        m_buttonsPage = CreateButtonsPage(contentPanel);
+        m_inputPage = CreateInputPage(contentPanel);
+        m_progressPage = CreateProgressPage(contentPanel);
+
+        contentSizer->Add(m_buttonsPage, 1, wxEXPAND);
+        contentSizer->Add(m_inputPage, 1, wxEXPAND);
+        contentSizer->Add(m_progressPage, 1, wxEXPAND);
+        contentPanel->SetSizer(contentSizer);
+
+        rootSizer->Add(contentPanel, 1, wxALL | wxEXPAND, 20);
+
+        rootPanel->SetSizer(rootSizer);
+
+        m_contentSizer = contentSizer;
+        SwitchToTab(0);
+    }
+
+private:
+    wxCustomization::StyledButton* CreateTabButton(wxWindow* parent,
+                                                   const wxString& label,
+                                                   int index)
+    {
+        wxCustomization::StyledButton* button =
+            new wxCustomization::StyledButton(parent, wxID_ANY, label);
+        button->SetStyleSheet(m_styleSheet);
+        button->AddStyleClass("tab");
+        button->Bind(wxEVT_BUTTON, [this, index](wxCommandEvent& /*evt*/) {
+            SwitchToTab(index);
+        });
+        return button;
+    }
+
+    void SwitchToTab(int index)
+    {
+        m_currentTab = index;
+
+        // Use the sizer to show/hide pages. This keeps the pages created and
+        // re-lays them out correctly when a previously hidden tab is selected.
+        m_contentSizer->Show(m_buttonsPage, index == 0);
+        m_contentSizer->Show(m_inputPage, index == 1);
+        m_contentSizer->Show(m_progressPage, index == 2);
+        m_contentSizer->Layout();
+
+        for (int i = 0; i < 3; ++i) {
+            if (i == index) {
+                m_tabButtons[i]->AddStyleClass("tab-active");
+            } else {
+                m_tabButtons[i]->RemoveStyleClass("tab-active");
+            }
+        }
+
+        Layout();
+    }
+
+    wxCustomization::StyledPanel* CreateButtonsPage(wxWindow* parent)
+    {
+        wxCustomization::StyledPanel* page =
+            new wxCustomization::StyledPanel(parent, wxID_ANY);
+        page->SetStyleSheet(m_styleSheet);
+
+        wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+
+        sizer->Add(CreateHeader(page, m_styleSheet, "StyledButton"), 0,
                    wxLEFT | wxRIGHT | wxTOP, 16);
 
         wxBoxSizer* buttonRow = new wxBoxSizer(wxHORIZONTAL);
-        m_button = new wxCustomization::StyledButton(panel, wxID_ANY, "Click me");
+        m_button = new wxCustomization::StyledButton(page, wxID_ANY, "Click me");
         m_button->SetStyleSheet(m_styleSheet);
         m_button->Bind(wxEVT_BUTTON, &DemoFrame::OnButtonClick, this);
         buttonRow->Add(m_button, 0, wxALL, 8);
 
         wxCustomization::StyledButton* disabledButton =
-            new wxCustomization::StyledButton(panel, wxID_ANY, "Disabled");
+            new wxCustomization::StyledButton(page, wxID_ANY, "Disabled");
         disabledButton->SetStyleSheet(m_styleSheet);
         disabledButton->Disable();
         buttonRow->Add(disabledButton, 0, wxALL, 8);
 
         sizer->Add(buttonRow, 0, wxLEFT | wxRIGHT, 8);
 
-        sizer->Add(CreateHeader(panel, m_styleSheet, "StyledToggleButton"), 0,
+        sizer->Add(CreateHeader(page, m_styleSheet, "StyledToggleButton"), 0,
                    wxLEFT | wxRIGHT | wxTOP, 16);
 
         wxBoxSizer* toggleRow = new wxBoxSizer(wxHORIZONTAL);
-        m_toggle = new wxCustomization::StyledToggleButton(panel, wxID_ANY, "Toggle me");
+        m_toggle = new wxCustomization::StyledToggleButton(page, wxID_ANY, "Toggle me");
         m_toggle->SetStyleSheet(m_styleSheet);
         m_toggle->Bind(wxEVT_TOGGLEBUTTON, &DemoFrame::OnToggle, this);
         toggleRow->Add(m_toggle, 0, wxALL, 8);
 
         wxCustomization::StyledToggleButton* disabledToggle =
-            new wxCustomization::StyledToggleButton(panel, wxID_ANY, "Disabled ON");
+            new wxCustomization::StyledToggleButton(page, wxID_ANY, "Disabled ON");
         disabledToggle->SetValue(true);
         disabledToggle->SetStyleSheet(m_styleSheet);
         disabledToggle->Disable();
@@ -90,48 +179,48 @@ public:
 
         sizer->Add(toggleRow, 0, wxLEFT | wxRIGHT, 8);
 
-        sizer->Add(CreateHeader(panel, m_styleSheet, "StyledCheckBox"), 0,
+        sizer->Add(CreateHeader(page, m_styleSheet, "StyledCheckBox"), 0,
                    wxLEFT | wxRIGHT | wxTOP, 16);
 
         wxBoxSizer* checkRow = new wxBoxSizer(wxHORIZONTAL);
-        m_checkBox = new wxCustomization::StyledCheckBox(panel, wxID_ANY, "Check me");
+        m_checkBox = new wxCustomization::StyledCheckBox(page, wxID_ANY, "Check me");
         m_checkBox->SetStyleSheet(m_styleSheet);
         m_checkBox->Bind(wxEVT_CHECKBOX, &DemoFrame::OnCheckBox, this);
         checkRow->Add(m_checkBox, 0, wxALL, 8);
 
         wxCustomization::StyledCheckBox* disabledCheck =
-            new wxCustomization::StyledCheckBox(panel, wxID_ANY, "Disabled checked");
+            new wxCustomization::StyledCheckBox(page, wxID_ANY, "Disabled checked");
         disabledCheck->SetValue(true);
         disabledCheck->SetStyleSheet(m_styleSheet);
         disabledCheck->Disable();
         checkRow->Add(disabledCheck, 0, wxALL, 8);
 
         m_indeterminateCheck =
-            new wxCustomization::StyledCheckBox(panel, wxID_ANY, "Indeterminate");
+            new wxCustomization::StyledCheckBox(page, wxID_ANY, "Indeterminate");
         m_indeterminateCheck->Set3StateValue(wxCustomization::CheckState::Indeterminate);
         m_indeterminateCheck->SetStyleSheet(m_styleSheet);
         checkRow->Add(m_indeterminateCheck, 0, wxALL, 8);
 
         sizer->Add(checkRow, 0, wxLEFT | wxRIGHT, 8);
 
-        sizer->Add(CreateHeader(panel, m_styleSheet, "StyledRadioButton"), 0,
+        sizer->Add(CreateHeader(page, m_styleSheet, "StyledRadioButton"), 0,
                    wxLEFT | wxRIGHT | wxTOP, 16);
 
         wxBoxSizer* radioRow = new wxBoxSizer(wxHORIZONTAL);
-        m_radio1 = new wxCustomization::StyledRadioButton(panel, wxID_ANY, "Radio 1",
+        m_radio1 = new wxCustomization::StyledRadioButton(page, wxID_ANY, "Radio 1",
                                                           wxDefaultPosition, wxDefaultSize,
                                                           wxRB_GROUP);
         m_radio1->SetStyleSheet(m_styleSheet);
         m_radio1->Bind(wxEVT_RADIOBUTTON, &DemoFrame::OnRadio, this);
         radioRow->Add(m_radio1, 0, wxALL, 8);
 
-        m_radio2 = new wxCustomization::StyledRadioButton(panel, wxID_ANY, "Radio 2");
+        m_radio2 = new wxCustomization::StyledRadioButton(page, wxID_ANY, "Radio 2");
         m_radio2->SetStyleSheet(m_styleSheet);
         m_radio2->Bind(wxEVT_RADIOBUTTON, &DemoFrame::OnRadio, this);
         radioRow->Add(m_radio2, 0, wxALL, 8);
 
         wxCustomization::StyledRadioButton* disabledRadio =
-            new wxCustomization::StyledRadioButton(panel, wxID_ANY, "Disabled selected");
+            new wxCustomization::StyledRadioButton(page, wxID_ANY, "Disabled selected");
         disabledRadio->SetValue(true);
         disabledRadio->SetStyleSheet(m_styleSheet);
         disabledRadio->Disable();
@@ -139,23 +228,41 @@ public:
 
         sizer->Add(radioRow, 0, wxLEFT | wxRIGHT, 8);
 
-        sizer->Add(CreateHeader(panel, m_styleSheet, "StyledLineEdit"), 0,
+        m_disableButton =
+            new wxCustomization::StyledButton(page, wxID_ANY, "Disable all widgets");
+        m_disableButton->SetStyleSheet(m_styleSheet);
+        m_disableButton->Bind(wxEVT_BUTTON, &DemoFrame::OnToggleDisabled, this);
+        sizer->Add(m_disableButton, 0, wxALL | wxALIGN_CENTER_HORIZONTAL, 24);
+
+        page->SetSizer(sizer);
+        return page;
+    }
+
+    wxCustomization::StyledPanel* CreateInputPage(wxWindow* parent)
+    {
+        wxCustomization::StyledPanel* page =
+            new wxCustomization::StyledPanel(parent, wxID_ANY);
+        page->SetStyleSheet(m_styleSheet);
+
+        wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+
+        sizer->Add(CreateHeader(page, m_styleSheet, "StyledLineEdit"), 0,
                    wxLEFT | wxRIGHT | wxTOP, 16);
 
         wxBoxSizer* editRow = new wxBoxSizer(wxHORIZONTAL);
-        m_lineEdit = new wxCustomization::StyledLineEdit(panel, wxID_ANY, "Type here...");
+        m_lineEdit = new wxCustomization::StyledLineEdit(page, wxID_ANY, "Type here...");
         m_lineEdit->SetStyleSheet(m_styleSheet);
         m_lineEdit->Bind(wxEVT_TEXT, &DemoFrame::OnLineEditText, this);
         m_lineEdit->Bind(wxEVT_TEXT_ENTER, &DemoFrame::OnLineEditEnter, this);
         editRow->Add(m_lineEdit, 1, wxALL | wxALIGN_CENTER_VERTICAL, 8);
 
-        m_lineEditValue = new wxCustomization::StyledLabel(panel, wxID_ANY, "Value: Type here...");
+        m_lineEditValue = new wxCustomization::StyledLabel(page, wxID_ANY, "Value: Type here...");
         m_lineEditValue->SetStyleSheet(m_styleSheet);
         editRow->Add(m_lineEditValue, 1, wxALL | wxALIGN_CENTER_VERTICAL, 8);
 
         sizer->Add(editRow, 0, wxLEFT | wxRIGHT | wxEXPAND, 8);
 
-        sizer->Add(CreateHeader(panel, m_styleSheet, "StyledComboBox"), 0,
+        sizer->Add(CreateHeader(page, m_styleSheet, "StyledComboBox"), 0,
                    wxLEFT | wxRIGHT | wxTOP, 16);
 
         wxBoxSizer* comboRow = new wxBoxSizer(wxHORIZONTAL);
@@ -163,33 +270,33 @@ public:
         choices.Add("Option 1");
         choices.Add("Option 2");
         choices.Add("Option 3");
-        m_comboBox = new wxCustomization::StyledComboBox(panel, wxID_ANY, choices);
+        m_comboBox = new wxCustomization::StyledComboBox(page, wxID_ANY, choices);
         m_comboBox->SetStyleSheet(m_styleSheet);
         m_comboBox->SetSelection(0);
         m_comboBox->Bind(wxEVT_COMBOBOX, &DemoFrame::OnComboBox, this);
         comboRow->Add(m_comboBox, 1, wxALL | wxALIGN_CENTER_VERTICAL, 8);
 
-        m_comboBoxValue = new wxCustomization::StyledLabel(panel, wxID_ANY, "Selected: Option 1");
+        m_comboBoxValue = new wxCustomization::StyledLabel(page, wxID_ANY, "Selected: Option 1");
         m_comboBoxValue->SetStyleSheet(m_styleSheet);
         comboRow->Add(m_comboBoxValue, 1, wxALL | wxALIGN_CENTER_VERTICAL, 8);
 
         sizer->Add(comboRow, 0, wxLEFT | wxRIGHT | wxEXPAND, 8);
 
-        sizer->Add(CreateHeader(panel, m_styleSheet, "StyledSlider"), 0,
+        sizer->Add(CreateHeader(page, m_styleSheet, "StyledSlider"), 0,
                    wxLEFT | wxRIGHT | wxTOP, 16);
 
         wxBoxSizer* sliderRow = new wxBoxSizer(wxHORIZONTAL);
-        m_slider = new wxCustomization::StyledSlider(panel, wxID_ANY, 25, 0, 100);
+        m_slider = new wxCustomization::StyledSlider(page, wxID_ANY, 25, 0, 100);
         m_slider->SetStyleSheet(m_styleSheet);
         m_slider->Bind(wxEVT_SLIDER, &DemoFrame::OnSlider, this);
         sliderRow->Add(m_slider, 1, wxALL | wxALIGN_CENTER_VERTICAL, 8);
 
-        m_sliderValue = new wxCustomization::StyledLabel(panel, wxID_ANY, "Value: 25");
+        m_sliderValue = new wxCustomization::StyledLabel(page, wxID_ANY, "Value: 25");
         m_sliderValue->SetStyleSheet(m_styleSheet);
         sliderRow->Add(m_sliderValue, 0, wxALL | wxALIGN_CENTER_VERTICAL, 8);
 
         wxCustomization::StyledSlider* verticalSlider =
-            new wxCustomization::StyledSlider(panel, wxID_ANY, 50, 0, 100,
+            new wxCustomization::StyledSlider(page, wxID_ANY, 50, 0, 100,
                                               wxDefaultPosition, wxDefaultSize,
                                               wxSL_VERTICAL);
         verticalSlider->SetStyleSheet(m_styleSheet);
@@ -197,32 +304,38 @@ public:
 
         sizer->Add(sliderRow, 0, wxLEFT | wxRIGHT | wxEXPAND, 8);
 
-        sizer->Add(CreateHeader(panel, m_styleSheet, "StyledProgressBar"), 0,
+        page->SetSizer(sizer);
+        return page;
+    }
+
+    wxCustomization::StyledPanel* CreateProgressPage(wxWindow* parent)
+    {
+        wxCustomization::StyledPanel* page =
+            new wxCustomization::StyledPanel(parent, wxID_ANY);
+        page->SetStyleSheet(m_styleSheet);
+
+        wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+
+        sizer->Add(CreateHeader(page, m_styleSheet, "StyledProgressBar"), 0,
                    wxLEFT | wxRIGHT | wxTOP, 16);
 
         wxBoxSizer* progressRow = new wxBoxSizer(wxHORIZONTAL);
-        m_progressBar = new wxCustomization::StyledProgressBar(panel, wxID_ANY, 25, 0, 100);
+        m_progressBar = new wxCustomization::StyledProgressBar(page, wxID_ANY, 25, 0, 100);
         m_progressBar->SetStyleSheet(m_styleSheet);
         progressRow->Add(m_progressBar, 1, wxALL | wxALIGN_CENTER_VERTICAL, 8);
 
         wxCustomization::StyledProgressBar* indeterminateBar =
-            new wxCustomization::StyledProgressBar(panel, wxID_ANY, 0, 0, 100);
+            new wxCustomization::StyledProgressBar(page, wxID_ANY, 0, 0, 100);
         indeterminateBar->SetStyleSheet(m_styleSheet);
         indeterminateBar->SetIndeterminate(true);
         progressRow->Add(indeterminateBar, 1, wxALL | wxALIGN_CENTER_VERTICAL, 8);
 
         sizer->Add(progressRow, 0, wxLEFT | wxRIGHT | wxEXPAND, 8);
 
-        m_disableButton =
-            new wxCustomization::StyledButton(panel, wxID_ANY, "Disable all widgets");
-        m_disableButton->SetStyleSheet(m_styleSheet);
-        m_disableButton->Bind(wxEVT_BUTTON, &DemoFrame::OnToggleDisabled, this);
-        sizer->Add(m_disableButton, 0, wxALL | wxALIGN_CENTER_HORIZONTAL, 24);
-
-        panel->SetSizer(sizer);
+        page->SetSizer(sizer);
+        return page;
     }
 
-private:
     void OnButtonClick(wxCommandEvent& /*evt*/)
     {
         wxCustomization::StyledMessageDialog::Show(
@@ -322,6 +435,14 @@ private:
     }
 
     wxCustomization::StyleSheet* m_styleSheet;
+
+    int m_currentTab = 0;
+    wxCustomization::StyledButton* m_tabButtons[3] = {nullptr, nullptr, nullptr};
+
+    wxCustomization::StyledPanel* m_buttonsPage = nullptr;
+    wxCustomization::StyledPanel* m_inputPage = nullptr;
+    wxCustomization::StyledPanel* m_progressPage = nullptr;
+    wxBoxSizer* m_contentSizer = nullptr;
 
     wxCustomization::StyledButton* m_button = nullptr;
     wxCustomization::StyledToggleButton* m_toggle = nullptr;

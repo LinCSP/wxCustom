@@ -260,3 +260,52 @@ StyledProgressBar::chunk {
 wxCustomization::StyledMessageDialog::Show(
     parent, "Message", "Title", wxOK | wxICON_INFORMATION, styleSheet);
 ```
+
+## Пример компоновки: кастомный tab bar
+
+Пока `StyledTabWidget` находится в разработке, demo использует кастомный tab bar на базе `StyledButton` и `StyledPanel`:
+
+```cpp
+auto* tabBar = new wxCustomization::StyledPanel(parent, wxID_ANY);
+tabBar->AddStyleClass("tab-bar");
+
+auto* buttonsTab = new wxCustomization::StyledButton(tabBar, wxID_ANY, "Buttons");
+buttonsTab->AddStyleClass("tab");
+buttonsTab->AddStyleClass("tab-active");
+
+auto* inputTab = new wxCustomization::StyledButton(tabBar, wxID_ANY, "Input");
+inputTab->AddStyleClass("tab");
+```
+
+Переключение вкладок выполняется через `wxSizer::Show()`:
+
+```cpp
+contentSizer->Show(buttonsPage, true);
+contentSizer->Show(inputPage, false);
+contentSizer->Layout();
+```
+
+Стили вкладок задаются через CSS-классы:
+
+```css
+StyledButton.tab {
+    background-color: #f8f9fa;
+    color: #2c3e50;
+    border: 1dip solid #dee2e6;
+    border-radius: 4dip;
+    padding: 8dip 16dip;
+}
+
+StyledButton.tab.tab-active {
+    background-color: var(--primary);
+    color: #ffffff;
+    border-color: var(--hover);
+}
+```
+
+## Планируемые виджеты
+
+| Виджет | Описание | Статус |
+|--------|----------|--------|
+| `StyledGroupBox` | Группа с заголовком и рамкой | в разработке |
+| `StyledTabWidget` | Полноценный виджет вкладок с sub-control'ами `::tab`, `::tab-bar`, `::pane` | запланирован |

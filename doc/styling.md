@@ -174,6 +174,44 @@ StyledButton:hover {
 
 ## Примеры
 
+### Стилизация вкладок через CSS-классы
+
+Кастомный tab bar в demo использует классы `.tab` и `.tab-active` поверх `StyledButton`:
+
+```css
+StyledPanel.tab-bar {
+    background-color: transparent;
+    border-bottom: 1dip solid #bdc3c7;
+    padding: 0dip;
+}
+
+StyledButton.tab {
+    background-color: #f8f9fa;
+    color: #2c3e50;
+    border: 1dip solid #dee2e6;
+    border-radius: 4dip;
+    padding: 8dip 16dip;
+    text-align: center;
+}
+
+StyledButton.tab:hover { background-color: #e9ecef; }
+StyledButton.tab:pressed { background-color: #dee2e6; }
+StyledButton.tab:focused { outline: 2dip solid #85c1e9; outline-offset: 2dip; }
+
+StyledButton.tab.tab-active {
+    background-color: var(--primary);
+    color: #ffffff;
+    border-color: var(--hover);
+}
+
+StyledButton.tab.tab-active:hover {
+    background-color: var(--hover);
+    border-color: var(--pressed);
+}
+```
+
+Классы позволяют стилизовать одну и ту же кнопку по-разному в зависимости от роли, не затрагивая остальные `StyledButton`.
+
 ### Тёмная тема
 
 ```css

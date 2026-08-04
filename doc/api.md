@@ -204,6 +204,30 @@ int GetTitleHeight() const;
 
 Контейнер: дочерние виджеты размещаются от начала клиентской области, поэтому место под заголовок резервируется в sizer'е (например, спейсером `GetTitleHeight()`). Заголовок стилизуется через под-контрол `::title`.
 
+## StyledTabWidget
+
+```cpp
+StyledTabWidget(wxWindow* parent, wxWindowID id = wxID_ANY,
+                const wxPoint& pos = wxDefaultPosition,
+                const wxSize& size = wxDefaultSize,
+                long style = 0,
+                const wxString& name = wxNotebookNameStr);
+
+// Страница должна быть создана как дочернее окно StyledTabWidget.
+bool AddPage(wxWindow* page, const wxString& title, bool select = false);
+
+size_t GetPageCount() const;
+wxWindow* GetPage(size_t index) const;
+
+wxString GetPageTitle(size_t index) const;
+void SetPageTitle(size_t index, const wxString& title);
+
+int GetSelection() const;       // -1, если страниц нет
+int SetSelection(size_t index); // возвращает прежнюю выбранную вкладку
+```
+
+Контейнер вкладок: выбранная страница показывается в области `::pane`, остальные скрыты. Переключение — кликом по вкладке, стрелками Left/Right (когда виджет в фокусе) и Ctrl+Tab / Ctrl+Shift+Tab (маршрутизируется wxWidgets через `HasMultiplePages()`, работает и при фокусе внутри страницы). Под-контролы: `::tab-bar`, `::tab` (состояния `:hover`, `:pressed`, `:selected`, `:disabled`), `::pane`.
+
 ## События
 
 | Виджет | Событие |
@@ -217,3 +241,4 @@ int GetTitleHeight() const;
 | `StyledSlider` | `wxEVT_SLIDER` |
 | `StyledProgressBar` | — |
 | `StyledGroupBox` | — |
+| `StyledTabWidget` | `wxEVT_NOTEBOOK_PAGE_CHANGED` (класс `wxBookCtrlEvent`: `GetSelection()` — новая вкладка, `GetOldSelection()` — прежняя) |

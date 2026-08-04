@@ -175,43 +175,53 @@ StyledButton:hover {
 
 ## Примеры
 
-### Стилизация вкладок через CSS-классы
+### Стилизация вкладок StyledTabWidget
 
-Кастомный tab bar в demo использует классы `.tab` и `.tab-active` поверх `StyledButton`:
+Вкладки `StyledTabWidget` стилизуются через под-контролы `::tab-bar`, `::tab` и `::pane` с псевдо-состояниями `:hover`, `:pressed`, `:selected`, `:disabled`:
 
 ```css
-StyledPanel.tab-bar {
+StyledTabWidget::tab-bar {
     background-color: transparent;
-    border-bottom: 1dip solid #bdc3c7;
-    padding: 0dip;
+    border-bottom-width: 1dip;
+    border-color: #bdc3c7;
+    border-style: solid;
 }
 
-StyledButton.tab {
+StyledTabWidget::tab {
     background-color: #f8f9fa;
     color: #2c3e50;
-    border: 1dip solid #dee2e6;
+    border-width: 1dip;
+    border-color: #dee2e6;
+    border-style: solid;
     border-radius: 4dip;
+    border-bottom-width: 0dip;
     padding: 8dip 16dip;
     text-align: center;
+    min-width: 80dip;
 }
 
-StyledButton.tab:hover { background-color: #e9ecef; }
-StyledButton.tab:pressed { background-color: #dee2e6; }
-StyledButton.tab:focused { outline: 2dip solid #85c1e9; outline-offset: 2dip; }
+StyledTabWidget::tab:hover { background-color: #e9ecef; }
+StyledTabWidget::tab:pressed { background-color: #dee2e6; }
 
-StyledButton.tab.tab-active {
+StyledTabWidget::tab:selected {
     background-color: var(--primary);
     color: #ffffff;
     border-color: var(--hover);
 }
 
-StyledButton.tab.tab-active:hover {
-    background-color: var(--hover);
-    border-color: var(--pressed);
+StyledTabWidget:focused {
+    outline-width: 2dip;
+    outline-color: #85c1e9;
+    outline-offset: 2dip;
+}
+
+StyledTabWidget::pane {
+    background-color: #ffffff;
+    padding: 0dip;
 }
 ```
 
-Классы позволяют стилизовать одну и ту же кнопку по-разному в зависимости от роли, не затрагивая остальные `StyledButton`.
+Псевдо-состояние `:selected` выделяет активную вкладку; при совпадении нескольких состояний (например, активная вкладка под курсором) `:selected` имеет приоритет над `:hover` и `:pressed`.
 
 ### Тёмная тема
 

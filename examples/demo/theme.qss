@@ -427,25 +427,21 @@ StyledMessageDialog {
     spacing: 16dip;
 }
 
-/* Custom tab bar styles used in the demo before StyledTabWidget exists. */
-StyledPanel.tab-bar {
+/* StyledTabWidget styles, adapted from the WXC-045 custom tab bar. */
+StyledTabWidget::tab-bar {
     background-color: transparent;
-    border-width: 0dip;
     border-bottom-width: 1dip;
     border-color: #bdc3c7;
     border-style: solid;
-    border-radius: 0dip;
     padding: 0dip;
 }
 
-StyledPanel.tab-content {
+StyledTabWidget::pane {
     background-color: #ffffff;
-    border-width: 0dip;
-    border-radius: 0dip;
     padding: 0dip;
 }
 
-StyledButton.tab {
+StyledTabWidget::tab {
     background-color: #f8f9fa;
     color: #2c3e50;
     border-width: 1dip;
@@ -459,28 +455,29 @@ StyledButton.tab {
     min-height: 32dip;
 }
 
-StyledButton.tab:hover {
+StyledTabWidget::tab:hover {
     background-color: #e9ecef;
     border-color: #ced4da;
 }
 
-StyledButton.tab:pressed {
+StyledTabWidget::tab:pressed {
     background-color: #dee2e6;
 }
 
-StyledButton.tab:focused {
-    outline-width: 2dip;
-    outline-color: #85c1e9;
-    outline-offset: 2dip;
-}
-
-StyledButton.tab.tab-active {
+StyledTabWidget::tab:selected {
     background-color: var(--primary);
     color: #ffffff;
     border-color: var(--hover);
 }
 
-StyledButton.tab.tab-active:hover {
-    background-color: var(--hover);
-    border-color: var(--pressed);
+StyledTabWidget::tab:disabled {
+    background-color: var(--disabled-bg);
+    border-color: var(--disabled-border);
+    color: var(--disabled-color);
+}
+
+StyledTabWidget:focused {
+    outline-width: 2dip;
+    outline-color: #85c1e9;
+    outline-offset: 2dip;
 }

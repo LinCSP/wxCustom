@@ -295,50 +295,67 @@ wxCustomization::StyledMessageDialog::Show(
     parent, "Message", "Title", wxOK | wxICON_INFORMATION, styleSheet);
 ```
 
-## Пример компоновки: кастомный tab bar
+## StyledTabWidget
 
-Пока `StyledTabWidget` находится в разработке, demo использует кастомный tab bar на базе `StyledButton` и `StyledPanel`:
+Контейнер вкладок (замена `wxNotebook`). Страницы — обычные дочерние окна виджета: выбранная страница показывается в области `::pane`, остальные скрыты. Поддерживает переключение кликом по вкладке, стрелками Left/Right и Ctrl+Tab / Ctrl+Shift+Tab (за счёт `HasMultiplePages()` маршрутизация Ctrl+Tab работает, даже когда фокус находится внутри страницы).
 
-```cpp
-auto* tabBar = new wxCustomization::StyledPanel(parent, wxID_ANY);
-tabBar->AddStyleClass("tab-bar");
-
-auto* buttonsTab = new wxCustomization::StyledButton(tabBar, wxID_ANY, "Buttons");
-buttonsTab->AddStyleClass("tab");
-buttonsTab->AddStyleClass("tab-active");
-
-auto* inputTab = new wxCustomization::StyledButton(tabBar, wxID_ANY, "Input");
-inputTab->AddStyleClass("tab");
-```
-
-Переключение вкладок выполняется через `wxSizer::Show()`:
+При смене выбранной вкладки генерируется `wxEVT_NOTEBOOK_PAGE_CHANGED` с новым и прежним индексами (как у `wxNotebook`).
 
 ```cpp
-contentSizer->Show(buttonsPage, true);
-contentSizer->Show(inputPage, false);
-contentSizer->Layout();
+auto* tabs = new wxCustomization::StyledTabWidget(parent, wxID_ANY);
+tabs->SetStyleSheet(sheet);
+
+// Страницы создаются как дочерние окна StyledTabWidget.
+auto* buttonsPage = new wxCustomization::StyledPanel(tabs, wxID_ANY);
+buttonsPage->SetStyleSheet(sheet);
+// ... наполнение страницы ...
+
+tabs->AddPage(buttonsPage, "Buttons");
+tabs->AddPage(inputPage, "Input");
+
+tabs->SetSelection(0);
+tabs->Bind(wxEVT_NOTEBOOK_PAGE_CHANGED, [](wxBookCtrlEvent& evt) {
+    // evt.GetSelection() — новая вкладка, evt.GetOldSelection() — прежняя.
+});
 ```
 
-Стили вкладок задаются через CSS-классы:
+Под-контролы: `::tab-bar` (полоса вкладок), `::tab` (одна вкладка; состояния `:hover`, `:pressed`, `:selected`, `:disabled`), `::pane` (область содержимого):
 
 ```css
-StyledButton.tab {
-    background-color: #f8f9fa;
-    color: #2c3e50;
-    border: 1dip solid #dee2e6;
-    border-radius: 4dip;
-    padding: 8dip 16dip;
+StyledTabWidget::tab-bar {
+    background-color: transparent;
+    border-bottom-width: 1dip;
+    border-color: #bdc3c7;
+    border-style: solid;
 }
 
-StyledButton.tab.tab-active {
+StyledTabWidget::tab {
+    background-color: #f8f9fa;
+    color: #2c3e50;
+    border-width: 1dip;
+    border-color: #dee2e6;
+    border-style: solid;
+    border-radius: 4dip;
+    border-bottom-width: 0dip;
+    padding: 8dip 16dip;
+    min-width: 80dip;
+    min-height: 32dip;
+}
+
+StyledTabWidget::tab:hover {
+    background-color: #e9ecef;
+}
+
+StyledTabWidget::tab:selected {
     background-color: var(--primary);
     color: #ffffff;
     border-color: var(--hover);
 }
+
+StyledTabWidget::pane {
+    background-color: #ffffff;
+    padding: 0dip;
+}
 ```
 
-## Планируемые виджеты
-
-| Виджет | Описание | Статус |
-|--------|----------|--------|
-| `StyledTabWidget` | Полноценный виджет вкладок с sub-control'ами `::tab`, `::tab-bar`, `::pane` | запланирован |
+`padding` у `::pane` задаёт отступ страницы от краёв области содержимого; `padding` у `::tab-bar` — отступы полосы вкладок (слева/справа — перед первой и после последней вкладки, сверху/снизу — увеличивают высоту полосы).

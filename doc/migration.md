@@ -16,6 +16,12 @@
 | `wxRadioButton` | `StyledRadioButton` |
 | `wxTextCtrl` (single-line) | `StyledLineEdit` |
 | `wxComboBox` | `StyledComboBox` |
+| `wxSlider` | `StyledSlider` |
+| `wxGauge` | `StyledProgressBar` |
+| `wxStaticBox` | `StyledGroupBox` |
+| `wxNotebook` | `StyledTabWidget` |
+
+`StyledTabWidget` сохраняет основные привычные точки API `wxNotebook`: страницы создаются как дочерние окна виджета, добавляются через `AddPage()`, а смена вкладки приходит событием `wxEVT_NOTEBOOK_PAGE_CHANGED` с классом `wxBookCtrlEvent` — существующие обработчики переносятся без изменений.
 
 ## Пример замены
 

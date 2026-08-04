@@ -54,7 +54,7 @@ Demo разделено на три вкладки:
 - **Input** — `StyledLineEdit`, `StyledComboBox`, `StyledSlider`.
 - **Progress** — `StyledProgressBar`.
 
-Вкладки реализованы кастомным tab bar на базе `StyledButton` до появления полноценного `StyledTabWidget`.
+Вкладки реализованы виджетом `StyledTabWidget`: переключение — кликом по вкладке, стрелками Left/Right или Ctrl+Tab / Ctrl+Shift+Tab.
 
 ## Сборка с отладкой
 

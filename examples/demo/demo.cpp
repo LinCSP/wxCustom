@@ -18,6 +18,7 @@
 #include "wxCustomization/widgets/StyledSlider.h"
 #include "wxCustomization/widgets/StyledProgressBar.h"
 #include "wxCustomization/widgets/StyledGroupBox.h"
+#include "wxCustomization/widgets/StyledTabWidget.h"
 #include "wxCustomization/wxCustomization.h"
 
 namespace {
@@ -56,87 +57,25 @@ public:
         title->AddStyleClass("title");
         rootSizer->Add(title, 0, wxALL | wxALIGN_CENTER_HORIZONTAL, 20);
 
-        // Custom tab bar.
-        wxCustomization::StyledPanel* tabBar =
-            new wxCustomization::StyledPanel(rootPanel, wxID_ANY);
-        tabBar->SetStyleSheet(m_styleSheet);
-        tabBar->AddStyleClass("tab-bar");
+        // Tab widget holding the demo pages.
+        wxCustomization::StyledTabWidget* tabWidget =
+            new wxCustomization::StyledTabWidget(rootPanel, wxID_ANY);
+        tabWidget->SetStyleSheet(m_styleSheet);
 
-        wxBoxSizer* tabSizer = new wxBoxSizer(wxHORIZONTAL);
+        m_buttonsPage = CreateButtonsPage(tabWidget);
+        m_inputPage = CreateInputPage(tabWidget);
+        m_progressPage = CreateProgressPage(tabWidget);
 
-        m_tabButtons[0] = CreateTabButton(tabBar, "Buttons", 0);
-        m_tabButtons[1] = CreateTabButton(tabBar, "Input", 1);
-        m_tabButtons[2] = CreateTabButton(tabBar, "Progress", 2);
+        tabWidget->AddPage(m_buttonsPage, "Buttons");
+        tabWidget->AddPage(m_inputPage, "Input");
+        tabWidget->AddPage(m_progressPage, "Progress");
 
-        tabSizer->Add(m_tabButtons[0], 0, wxRIGHT, 4);
-        tabSizer->Add(m_tabButtons[1], 0, wxRIGHT, 4);
-        tabSizer->Add(m_tabButtons[2], 0, wxRIGHT, 0);
-        tabBar->SetSizer(tabSizer);
-
-        rootSizer->Add(tabBar, 0, wxLEFT | wxRIGHT | wxEXPAND, 20);
-
-        // Content panel holding the tab pages.
-        wxCustomization::StyledPanel* contentPanel =
-            new wxCustomization::StyledPanel(rootPanel, wxID_ANY);
-        contentPanel->SetStyleSheet(m_styleSheet);
-        contentPanel->AddStyleClass("tab-content");
-
-        wxBoxSizer* contentSizer = new wxBoxSizer(wxVERTICAL);
-
-        m_buttonsPage = CreateButtonsPage(contentPanel);
-        m_inputPage = CreateInputPage(contentPanel);
-        m_progressPage = CreateProgressPage(contentPanel);
-
-        contentSizer->Add(m_buttonsPage, 1, wxEXPAND);
-        contentSizer->Add(m_inputPage, 1, wxEXPAND);
-        contentSizer->Add(m_progressPage, 1, wxEXPAND);
-        contentPanel->SetSizer(contentSizer);
-
-        rootSizer->Add(contentPanel, 1, wxALL | wxEXPAND, 20);
+        rootSizer->Add(tabWidget, 1, wxALL | wxEXPAND, 20);
 
         rootPanel->SetSizer(rootSizer);
-
-        m_contentSizer = contentSizer;
-        SwitchToTab(0);
     }
 
 private:
-    wxCustomization::StyledButton* CreateTabButton(wxWindow* parent,
-                                                   const wxString& label,
-                                                   int index)
-    {
-        wxCustomization::StyledButton* button =
-            new wxCustomization::StyledButton(parent, wxID_ANY, label);
-        button->SetStyleSheet(m_styleSheet);
-        button->AddStyleClass("tab");
-        button->Bind(wxEVT_BUTTON, [this, index](wxCommandEvent& /*evt*/) {
-            SwitchToTab(index);
-        });
-        return button;
-    }
-
-    void SwitchToTab(int index)
-    {
-        m_currentTab = index;
-
-        // Use the sizer to show/hide pages. This keeps the pages created and
-        // re-lays them out correctly when a previously hidden tab is selected.
-        m_contentSizer->Show(m_buttonsPage, index == 0);
-        m_contentSizer->Show(m_inputPage, index == 1);
-        m_contentSizer->Show(m_progressPage, index == 2);
-        m_contentSizer->Layout();
-
-        for (int i = 0; i < 3; ++i) {
-            if (i == index) {
-                m_tabButtons[i]->AddStyleClass("tab-active");
-            } else {
-                m_tabButtons[i]->RemoveStyleClass("tab-active");
-            }
-        }
-
-        Layout();
-    }
-
     wxCustomization::StyledPanel* CreateButtonsPage(wxWindow* parent)
     {
         wxCustomization::StyledPanel* page =
@@ -448,13 +387,9 @@ private:
 
     wxCustomization::StyleSheet* m_styleSheet;
 
-    int m_currentTab = 0;
-    wxCustomization::StyledButton* m_tabButtons[3] = {nullptr, nullptr, nullptr};
-
     wxCustomization::StyledPanel* m_buttonsPage = nullptr;
     wxCustomization::StyledPanel* m_inputPage = nullptr;
     wxCustomization::StyledPanel* m_progressPage = nullptr;
-    wxBoxSizer* m_contentSizer = nullptr;
 
     wxCustomization::StyledButton* m_button = nullptr;
     wxCustomization::StyledToggleButton* m_toggle = nullptr;

@@ -41,6 +41,7 @@ add_library(wxCustomization
     include/wxCustomization/widgets/StyledSlider.h
     include/wxCustomization/widgets/StyledProgressBar.h
     include/wxCustomization/widgets/StyledGroupBox.h
+    include/wxCustomization/widgets/StyledTabWidget.h
     src/dummy.cpp
     src/Length.cpp
     src/Color.cpp
@@ -64,6 +65,7 @@ add_library(wxCustomization
     src/widgets/StyledSlider.cpp
     src/widgets/StyledProgressBar.cpp
     src/widgets/StyledGroupBox.cpp
+    src/widgets/StyledTabWidget.cpp
 )
 
 add_library(wxCustomization::wxCustomization ALIAS wxCustomization)

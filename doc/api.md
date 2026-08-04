@@ -185,6 +185,25 @@ void ShowText(bool show);
 bool ShowsText() const;
 ```
 
+## StyledGroupBox
+
+```cpp
+StyledGroupBox(wxWindow* parent, wxWindowID id = wxID_ANY,
+               const wxString& title = wxEmptyString,
+               const wxPoint& pos = wxDefaultPosition,
+               const wxSize& size = wxDefaultSize,
+               long style = 0,
+               const wxString& name = wxStaticBoxNameStr);
+
+void SetTitle(const wxString& title);
+wxString GetTitle() const;
+
+// Высота полосы заголовка в верхней части виджета (0, если заголовка нет).
+int GetTitleHeight() const;
+```
+
+Контейнер: дочерние виджеты размещаются от начала клиентской области, поэтому место под заголовок резервируется в sizer'е (например, спейсером `GetTitleHeight()`). Заголовок стилизуется через под-контрол `::title`.
+
 ## События
 
 | Виджет | Событие |
@@ -197,3 +216,4 @@ bool ShowsText() const;
 | `StyledComboBox` | `wxEVT_COMBOBOX` |
 | `StyledSlider` | `wxEVT_SLIDER` |
 | `StyledProgressBar` | — |
+| `StyledGroupBox` | — |

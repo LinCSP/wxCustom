@@ -17,6 +17,7 @@
 #include "wxCustomization/widgets/StyledComboBox.h"
 #include "wxCustomization/widgets/StyledSlider.h"
 #include "wxCustomization/widgets/StyledProgressBar.h"
+#include "wxCustomization/widgets/StyledGroupBox.h"
 #include "wxCustomization/wxCustomization.h"
 
 namespace {
@@ -203,30 +204,41 @@ private:
 
         sizer->Add(checkRow, 0, wxLEFT | wxRIGHT, 8);
 
-        sizer->Add(CreateHeader(page, m_styleSheet, "StyledRadioButton"), 0,
-                   wxLEFT | wxRIGHT | wxTOP, 16);
+        // StyledGroupBox wraps the radio buttons; its title replaces the
+        // usual section header.
+        wxCustomization::StyledGroupBox* groupBox =
+            new wxCustomization::StyledGroupBox(page, wxID_ANY, "StyledRadioButton");
+        groupBox->SetStyleSheet(m_styleSheet);
+
+        wxBoxSizer* groupSizer = new wxBoxSizer(wxVERTICAL);
+        // Children are laid out from the client origin, so reserve space for
+        // the title strip at the top of the group box.
+        groupSizer->AddSpacer(groupBox->GetTitleHeight() + groupBox->FromDIP(4));
 
         wxBoxSizer* radioRow = new wxBoxSizer(wxHORIZONTAL);
-        m_radio1 = new wxCustomization::StyledRadioButton(page, wxID_ANY, "Radio 1",
+        m_radio1 = new wxCustomization::StyledRadioButton(groupBox, wxID_ANY, "Radio 1",
                                                           wxDefaultPosition, wxDefaultSize,
                                                           wxRB_GROUP);
         m_radio1->SetStyleSheet(m_styleSheet);
         m_radio1->Bind(wxEVT_RADIOBUTTON, &DemoFrame::OnRadio, this);
         radioRow->Add(m_radio1, 0, wxALL, 8);
 
-        m_radio2 = new wxCustomization::StyledRadioButton(page, wxID_ANY, "Radio 2");
+        m_radio2 = new wxCustomization::StyledRadioButton(groupBox, wxID_ANY, "Radio 2");
         m_radio2->SetStyleSheet(m_styleSheet);
         m_radio2->Bind(wxEVT_RADIOBUTTON, &DemoFrame::OnRadio, this);
         radioRow->Add(m_radio2, 0, wxALL, 8);
 
         wxCustomization::StyledRadioButton* disabledRadio =
-            new wxCustomization::StyledRadioButton(page, wxID_ANY, "Disabled selected");
+            new wxCustomization::StyledRadioButton(groupBox, wxID_ANY, "Disabled selected");
         disabledRadio->SetValue(true);
         disabledRadio->SetStyleSheet(m_styleSheet);
         disabledRadio->Disable();
         radioRow->Add(disabledRadio, 0, wxALL, 8);
 
-        sizer->Add(radioRow, 0, wxLEFT | wxRIGHT, 8);
+        groupSizer->Add(radioRow, 0, wxLEFT | wxRIGHT | wxBOTTOM, 4);
+        groupBox->SetSizer(groupSizer);
+
+        sizer->Add(groupBox, 0, wxLEFT | wxRIGHT | wxTOP | wxEXPAND, 16);
 
         m_disableButton =
             new wxCustomization::StyledButton(page, wxID_ANY, "Disable all widgets");

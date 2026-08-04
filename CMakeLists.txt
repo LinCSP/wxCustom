@@ -40,6 +40,7 @@ add_library(wxCustomization
     include/wxCustomization/widgets/StyledComboBox.h
     include/wxCustomization/widgets/StyledSlider.h
     include/wxCustomization/widgets/StyledProgressBar.h
+    include/wxCustomization/widgets/StyledGroupBox.h
     src/dummy.cpp
     src/Length.cpp
     src/Color.cpp
@@ -62,6 +63,7 @@ add_library(wxCustomization
     src/widgets/StyledComboBox.cpp
     src/widgets/StyledSlider.cpp
     src/widgets/StyledProgressBar.cpp
+    src/widgets/StyledGroupBox.cpp
 )
 
 add_library(wxCustomization::wxCustomization ALIAS wxCustomization)

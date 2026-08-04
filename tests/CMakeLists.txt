@@ -20,6 +20,7 @@ add_executable(wxCustomization_tests
     test_styled_combobox.cpp
     test_styled_slider.cpp
     test_styled_progressbar.cpp
+    test_styled_groupbox.cpp
 )
 
 target_link_libraries(wxCustomization_tests

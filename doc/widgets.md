@@ -252,6 +252,40 @@ StyledProgressBar::chunk {
 }
 ```
 
+## StyledGroupBox
+
+Группа с заголовком и рамкой. Верхняя грань рамки проходит через середину заголовка и вырезается под ним. Работает как контейнер для других виджетов. Заголовок стилизуется через под-контрол `::title`.
+
+Дочерние виджеты размещаются от начала клиентской области (как в `StyledPanel`), поэтому в sizer группы нужно зарезервировать место под заголовок, например спейсером высотой `GetTitleHeight()`.
+
+```cpp
+auto* box = new wxCustomization::StyledGroupBox(parent, wxID_ANY, "Options");
+box->SetStyleSheet(sheet);
+
+auto* sizer = new wxBoxSizer(wxVERTICAL);
+sizer->AddSpacer(box->GetTitleHeight() + box->FromDIP(4));
+sizer->Add(new wxCustomization::StyledRadioButton(box, wxID_ANY, "Radio 1"), 0, wxALL, 8);
+sizer->Add(new wxCustomization::StyledRadioButton(box, wxID_ANY, "Radio 2"), 0, wxALL, 8);
+box->SetSizer(sizer);
+```
+
+```css
+StyledGroupBox {
+    border-width: 1dip;
+    border-color: #bdc3c7;
+    border-style: solid;
+    border-radius: 4dip;
+    padding: 0dip 12dip 12dip 12dip;
+}
+
+StyledGroupBox::title {
+    color: var(--primary);
+    font-size: 12dip;
+    font-weight: bold;
+    padding: 0dip 6dip;
+}
+```
+
 ## StyledMessageDialog
 
 Стилизованное диалоговое окно.
@@ -307,5 +341,4 @@ StyledButton.tab.tab-active {
 
 | Виджет | Описание | Статус |
 |--------|----------|--------|
-| `StyledGroupBox` | Группа с заголовком и рамкой | в разработке |
 | `StyledTabWidget` | Полноценный виджет вкладок с sub-control'ами `::tab`, `::tab-bar`, `::pane` | запланирован |

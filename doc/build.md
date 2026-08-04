@@ -50,7 +50,7 @@ ctest --output-on-failure
 
 Demo разделено на три вкладки:
 
-- **Buttons** — `StyledButton`, `StyledToggleButton`, `StyledCheckBox`, `StyledRadioButton`.
+- **Buttons** — `StyledButton`, `StyledToggleButton`, `StyledCheckBox`, `StyledRadioButton` (внутри `StyledGroupBox`).
 - **Input** — `StyledLineEdit`, `StyledComboBox`, `StyledSlider`.
 - **Progress** — `StyledProgressBar`.
 

@@ -400,6 +400,21 @@ StyledProgressBar:disabled {
     opacity: 0.65;
 }
 
+StyledGroupBox {
+    border-width: 1dip;
+    border-color: #bdc3c7;
+    border-style: solid;
+    border-radius: 4dip;
+    padding: 0dip 12dip 12dip 12dip;
+}
+
+StyledGroupBox::title {
+    color: var(--primary);
+    font-size: 12dip;
+    font-weight: bold;
+    padding: 0dip 6dip;
+}
+
 StyledMessageDialog {
     background-color: #ffffff;
     color: #2c3e50;

@@ -5,6 +5,7 @@
 
 #include <wx/dc.h>
 #include <wx/settings.h>
+#include <wx/utils.h>
 
 #include <algorithm>
 
@@ -15,7 +16,10 @@ namespace {
 constexpr int DEFAULT_HORIZONTAL_LENGTH_DIP = 120;
 constexpr int DEFAULT_VERTICAL_LENGTH_DIP = 120;
 constexpr int DEFAULT_THICKNESS_DIP = 16;
-constexpr int INDETERMINATE_TIMER_INTERVAL_MS = 50;
+constexpr int INDETERMINATE_TIMER_INTERVAL_MS = 25;
+// Chunk speed in pixels per second; the offset is computed from the elapsed
+// time so the motion stays constant-speed even if a timer tick is late.
+constexpr int INDETERMINATE_SPEED_PX_PER_SEC = 40;
 
 } // namespace
 
@@ -71,6 +75,7 @@ void StyledProgressBar::SetIndeterminate(bool indeterminate)
     m_indeterminate = indeterminate;
     if (m_indeterminate) {
         m_indeterminateOffset = 0;
+        m_indeterminateStartMs = wxGetUTCTimeMillis().GetValue();
         m_timer.Start(INDETERMINATE_TIMER_INTERVAL_MS);
     } else {
         m_timer.Stop();
@@ -166,7 +171,11 @@ void StyledProgressBar::OnTimer(wxTimerEvent& /*evt*/)
         return;
     }
 
-    m_indeterminateOffset += 2;
+    // Time-based offset: a delayed tick skips ahead instead of slowing the
+    // animation down, so the motion does not accumulate jitter under load.
+    const long long elapsed = wxGetUTCTimeMillis().GetValue() - m_indeterminateStartMs;
+    m_indeterminateOffset =
+        static_cast<int>(elapsed * INDETERMINATE_SPEED_PX_PER_SEC / 1000);
     Refresh();
 }
 

@@ -80,6 +80,7 @@ private:
     bool m_indeterminate = false;
     bool m_showText = true;
     int m_indeterminateOffset = 0;
+    long long m_indeterminateStartMs = 0;
 
     wxTimer m_timer;
 

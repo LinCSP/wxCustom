@@ -232,7 +232,7 @@ TEST(StyledTabWidget, CtrlTabNavigationChangesSelection)
     EXPECT_EQ(tabs->GetSelection(), 0);
 }
 
-TEST(StyledTabWidget, MouseClickSelectsTab)
+TEST(StyledTabWidget, MousePressSelectsTabImmediately)
 {
     TestTabWidget* tabs = CreateWithPages(gTestFrame, 3);
     tabs->SetSize(0, 0, 400, 200);
@@ -245,20 +245,23 @@ TEST(StyledTabWidget, MouseClickSelectsTab)
                                    secondTab.y + secondTab.height / 2);
     EXPECT_EQ(tabs->HitTestTab(center), 1);
 
+    // Selection changes on mouse press, not on release (like QTabBar).
     wxMouseEvent downEvent(wxEVT_LEFT_DOWN);
     downEvent.SetPosition(center);
     tabs->GetEventHandler()->ProcessEvent(downEvent);
-    EXPECT_EQ(tabs->GetSelection(), 0); // selection changes on release
+    EXPECT_EQ(tabs->GetSelection(), 1);
+    EXPECT_EQ(catcher.eventCount, 1);
+    EXPECT_EQ(catcher.lastSelection, 1);
 
+    // The release does not change anything further.
     wxMouseEvent upEvent(wxEVT_LEFT_UP);
     upEvent.SetPosition(center);
     tabs->GetEventHandler()->ProcessEvent(upEvent);
     EXPECT_EQ(tabs->GetSelection(), 1);
     EXPECT_EQ(catcher.eventCount, 1);
-    EXPECT_EQ(catcher.lastSelection, 1);
 }
 
-TEST(StyledTabWidget, MouseReleaseOutsideTabDoesNotSelect)
+TEST(StyledTabWidget, MouseReleaseOutsideKeepsSelection)
 {
     TestTabWidget* tabs = CreateWithPages(gTestFrame, 2);
     tabs->SetSize(0, 0, 400, 200);
@@ -267,14 +270,17 @@ TEST(StyledTabWidget, MouseReleaseOutsideTabDoesNotSelect)
     const wxPoint center = wxPoint(secondTab.x + secondTab.width / 2,
                                    secondTab.y + secondTab.height / 2);
 
+    // Press selects the tab right away; dragging off and releasing outside
+    // does not revert it.
     wxMouseEvent downEvent(wxEVT_LEFT_DOWN);
     downEvent.SetPosition(center);
     tabs->GetEventHandler()->ProcessEvent(downEvent);
+    EXPECT_EQ(tabs->GetSelection(), 1);
 
     wxMouseEvent upEvent(wxEVT_LEFT_UP);
     upEvent.SetPosition(wxPoint(390, 190)); // pane area, far from the tab
     tabs->GetEventHandler()->ProcessEvent(upEvent);
-    EXPECT_EQ(tabs->GetSelection(), 0);
+    EXPECT_EQ(tabs->GetSelection(), 1);
 }
 
 TEST(StyledTabWidget, BestSizeIncludesTabBarAndPage)
@@ -299,6 +305,49 @@ TEST(StyledTabWidget, BestSizeIncludesTabBarAndPage)
 
     EXPECT_GT(size.y, buttonSize.y + tabs->GetTabBarRect().height);
     EXPECT_GT(size.x, buttonSize.x);
+}
+
+TEST(StyledTabWidget, BaselineIsCoveredBySelectedTab)
+{
+    StyleSheet sheet;
+    ASSERT_TRUE(sheet.LoadFromString(
+        "StyledTabWidget::tab-bar { background-color: #ffffff; border-bottom-width: 2px;"
+        " border-color: #ff0000; border-style: solid; }\n"
+        "StyledTabWidget::tab { background-color: #202020; color: #ffffff; padding: 4px 8px; }\n"
+        "StyledTabWidget::tab:selected { background-color: #404040; }\n"
+        "StyledTabWidget::pane { background-color: #606060; }"));
+
+    TestTabWidget* tabs = CreateWithPages(gTestFrame, 2);
+    tabs->SetStyleSheet(&sheet);
+    tabs->SetSize(0, 0, 400, 200);
+
+    wxBitmap bitmap(400, 200, 24);
+    {
+        wxMemoryDC dc(bitmap);
+        dc.SetBackground(wxBrush(wxColour(255, 255, 255)));
+        dc.Clear();
+        tabs->DrawTabWidget(dc, wxRect(0, 0, 400, 200));
+    }
+
+    const wxRect bar = tabs->GetTabBarRect();
+    const int baselineY = bar.y + bar.height - 2; // centre row of the 2px baseline
+
+    // Under the selected tab the baseline is covered by the tab background.
+    const wxRect firstTab = tabs->GetTabRect(0);
+    const wxColour underSelected = GetPixel(bitmap, firstTab.x + firstTab.width / 2, baselineY);
+    EXPECT_EQ(underSelected, wxColour(0x40, 0x40, 0x40));
+
+    // Under an inactive tab the baseline stays visible.
+    const wxRect secondTab = tabs->GetTabRect(1);
+    const wxColour underInactive = GetPixel(bitmap, secondTab.x + secondTab.width / 2, baselineY);
+    EXPECT_GT(underInactive.Red(), 200);
+    EXPECT_LT(underInactive.Green(), 60);
+
+    // To the right of all tabs the baseline also stays visible.
+    const int freeX = secondTab.x + secondTab.width + 20;
+    const wxColour freePixel = GetPixel(bitmap, freeX, baselineY);
+    EXPECT_GT(freePixel.Red(), 200);
+    EXPECT_LT(freePixel.Green(), 60);
 }
 
 TEST(StyledTabWidget, SelectedTabIsPaintedWithSelectedColour)

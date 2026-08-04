@@ -297,7 +297,7 @@ wxCustomization::StyledMessageDialog::Show(
 
 ## StyledTabWidget
 
-Контейнер вкладок (замена `wxNotebook`). Страницы — обычные дочерние окна виджета: выбранная страница показывается в области `::pane`, остальные скрыты. Поддерживает переключение кликом по вкладке, стрелками Left/Right и Ctrl+Tab / Ctrl+Shift+Tab (за счёт `HasMultiplePages()` маршрутизация Ctrl+Tab работает, даже когда фокус находится внутри страницы).
+Контейнер вкладок (замена `wxNotebook`). Страницы — обычные дочерние окна виджета: выбранная страница показывается в области `::pane`, остальные скрыты. Поддерживает переключение нажатием мыши на вкладку (сразу по нажатию, как QTabBar/wxNotebook), стрелками Left/Right и Ctrl+Tab / Ctrl+Shift+Tab (за счёт `HasMultiplePages()` маршрутизация Ctrl+Tab работает, даже когда фокус находится внутри страницы).
 
 При смене выбранной вкладки генерируется `wxEVT_NOTEBOOK_PAGE_CHANGED` с новым и прежним индексами (как у `wxNotebook`).
 
@@ -319,37 +319,34 @@ tabs->Bind(wxEVT_NOTEBOOK_PAGE_CHANGED, [](wxBookCtrlEvent& evt) {
 });
 ```
 
-Под-контролы: `::tab-bar` (полоса вкладок), `::tab` (одна вкладка; состояния `:hover`, `:pressed`, `:selected`, `:disabled`), `::pane` (область содержимого):
+Под-контролы: `::tab-bar` (полоса вкладок), `::tab` (одна вкладка; состояния `:hover`, `:pressed`, `:selected`, `:disabled`), `::pane` (область содержимого). Вкладки рисуются специальным образом: `border-radius` применяется только к верхним углам, рамка рисуется сверху и по бокам (низ не обводится), а выбранная вкладка перекрывает нижнюю рамку `::tab-bar`, поэтому она визуально «прикреплена» к содержимому — как вкладки Bootstrap 5:
 
 ```css
 StyledTabWidget::tab-bar {
-    background-color: transparent;
     border-bottom-width: 1dip;
-    border-color: #bdc3c7;
+    border-color: #dee2e6;
     border-style: solid;
 }
 
 StyledTabWidget::tab {
-    background-color: #f8f9fa;
-    color: #2c3e50;
-    border-width: 1dip;
-    border-color: #dee2e6;
-    border-style: solid;
-    border-radius: 4dip;
-    border-bottom-width: 0dip;
+    color: #0d6efd;              /* неактивные вкладки — ссылки без рамки */
     padding: 8dip 16dip;
+    border-width: 1dip;
+    border-color: transparent;   /* рамка появляется только у :selected */
+    border-style: solid;
+    border-radius: 6dip;
     min-width: 80dip;
-    min-height: 32dip;
 }
 
 StyledTabWidget::tab:hover {
-    background-color: #e9ecef;
+    color: #0a58ca;
+    background-color: #f1f3f5;
 }
 
 StyledTabWidget::tab:selected {
-    background-color: var(--primary);
-    color: #ffffff;
-    border-color: var(--hover);
+    background-color: #ffffff;
+    color: #495057;
+    border-color: #dee2e6;
 }
 
 StyledTabWidget::pane {
@@ -358,4 +355,6 @@ StyledTabWidget::pane {
 }
 ```
 
-`padding` у `::pane` задаёт отступ страницы от краёв области содержимого; `padding` у `::tab-bar` — отступы полосы вкладок (слева/справа — перед первой и после последней вкладки, сверху/снизу — увеличивают высоту полосы).
+`padding` у `::pane` задаёт отступ страницы от краёв области содержимого; `padding` у `::tab-bar` — отступы полосы вкладок (слева/справа — перед первой и после последней вкладки, сверху/снизу — увеличивают высоту полосы). Ширина `border-bottom-width` у `::tab-bar` — это «базовая линия», на которой сидят вкладки; выбранная вкладка перекрывает её, неактивные останавливаются над ней.
+
+> **Совет:** держите `border-width` у `::tab` одинаковым во всех состояниях (невидимая рамка через `border-color: transparent`), чтобы ширина вкладок не менялась при наведении/выборе.

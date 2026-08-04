@@ -85,24 +85,37 @@ protected:
     void ChangeSelection(int delta, bool sendEvent);
 
 private:
-    struct Page {
-        wxWindow* window;
-        wxString title;
-    };
-
     int SetSelectionInternal(int index, bool sendEvent);
     void UpdatePageVisibility();
     void LayoutPage();
     wxSize GetTabSize(int index) const;
     wxFont GetTabFont(int index) const;
-    wxColour GetPaneColour(const Style& paneStyle) const;
+    /// Colour behind unstyled areas (pane, tab bar): the style's own
+    /// background, then the widget's, then the parent's.
+    wxColour GetBehindColour(const Style& style) const;
+    /// Width of the tab bar's bottom border (the baseline), 0 when not styled.
+    int GetBaselineWidth(const Style& barStyle) const;
+    void DrawTabBar(wxDC& dc, const wxRect& rect);
+    /// Draw a single tab: rounded top corners, square bottom edge, borders on
+    /// top/left/right only. The selected tab extends @p baselineWidth pixels
+    /// into the pane so it covers the tab bar's baseline; inactive tabs stop
+    /// above it.
+    void DrawTab(wxDC& dc, const wxRect& tabRect, const wxString& title,
+                 const Style& tabStyle, bool selected, int baselineWidth);
     void SendPageChanged(int oldSelection, int newSelection);
+
+protected:
+    struct Page {
+        wxWindow* window;
+        wxString title;
+    };
 
     std::vector<Page> m_pages;
     int m_selection = -1;
     int m_hoveredTab = -1;
     int m_pressedTab = -1;
 
+private:
     wxDECLARE_EVENT_TABLE();
 };
 

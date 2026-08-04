@@ -254,17 +254,17 @@ wxFont StyledTabWidget::GetTabFont(int index) const
     return wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
 }
 
-wxColour StyledTabWidget::GetPaneColour(const Style& paneStyle) const
+wxColour StyledTabWidget::GetBehindColour(const Style& style) const
 {
-    if (paneStyle.IsSet(Property::BackgroundColor) && paneStyle.backgroundColor.IsOk()) {
-        return paneStyle.backgroundColor;
-    }
-    const Style& style = GetCurrentStyle();
     if (style.IsSet(Property::BackgroundColor) && style.backgroundColor.IsOk()) {
         return style.backgroundColor;
     }
-    // The pane area belongs visually to this widget; fall back to the
-    // parent's styled background so no stale pixels remain behind the page.
+    const Style& widgetStyle = GetCurrentStyle();
+    if (widgetStyle.IsSet(Property::BackgroundColor) && widgetStyle.backgroundColor.IsOk()) {
+        return widgetStyle.backgroundColor;
+    }
+    // Unstyled areas belong visually to the parent, so prefer the parent's
+    // styled background; this guarantees no stale pixels remain there.
     if (const StyledControl* styledParent = dynamic_cast<const StyledControl*>(GetParent())) {
         const Style& parentStyle = styledParent->GetCurrentStyle();
         if (parentStyle.IsSet(Property::BackgroundColor) && parentStyle.backgroundColor.IsOk()) {
@@ -275,6 +275,129 @@ wxColour StyledTabWidget::GetPaneColour(const Style& paneStyle) const
         return parent->GetBackgroundColour();
     }
     return wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE);
+}
+
+int StyledTabWidget::GetBaselineWidth(const Style& barStyle) const
+{
+    if (barStyle.borderStyle == BorderStyle::None || barStyle.borderStyle == BorderStyle::Hidden) {
+        return 0;
+    }
+    if (!barStyle.borderColor.IsOk() || barStyle.borderColor.Alpha() == 0) {
+        return 0;
+    }
+    return barStyle.IsSet(Property::BorderBottomWidth) ? barStyle.borderBottomWidth
+                                                       : barStyle.borderWidth;
+}
+
+void StyledTabWidget::DrawTabBar(wxDC& dc, const wxRect& rect)
+{
+    const Style barStyle = GetSubControlStyle("tab-bar");
+
+    Painter painter;
+    painter.DrawBackground(dc, rect, barStyle);
+    if (!barStyle.IsSet(Property::BackgroundColor)) {
+        dc.SetPen(*wxTRANSPARENT_PEN);
+        dc.SetBrush(GetBehindColour(barStyle));
+        dc.DrawRectangle(rect);
+    }
+
+    // Straight per-side borders (Painter would stroke the full box even when
+    // only border-bottom-width is set). Typically only the bottom line —
+    // the baseline the tabs sit on — is styled.
+    if (barStyle.borderStyle == BorderStyle::None || barStyle.borderStyle == BorderStyle::Hidden
+        || !barStyle.borderColor.IsOk() || barStyle.borderColor.Alpha() == 0) {
+        return;
+    }
+    const wxColour colour = barStyle.borderColor;
+    const int right = rect.x + rect.width - 1;
+    const int bottom = rect.y + rect.height - 1;
+
+    if (barStyle.borderTopWidth > 0) {
+        const int w = barStyle.borderTopWidth;
+        dc.SetPen(wxPen(colour, w));
+        dc.DrawLine(rect.x, rect.y + w / 2, right + 1, rect.y + w / 2);
+    }
+    if (barStyle.borderBottomWidth > 0) {
+        const int w = barStyle.borderBottomWidth;
+        dc.SetPen(wxPen(colour, w));
+        dc.DrawLine(rect.x, bottom - w / 2, right + 1, bottom - w / 2);
+    }
+    if (barStyle.borderLeftWidth > 0) {
+        const int w = barStyle.borderLeftWidth;
+        dc.SetPen(wxPen(colour, w));
+        dc.DrawLine(rect.x + w / 2, rect.y, rect.x + w / 2, bottom + 1);
+    }
+    if (barStyle.borderRightWidth > 0) {
+        const int w = barStyle.borderRightWidth;
+        dc.SetPen(wxPen(colour, w));
+        dc.DrawLine(right - w / 2, rect.y, right - w / 2, bottom + 1);
+    }
+}
+
+void StyledTabWidget::DrawTab(wxDC& dc, const wxRect& tabRect, const wxString& title,
+                              const Style& tabStyle, bool selected, int baselineWidth)
+{
+    wxRect rect = tabRect;
+    if (selected) {
+        // Overlap the tab bar baseline: the selected tab covers it, so the
+        // tab appears attached to the pane (Bootstrap-style).
+        rect.height += baselineWidth;
+    } else {
+        // Inactive tabs stay above the baseline so it remains visible.
+        rect.height -= baselineWidth;
+    }
+    if (rect.width <= 0 || rect.height <= 0) {
+        return;
+    }
+
+    const int radius = std::min({tabStyle.borderRadius, rect.width / 2, rect.height / 2});
+
+    // Background: rounded top corners, square bottom edge.
+    if (tabStyle.IsSet(Property::BackgroundColor) && tabStyle.backgroundColor.IsOk()
+        && tabStyle.backgroundColor.Alpha() > 0) {
+        dc.SetPen(*wxTRANSPARENT_PEN);
+        dc.SetBrush(wxBrush(tabStyle.backgroundColor));
+        if (radius > 0) {
+            dc.DrawRoundedRectangle(rect, radius);
+            dc.DrawRectangle(rect.x, rect.y + rect.height - radius, rect.width, radius);
+        } else {
+            dc.DrawRectangle(rect);
+        }
+    }
+
+    // Borders: top, left and right with rounded top corners. The bottom edge
+    // is never stroked — a tab is visually attached to the pane.
+    const int width = std::max(
+        {tabStyle.borderTopWidth, tabStyle.borderLeftWidth, tabStyle.borderRightWidth});
+    const bool hasBorder = tabStyle.borderStyle != BorderStyle::None
+                           && tabStyle.borderStyle != BorderStyle::Hidden
+                           && tabStyle.borderColor.IsOk()
+                           && tabStyle.borderColor.Alpha() > 0 && width > 0;
+    if (hasBorder) {
+        dc.SetPen(wxPen(tabStyle.borderColor, width));
+        dc.SetBrush(*wxTRANSPARENT_BRUSH);
+
+        const int inset = (width + 1) / 2;
+        const int x1 = rect.x + inset;
+        const int y1 = rect.y + inset;
+        const int x2 = rect.x + rect.width - inset - 1;
+        const int y2 = rect.y + rect.height - 1;
+
+        if (radius > 0) {
+            dc.DrawLine(x1, y2, x1, y1 + radius);              // left
+            dc.DrawEllipticArc(x1, y1, 2 * radius, 2 * radius, 90, 180);
+            dc.DrawLine(x1 + radius, y1, x2 - radius, y1);     // top
+            dc.DrawEllipticArc(x2 - 2 * radius + 1, y1, 2 * radius, 2 * radius, 0, 90);
+            dc.DrawLine(x2, y1 + radius, x2, y2);              // right
+        } else {
+            dc.DrawLine(x1, y2, x1, y1);
+            dc.DrawLine(x1, y1, x2, y1);
+            dc.DrawLine(x2, y1, x2, y2);
+        }
+    }
+
+    Painter painter;
+    painter.DrawText(dc, tabRect, title, tabStyle);
 }
 
 void StyledTabWidget::DrawTabWidget(wxDC& dc, const wxRect& rect)
@@ -298,7 +421,7 @@ void StyledTabWidget::DrawTabWidget(wxDC& dc, const wxRect& rect)
         painter.Paint(dc, paneRect, paneStyle, this);
         if (!paneStyle.IsSet(Property::BackgroundColor)) {
             dc.SetPen(*wxTRANSPARENT_PEN);
-            dc.SetBrush(GetPaneColour(paneStyle));
+            dc.SetBrush(GetBehindColour(paneStyle));
             dc.DrawRectangle(paneRect);
         }
     }
@@ -306,7 +429,8 @@ void StyledTabWidget::DrawTabWidget(wxDC& dc, const wxRect& rect)
     // Tab bar.
     const wxRect barRect = GetTabBarRect();
     const Style barStyle = GetSubControlStyle("tab-bar");
-    painter.Paint(dc, barRect, barStyle, this);
+    DrawTabBar(dc, barRect);
+    const int baselineWidth = GetBaselineWidth(barStyle);
 
     // Tabs.
     for (size_t i = 0; i < m_pages.size(); ++i) {
@@ -320,8 +444,8 @@ void StyledTabWidget::DrawTabWidget(wxDC& dc, const wxRect& rect)
         if (!tabStyle.color.IsOk() && style.color.IsOk()) {
             tabStyle.color = style.color;
         }
-        painter.Paint(dc, tabRect, tabStyle, this);
-        painter.DrawText(dc, tabRect, m_pages[i].title, tabStyle);
+        DrawTab(dc, tabRect, m_pages[i].title, tabStyle, index == m_selection,
+                baselineWidth);
     }
 
     // Focus indicator around the selected tab.
@@ -377,7 +501,9 @@ void StyledTabWidget::OnLeftDown(wxMouseEvent& evt)
 {
     const int tab = HitTestTab(evt.GetPosition());
     if (tab >= 0) {
+        // Tabs switch on mouse press, like QTabBar/wxNotebook — not on release.
         m_pressedTab = tab;
+        SetSelectionInternal(tab, true);
         SetFocus();
         Refresh();
         return;
@@ -387,13 +513,8 @@ void StyledTabWidget::OnLeftDown(wxMouseEvent& evt)
 
 void StyledTabWidget::OnLeftUp(wxMouseEvent& evt)
 {
-    const int tab = m_pressedTab;
-    m_pressedTab = -1;
-
-    if (tab >= 0) {
-        if (HitTestTab(evt.GetPosition()) == tab) {
-            SetSelectionInternal(tab, true);
-        }
+    if (m_pressedTab >= 0) {
+        m_pressedTab = -1;
         Refresh();
         return;
     }

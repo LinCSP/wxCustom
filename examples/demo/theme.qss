@@ -427,11 +427,12 @@ StyledMessageDialog {
     spacing: 16dip;
 }
 
-/* StyledTabWidget styles, adapted from the WXC-045 custom tab bar. */
+/* StyledTabWidget styles (Bootstrap 5 nav-tabs look).
+   Inactive tabs are borderless links; the selected tab is white, bordered on
+   top/left/right with rounded top corners and covers the tab bar baseline. */
 StyledTabWidget::tab-bar {
-    background-color: transparent;
     border-bottom-width: 1dip;
-    border-color: #bdc3c7;
+    border-color: #dee2e6;
     border-style: solid;
     padding: 0dip;
 }
@@ -442,37 +443,34 @@ StyledTabWidget::pane {
 }
 
 StyledTabWidget::tab {
-    background-color: #f8f9fa;
-    color: #2c3e50;
-    border-width: 1dip;
-    border-color: #dee2e6;
-    border-style: solid;
-    border-radius: 4dip;
-    border-bottom-width: 0dip;
+    color: #0d6efd;
     padding: 8dip 16dip;
+    border-width: 1dip;
+    border-color: transparent;
+    border-style: solid;
+    border-radius: 6dip;
     text-align: center;
     min-width: 80dip;
     min-height: 32dip;
 }
 
 StyledTabWidget::tab:hover {
-    background-color: #e9ecef;
-    border-color: #ced4da;
+    color: #0a58ca;
+    background-color: #f1f3f5;
 }
 
 StyledTabWidget::tab:pressed {
-    background-color: #dee2e6;
+    color: #0a58ca;
+    background-color: #e9ecef;
 }
 
 StyledTabWidget::tab:selected {
-    background-color: var(--primary);
-    color: #ffffff;
-    border-color: var(--hover);
+    background-color: #ffffff;
+    color: #495057;
+    border-color: #dee2e6;
 }
 
 StyledTabWidget::tab:disabled {
-    background-color: var(--disabled-bg);
-    border-color: var(--disabled-border);
     color: var(--disabled-color);
 }
 
@@ -480,4 +478,11 @@ StyledTabWidget:focused {
     outline-width: 2dip;
     outline-color: #85c1e9;
     outline-offset: 2dip;
+}
+
+/* Pages inside StyledTabWidget: no own frame — the tab bar baseline is the
+   only separator between the tabs and the content. */
+StyledPanel.tab-page {
+    border-width: 0dip;
+    border-radius: 0dip;
 }

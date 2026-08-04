@@ -212,7 +212,7 @@ int StyleResolver::CalculateSpecificity(const SelectorSequence& seq) const
 
 wxString StyleResolver::ResolveVariables(const wxString& value, const StyleSheet& sheet) const
 {
-    std::string input = value.ToStdString();
+    std::string input = value.utf8_string();
     const std::regex varRegex(R"(\bvar\s*\(\s*(--[A-Za-z0-9-]+)\s*(?:,\s*([^)]*))?\s*\))");
 
     std::smatch match;
@@ -222,7 +222,7 @@ wxString StyleResolver::ResolveVariables(const wxString& value, const StyleSheet
         if (replacement.empty() && match[2].matched) {
             replacement = wxString::FromUTF8(match[2].str());
         }
-        input = match.prefix().str() + replacement.ToStdString() + match.suffix().str();
+        input = match.prefix().str() + replacement.utf8_string() + match.suffix().str();
     }
 
     return wxString::FromUTF8(input);

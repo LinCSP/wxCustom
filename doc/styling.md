@@ -177,36 +177,40 @@ StyledButton:hover {
 
 ### Стилизация вкладок StyledTabWidget
 
-Вкладки `StyledTabWidget` стилизуются через под-контролы `::tab-bar`, `::tab` и `::pane` с псевдо-состояниями `:hover`, `:pressed`, `:selected`, `:disabled`:
+Вкладки `StyledTabWidget` стилизуются через под-контролы `::tab-bar`, `::tab` и `::pane` с псевдо-состояниями `:hover`, `:pressed`, `:selected`, `:disabled`. Особенности отрисовки вкладок: `border-radius` применяется только к верхним углам, рамка рисуется сверху и по бокам (низ не обводится), а выбранная вкладка перекрывает нижнюю рамку `::tab-bar` — получается вид в духе Bootstrap 5:
 
 ```css
 StyledTabWidget::tab-bar {
-    background-color: transparent;
     border-bottom-width: 1dip;
-    border-color: #bdc3c7;
+    border-color: #dee2e6;
     border-style: solid;
 }
 
 StyledTabWidget::tab {
-    background-color: #f8f9fa;
-    color: #2c3e50;
-    border-width: 1dip;
-    border-color: #dee2e6;
-    border-style: solid;
-    border-radius: 4dip;
-    border-bottom-width: 0dip;
+    color: #0d6efd;
     padding: 8dip 16dip;
+    border-width: 1dip;
+    border-color: transparent;
+    border-style: solid;
+    border-radius: 6dip;
     text-align: center;
     min-width: 80dip;
 }
 
-StyledTabWidget::tab:hover { background-color: #e9ecef; }
-StyledTabWidget::tab:pressed { background-color: #dee2e6; }
+StyledTabWidget::tab:hover {
+    color: #0a58ca;
+    background-color: #f1f3f5;
+}
+
+StyledTabWidget::tab:pressed {
+    color: #0a58ca;
+    background-color: #e9ecef;
+}
 
 StyledTabWidget::tab:selected {
-    background-color: var(--primary);
-    color: #ffffff;
-    border-color: var(--hover);
+    background-color: #ffffff;
+    color: #495057;
+    border-color: #dee2e6;
 }
 
 StyledTabWidget:focused {
@@ -221,7 +225,7 @@ StyledTabWidget::pane {
 }
 ```
 
-Псевдо-состояние `:selected` выделяет активную вкладку; при совпадении нескольких состояний (например, активная вкладка под курсором) `:selected` имеет приоритет над `:hover` и `:pressed`.
+Псевдо-состояние `:selected` выделяет активную вкладку; при совпадении нескольких состояний (например, активная вкладка под курсором) `:selected` имеет приоритет над `:hover` и `:pressed`. Держите `border-width` у `::tab` одинаковым во всех состояниях (невидимая рамка через `border-color: transparent`), чтобы вкладки не «прыгали» при наведении.
 
 ### Тёмная тема
 

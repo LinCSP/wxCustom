@@ -34,7 +34,10 @@ wxString TokenTypeToString(Token::Type type)
 }
 
 Lexer::Lexer(const wxString& input)
-    : m_input(input.ToStdString())
+    // Use UTF-8 explicitly: ToStdString() would go through the locale
+    // encoding and silently return an empty string for non-ASCII input
+    // (e.g. a comment with a typographic dash) under a non-UTF-8 locale.
+    : m_input(input.utf8_string())
 {
 }
 

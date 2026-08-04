@@ -1,4 +1,8 @@
 #include <gtest/gtest.h>
+
+#include <clocale>
+#include <string>
+
 #include "wxCustomization/StyleSheet.h"
 
 using wxCustomization::StyleSheet;
@@ -106,4 +110,26 @@ TEST(StyleSheet, ParseNestedOrInvalidFails)
 {
     StyleSheet sheet;
     EXPECT_FALSE(sheet.LoadFromString("StyledButton { color: red"));
+}
+
+TEST(StyleSheet, NonAsciiCommentParsesUnderCLocale)
+{
+    // wxString::ToStdString() goes through the locale encoding and fails on
+    // non-ASCII input under the C locale. The lexer must convert with UTF-8
+    // explicitly, otherwise a single non-ASCII comment would silently drop
+    // every rule in the sheet.
+    const char* prev = setlocale(LC_ALL, nullptr);
+    const std::string prevLocale = prev != nullptr ? prev : "";
+    setlocale(LC_ALL, "C");
+
+    StyleSheet sheet;
+    const bool ok = sheet.LoadFromString(wxString::FromUTF8(
+        "/* non-ASCII: em-dash — Cyrillic привет */\n"
+        "StyledButton { color: red; }\n"
+        "StyledPanel { background-color: #ffffff; }"));
+
+    setlocale(LC_ALL, prevLocale.c_str());
+
+    ASSERT_TRUE(ok);
+    EXPECT_EQ(sheet.GetRules().size(), 2u);
 }

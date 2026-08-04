@@ -81,6 +81,9 @@ private:
         wxCustomization::StyledPanel* page =
             new wxCustomization::StyledPanel(parent, wxID_ANY);
         page->SetStyleSheet(m_styleSheet);
+        // No own frame inside the tab widget: the tab bar baseline is the
+        // only separator between the tabs and the content.
+        page->AddStyleClass("tab-page");
 
         wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 
@@ -194,6 +197,9 @@ private:
         wxCustomization::StyledPanel* page =
             new wxCustomization::StyledPanel(parent, wxID_ANY);
         page->SetStyleSheet(m_styleSheet);
+        // No own frame inside the tab widget: the tab bar baseline is the
+        // only separator between the tabs and the content.
+        page->AddStyleClass("tab-page");
 
         wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 
@@ -264,6 +270,9 @@ private:
         wxCustomization::StyledPanel* page =
             new wxCustomization::StyledPanel(parent, wxID_ANY);
         page->SetStyleSheet(m_styleSheet);
+        // No own frame inside the tab widget: the tab bar baseline is the
+        // only separator between the tabs and the content.
+        page->AddStyleClass("tab-page");
 
         wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 

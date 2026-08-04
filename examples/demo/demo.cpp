@@ -1,4 +1,5 @@
 #include <wx/wx.h>
+#include <wx/file.h>
 #include <wx/filename.h>
 #include <wx/sizer.h>
 #include <wx/stdpaths.h>
@@ -22,6 +23,24 @@
 #include "wxCustomization/wxCustomization.h"
 
 namespace {
+
+/// Base theme file loaded by this demo binary (default.qss or dark.qss).
+#ifndef DEMO_THEME_FILE
+#define DEMO_THEME_FILE "default.qss"
+#endif
+
+wxString ReadTextFile(const wxString& path)
+{
+    wxFile file(path);
+    if (!file.IsOpened()) {
+        return wxString();
+    }
+    wxString text;
+    if (!file.ReadAll(&text)) {
+        return wxString();
+    }
+    return text;
+}
 
 /// A small helper label used as section header in the demo.
 wxCustomization::StyledLabel* CreateHeader(wxWindow* parent,
@@ -434,9 +453,15 @@ public:
 private:
     bool LoadTheme()
     {
-        wxFileName stylePath(wxStandardPaths::Get().GetExecutablePath());
-        stylePath.SetFullName("theme.qss");
-        return m_styleSheet.Load(stylePath.GetFullPath());
+        // The base theme (default.qss / dark.qss) plus demo-specific styles.
+        const wxFileName exePath(wxStandardPaths::Get().GetExecutablePath());
+        const wxString dir = exePath.GetPath();
+        const wxString baseTheme = ReadTextFile(dir + "/" + DEMO_THEME_FILE);
+        const wxString demoTheme = ReadTextFile(dir + "/demo.qss");
+        if (baseTheme.empty() || demoTheme.empty()) {
+            return false;
+        }
+        return m_styleSheet.LoadFromString(baseTheme + "\n" + demoTheme);
     }
 
     wxCustomization::StyleSheet m_styleSheet;

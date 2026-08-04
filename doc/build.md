@@ -42,11 +42,14 @@ ctest --output-on-failure
 
 ## Запуск demo
 
+Собираются два demo-приложения из одного `demo.cpp` — по одному на тему:
+
 ```bash
-./examples/demo/demo
+./examples/demo/demo        # светлая тема (themes/default.qss)
+./examples/demo/demo_dark   # тёмная тема (themes/dark.qss)
 ```
 
-Файл `theme.qss` копируется рядом с бинарником автоматически при сборке. Demo загружает его относительно исполняемого файла.
+Библиотечные темы лежат в `themes/` (`default.qss`, `dark.qss`); демонстрационные классы (`.title`, `.section-header`, `.tab-page`) — в `examples/demo/demo.qss`. Все файлы копируются рядом с бинарниками при сборке и загружаются относительно исполняемого файла; базовая тема выбирается compile-определением `DEMO_THEME_FILE`.
 
 Demo разделено на три вкладки:
 
@@ -54,7 +57,7 @@ Demo разделено на три вкладки:
 - **Input** — `StyledLineEdit`, `StyledComboBox`, `StyledSlider`.
 - **Progress** — `StyledProgressBar`.
 
-Вкладки реализованы виджетом `StyledTabWidget`: переключение — кликом по вкладке, стрелками Left/Right или Ctrl+Tab / Ctrl+Shift+Tab.
+Вкладки реализованы виджетом `StyledTabWidget`: переключение — нажатием мыши на вкладку, стрелками Left/Right или Ctrl+Tab / Ctrl+Shift+Tab.
 
 ## Сборка с отладкой
 

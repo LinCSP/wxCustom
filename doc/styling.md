@@ -2,6 +2,31 @@
 
 wxCustomization использует подмножество Qt Style Sheets (QSS) с wx-специфичными расширениями.
 
+## Загрузка и применение темы
+
+Класс `Theme` загружает таблицу стилей из файла, хранит глобальную тему и применяет её к дереву виджетов:
+
+```cpp
+#include "wxCustomization/Theme.h"
+
+wxCustomization::Theme theme;
+theme.Load("themes/default.qss");
+
+// Глобальная тема (указатель не владеющий — Theme должен пережить виджеты).
+wxCustomization::Theme::SetGlobal(&theme.GetSheet());
+
+// Применить ко всем StyledControl в поддереве окна и пересчитать layout.
+wxCustomization::Theme::ApplyTo(frame);
+```
+
+Hot-reload при разработке: `StartWatching(root)` опрашивает файл темы по таймеру и при изменении перезагружает его и повторно применяет к дереву:
+
+```cpp
+theme.StartWatching(frame);   // theme.StopWatching() — остановить
+```
+
+Каждому виджету по-прежнему можно назначить таблицу стилей вручную через `SetStyleSheet()`; учтите, что очередной вызов `ApplyTo()` перезапишет таблицы всех `StyledControl` в дереве.
+
 ## Базовый синтаксис
 
 ```css
@@ -229,26 +254,34 @@ StyledTabWidget::pane {
 
 ### Тёмная тема
 
+Библиотека поставляется с готовыми темами `themes/default.qss` (светлая) и `themes/dark.qss` (тёмная); обе покрывают все виджеты P0–P1 и параметризованы CSS-переменными. Собственная тема обычно начинается с переопределения палитры:
+
 ```css
 :root {
-    --bg-primary: #2c3e50;
-    --bg-secondary: #34495e;
-    --text-primary: #ecf0f1;
-    --accent: #3498db;
+    --panel-bg: #2c3e50;
+    --surface: #34495e;
+    --text: #ecf0f1;
+    --text-secondary: #bdc3c7;
+    --primary: #3498db;
+    --accent: #0d6efd;
+    --border: #4a6178;
+    --border-strong: #5d6d7e;
 }
 
 StyledPanel {
-    background-color: var(--bg-primary);
+    background-color: var(--panel-bg);
 }
 
 StyledLabel {
-    color: var(--text-primary);
+    color: var(--text);
 }
 
 StyledButton {
-    background-color: var(--accent);
+    background-color: var(--primary);
     color: white;
     border-radius: 4dip;
     padding: 8dip 16dip;
 }
 ```
+
+Полный пример — `themes/dark.qss` в репозитории; в demo она демонстрируется отдельным приложением `demo_dark`.

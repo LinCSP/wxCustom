@@ -242,3 +242,29 @@ int SetSelection(size_t index); // возвращает прежнюю выбр�
 | `StyledProgressBar` | — |
 | `StyledGroupBox` | — |
 | `StyledTabWidget` | `wxEVT_NOTEBOOK_PAGE_CHANGED` (класс `wxBookCtrlEvent`: `GetSelection()` — новая вкладка, `GetOldSelection()` — прежняя) |
+
+## Theme
+
+```cpp
+Theme();
+explicit Theme(const wxString& filePath);
+
+bool Load(const wxString& filePath);   // при ошибке прежняя тема сохраняется
+bool Reload();
+const wxString& GetFilePath() const;
+wxString GetLastError() const;
+StyleSheet& GetSheet();
+
+// Глобальная тема (невладеющий указатель).
+static void SetGlobal(StyleSheet* sheet);
+static StyleSheet* GetGlobal();
+
+// Применить тему (или глобальную, если sheet == nullptr) ко всем
+// StyledControl в поддереве root и пересчитать layout.
+static void ApplyTo(wxWindow* root, StyleSheet* sheet = nullptr);
+
+// Hot-reload: опрос файла по таймеру, перезагрузка и ApplyTo при изменении.
+void StartWatching(wxWindow* root, int intervalMs = 500);
+void StopWatching();
+bool IsWatching() const;
+```

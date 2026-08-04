@@ -1,50 +1,93 @@
+/* wxCustomization dark theme.
+   Covers all P0–P1 widgets; colours are parameterized via CSS variables. */
 :root {
+    /* Primary accent: buttons, toggles, checkboxes, headers. */
     --primary: #3498db;
-    --hover: #2980b9;
-    --pressed: #1c6ea4;
-    --bg: #ecf0f1;
-    --disabled-bg: #bdc3c7;
-    --disabled-border: #95a5a6;
-    --disabled-color: #7f8c8d;
-    --panel-bg: #ffffff;
-    --text: #2c3e50;
-}
+    --primary-hover: #2980b9;
+    --primary-pressed: #1c6ea4;
 
-.title {
-    color: var(--text);
-    font-size: 24dip;
-    font-weight: bold;
-    text-align: center;
-}
+    /* Secondary accent: slider, progress bar (Bootstrap-like). */
+    --accent: #0d6efd;
+    --accent-hover: #0b5ed7;
+    --accent-pressed: #0a58ca;
 
-.section-header {
-    color: var(--primary);
-    font-size: 12dip;
-    font-weight: bold;
-    text-align: left;
-    text-transform: uppercase;
+    /* Link colour for inactive tabs (readable on dark surfaces). */
+    --tab-link: #6ea8fe;
+    --tab-link-hover: #9ec5fe;
+
+    /* Surfaces and text. */
+    --panel-bg: #2c3e50;
+    --surface: #34495e;
+    --bg: #283747;
+    --text: #ecf0f1;
+    --text-secondary: #bdc3c7;
+
+    /* Borders. */
+    --border: #4a6178;
+    --border-strong: #5d6d7e;
+
+    /* Disabled state. */
+    --disabled-bg: #566573;
+    --disabled-border: #4a5a6a;
+    --disabled-color: #85929e;
+
+    /* Focus outline. */
+    --focus-outline: #5dade2;
 }
 
 StyledPanel {
-    background-color: #ffffff;
+    background-color: var(--panel-bg);
     border-width: 1dip;
-    border-color: #bdc3c7;
+    border-color: var(--border-strong);
     border-style: solid;
     border-radius: 8dip;
     padding: 16dip;
 }
 
 StyledLabel {
-    color: #2c3e50;
+    color: var(--text);
     font-size: 16dip;
     text-align: center;
 }
 
-StyledToggleButton {
-    background-color: #ecf0f1;
-    color: #2c3e50;
+StyledButton {
+    background-color: var(--primary);
+    color: #ffffff;
     border-width: 1dip;
-    border-color: #bdc3c7;
+    border-color: var(--primary-hover);
+    border-style: solid;
+    border-radius: 4dip;
+    padding: 8dip 16dip;
+    text-align: center;
+    min-width: 80dip;
+    min-height: 32dip;
+}
+
+StyledButton:hover {
+    background-color: var(--primary-hover);
+}
+
+StyledButton:pressed {
+    background-color: var(--primary-pressed);
+}
+
+StyledButton:focused {
+    outline-width: 2dip;
+    outline-color: var(--focus-outline);
+    outline-offset: 2dip;
+}
+
+StyledButton:disabled {
+    background-color: var(--disabled-bg);
+    border-color: var(--disabled-border);
+    color: var(--disabled-color);
+}
+
+StyledToggleButton {
+    background-color: var(--surface);
+    color: var(--text);
+    border-width: 1dip;
+    border-color: var(--border-strong);
     border-style: solid;
     border-radius: 4dip;
     padding: 8dip 16dip;
@@ -54,22 +97,22 @@ StyledToggleButton {
 }
 
 StyledToggleButton:hover {
-    background-color: #d0d3d4;
+    background-color: #3f5871;
 }
 
 StyledToggleButton:pressed {
-    background-color: #bfc9ca;
+    background-color: #46596b;
 }
 
 StyledToggleButton:checked {
     background-color: var(--primary);
     color: #ffffff;
-    border-color: var(--hover);
+    border-color: var(--primary-hover);
 }
 
 StyledToggleButton:focused {
     outline-width: 2dip;
-    outline-color: #85c1e9;
+    outline-color: var(--focus-outline);
     outline-offset: 2dip;
 }
 
@@ -80,7 +123,7 @@ StyledToggleButton:disabled {
 }
 
 StyledCheckBox {
-    color: #2c3e50;
+    color: var(--text);
     padding: 4dip;
     spacing: 8dip;
     text-align: left;
@@ -89,9 +132,9 @@ StyledCheckBox {
 StyledCheckBox::indicator {
     width: 18dip;
     height: 18dip;
-    background-color: #ffffff;
+    background-color: var(--surface);
     border-width: 2dip;
-    border-color: #bdc3c7;
+    border-color: var(--border-strong);
     border-style: solid;
     border-radius: 3dip;
 }
@@ -113,12 +156,12 @@ StyledCheckBox::indicator:indeterminate {
 }
 
 StyledCheckBox::indicator:pressed {
-    background-color: #d6eaf8;
+    background-color: #3f5871;
 }
 
 StyledCheckBox:focused {
     outline-width: 2dip;
-    outline-color: #85c1e9;
+    outline-color: var(--focus-outline);
     outline-offset: 2dip;
 }
 
@@ -127,19 +170,19 @@ StyledCheckBox:disabled {
 }
 
 StyledCheckBox::indicator:disabled {
-    background-color: #e5e8e8;
+    background-color: var(--bg);
     border-color: var(--disabled-border);
 }
 
 StyledCheckBox::indicator:disabled:checked,
 StyledCheckBox::indicator:disabled:indeterminate {
-    background-color: #aed6f1;
-    border-color: #85c1e9;
+    background-color: #5d8abd;
+    border-color: var(--focus-outline);
     color: #ffffff;
 }
 
 StyledRadioButton {
-    color: #2c3e50;
+    color: var(--text);
     padding: 4dip;
     spacing: 8dip;
     text-align: left;
@@ -148,9 +191,9 @@ StyledRadioButton {
 StyledRadioButton::indicator {
     width: 18dip;
     height: 18dip;
-    background-color: #ffffff;
+    background-color: var(--surface);
     border-width: 2dip;
-    border-color: #bdc3c7;
+    border-color: var(--border-strong);
     border-style: solid;
     border-radius: 50%;
 }
@@ -165,12 +208,12 @@ StyledRadioButton::indicator:checked {
 }
 
 StyledRadioButton::indicator:pressed {
-    background-color: #d6eaf8;
+    background-color: #3f5871;
 }
 
 StyledRadioButton:focused {
     outline-width: 2dip;
-    outline-color: #85c1e9;
+    outline-color: var(--focus-outline);
     outline-offset: 2dip;
 }
 
@@ -179,77 +222,20 @@ StyledRadioButton:disabled {
 }
 
 StyledRadioButton::indicator:disabled {
-    background-color: #e5e8e8;
+    background-color: var(--bg);
     border-color: var(--disabled-border);
 }
 
 StyledRadioButton::indicator:disabled:checked {
-    border-color: #85c1e9;
-    color: #aed6f1;
-}
-
-DemoWidget {
-    background-color: var(--bg);
-    border-width: 2dip;
-    border-color: #bdc3c7;
-    border-style: solid;
-    border-radius: 6dip;
-    color: #2c3e50;
-    padding: 8dip;
-    min-width: 80dip;
-    min-height: 32dip;
-}
-
-DemoWidget:hover {
-    background-color: var(--hover);
-    border-color: var(--primary);
-    color: #ffffff;
-}
-
-DemoWidget:focused {
-    outline-width: 3dip;
-    outline-color: var(--primary);
-    outline-offset: 2dip;
-}
-
-StyledButton {
-    background-color: var(--primary);
-    color: #ffffff;
-    border-width: 1dip;
-    border-color: var(--hover);
-    border-style: solid;
-    border-radius: 4dip;
-    padding: 8dip 16dip;
-    text-align: center;
-    min-width: 80dip;
-    min-height: 32dip;
-}
-
-StyledButton:hover {
-    background-color: var(--hover);
-}
-
-StyledButton:pressed {
-    background-color: var(--pressed);
-}
-
-StyledButton:focused {
-    outline-width: 2dip;
-    outline-color: #85c1e9;
-    outline-offset: 2dip;
-}
-
-StyledButton:disabled {
-    background-color: var(--disabled-bg);
-    border-color: var(--disabled-border);
-    color: var(--disabled-color);
+    border-color: var(--focus-outline);
+    color: #5d8abd;
 }
 
 StyledLineEdit {
-    background-color: #ffffff;
-    color: #2c3e50;
+    background-color: var(--surface);
+    color: var(--text);
     border-width: 1dip;
-    border-color: #bdc3c7;
+    border-color: var(--border-strong);
     border-style: solid;
     border-radius: 4dip;
     padding: 6dip 8dip;
@@ -259,32 +245,32 @@ StyledLineEdit {
 }
 
 StyledLineEdit:hover {
-    border-color: #3498db;
+    border-color: var(--primary);
 }
 
 StyledLineEdit:focused {
     border-color: var(--primary);
     outline-width: 2dip;
-    outline-color: #85c1e9;
+    outline-color: var(--focus-outline);
     outline-offset: 2dip;
 }
 
 StyledLineEdit:disabled {
-    background-color: #ecf0f1;
-    border-color: #bdc3c7;
+    background-color: var(--bg);
+    border-color: var(--border-strong);
     color: var(--disabled-color);
 }
 
 StyledLineEdit:read-only {
-    background-color: #f4f6f7;
-    color: #7f8c8d;
+    background-color: var(--bg);
+    color: var(--disabled-color);
 }
 
 StyledComboBox {
-    background-color: #ffffff;
-    color: #2c3e50;
+    background-color: var(--surface);
+    color: var(--text);
     border-width: 1dip;
-    border-color: #bdc3c7;
+    border-color: var(--border-strong);
     border-style: solid;
     border-radius: 4dip;
     padding: 6dip 4dip 6dip 8dip;
@@ -295,19 +281,19 @@ StyledComboBox {
 }
 
 StyledComboBox:hover {
-    border-color: #3498db;
+    border-color: var(--primary);
 }
 
 StyledComboBox:focused {
     border-color: var(--primary);
     outline-width: 2dip;
-    outline-color: #85c1e9;
+    outline-color: var(--focus-outline);
     outline-offset: 2dip;
 }
 
 StyledComboBox:disabled {
-    background-color: #ecf0f1;
-    border-color: #bdc3c7;
+    background-color: var(--bg);
+    border-color: var(--border-strong);
     color: var(--disabled-color);
 }
 
@@ -317,20 +303,20 @@ StyledComboBox::drop-down {
 }
 
 StyledComboBox::down-arrow {
-    color: #7f8c8d;
+    color: var(--text-secondary);
     /* border-width controls the thickness of the chevron lines. */
     border-width: 2dip;
 }
 
 StyledComboBox::item {
-    background-color: #ffffff;
-    color: #2c3e50;
+    background-color: var(--surface);
+    color: var(--text);
     padding: 6dip 8dip;
     text-align: left;
 }
 
 StyledComboBox::item:hover {
-    background-color: #eaf2f8;
+    background-color: #3f5871;
 }
 
 StyledComboBox::item:selected {
@@ -343,29 +329,29 @@ StyledSlider {
 }
 
 StyledSlider::groove {
-    background-color: #dee2e6;
+    background-color: var(--border);
     border-radius: 3dip;
     height: 6dip;
 }
 
 StyledSlider::sub-page {
-    background-color: #0d6efd;
+    background-color: var(--accent);
     border-radius: 3dip;
 }
 
 StyledSlider::handle {
     width: 18dip;
     height: 18dip;
-    background-color: #0d6efd;
+    background-color: var(--accent);
     border-radius: 50%;
 }
 
 StyledSlider::handle:hover {
-    background-color: #0b5ed7;
+    background-color: var(--accent-hover);
 }
 
 StyledSlider::handle:pressed {
-    background-color: #0a58ca;
+    background-color: var(--accent-pressed);
 }
 
 StyledSlider:focused {
@@ -380,19 +366,19 @@ StyledSlider:disabled {
 
 StyledProgressBar {
     min-height: 24dip;
-    color: #2c3e50;
+    color: var(--text);
     font-size: 10dip;
     font-weight: bold;
 }
 
 StyledProgressBar::groove {
-    background-color: #e9ecef;
+    background-color: var(--bg);
     border-radius: 4dip;
     height: 16dip;
 }
 
 StyledProgressBar::chunk {
-    background-color: #0d6efd;
+    background-color: var(--accent);
     border-radius: 4dip;
 }
 
@@ -402,7 +388,7 @@ StyledProgressBar:disabled {
 
 StyledGroupBox {
     border-width: 1dip;
-    border-color: #bdc3c7;
+    border-color: var(--border-strong);
     border-style: solid;
     border-radius: 4dip;
     padding: 0dip 12dip 12dip 12dip;
@@ -416,10 +402,10 @@ StyledGroupBox::title {
 }
 
 StyledMessageDialog {
-    background-color: #ffffff;
-    color: #2c3e50;
+    background-color: var(--panel-bg);
+    color: var(--text);
     border-width: 1dip;
-    border-color: #bdc3c7;
+    border-color: var(--border-strong);
     border-style: solid;
     border-radius: 8dip;
     padding: 24dip;
@@ -428,22 +414,22 @@ StyledMessageDialog {
 }
 
 /* StyledTabWidget styles (Bootstrap 5 nav-tabs look).
-   Inactive tabs are borderless links; the selected tab is white, bordered on
-   top/left/right with rounded top corners and covers the tab bar baseline. */
+   Inactive tabs are borderless links; the selected tab merges with the pane,
+   is bordered on top/left/right and covers the tab bar baseline. */
 StyledTabWidget::tab-bar {
     border-bottom-width: 1dip;
-    border-color: #dee2e6;
+    border-color: var(--border);
     border-style: solid;
     padding: 0dip;
 }
 
 StyledTabWidget::pane {
-    background-color: #ffffff;
+    background-color: var(--panel-bg);
     padding: 0dip;
 }
 
 StyledTabWidget::tab {
-    color: #0d6efd;
+    color: var(--tab-link);
     padding: 8dip 16dip;
     border-width: 1dip;
     border-color: transparent;
@@ -455,19 +441,19 @@ StyledTabWidget::tab {
 }
 
 StyledTabWidget::tab:hover {
-    color: #0a58ca;
-    background-color: #f1f3f5;
+    color: var(--tab-link-hover);
+    background-color: #3a4a5c;
 }
 
 StyledTabWidget::tab:pressed {
-    color: #0a58ca;
-    background-color: #e9ecef;
+    color: var(--tab-link-hover);
+    background-color: #46596b;
 }
 
 StyledTabWidget::tab:selected {
-    background-color: #ffffff;
-    color: #495057;
-    border-color: #dee2e6;
+    background-color: var(--panel-bg);
+    color: var(--text);
+    border-color: var(--border);
 }
 
 StyledTabWidget::tab:disabled {
@@ -476,13 +462,6 @@ StyledTabWidget::tab:disabled {
 
 StyledTabWidget:focused {
     outline-width: 2dip;
-    outline-color: #85c1e9;
+    outline-color: var(--focus-outline);
     outline-offset: 2dip;
-}
-
-/* Pages inside StyledTabWidget: no own frame — the tab bar baseline is the
-   only separator between the tabs and the content. */
-StyledPanel.tab-page {
-    border-width: 0dip;
-    border-radius: 0dip;
 }

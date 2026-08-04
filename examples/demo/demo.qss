@@ -1,0 +1,23 @@
+/* Demo-specific styles, loaded on top of themes/default.qss. */
+
+.title {
+    color: var(--text);
+    font-size: 24dip;
+    font-weight: bold;
+    text-align: center;
+}
+
+.section-header {
+    color: var(--primary);
+    font-size: 12dip;
+    font-weight: bold;
+    text-align: left;
+    text-transform: uppercase;
+}
+
+/* Pages inside StyledTabWidget: no own frame — the tab bar baseline is the
+   only separator between the tabs and the content. */
+StyledPanel.tab-page {
+    border-width: 0dip;
+    border-radius: 0dip;
+}

@@ -29,6 +29,7 @@ add_library(wxCustomization
     include/wxCustomization/Painter.h
     include/wxCustomization/StyledControl.h
     include/wxCustomization/StyledAccessible.h
+    include/wxCustomization/Theme.h
     include/wxCustomization/widgets/StyledButton.h
     include/wxCustomization/widgets/StyledMessageDialog.h
     include/wxCustomization/widgets/StyledPanel.h
@@ -53,6 +54,7 @@ add_library(wxCustomization
     src/Painter.cpp
     src/StyledControl.cpp
     src/StyledAccessible.cpp
+    src/Theme.cpp
     src/widgets/StyledButton.cpp
     src/widgets/StyledMessageDialog.cpp
     src/widgets/StyledPanel.cpp

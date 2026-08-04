@@ -1,0 +1,463 @@
+/* wxCustomization default light theme.
+   Covers all P0–P1 widgets; colours are parameterized via CSS variables. */
+:root {
+    /* Primary accent: buttons, toggles, checkboxes, headers. */
+    --primary: #3498db;
+    --primary-hover: #2980b9;
+    --primary-pressed: #1c6ea4;
+
+    /* Secondary accent: slider, progress bar, tabs (Bootstrap-like). */
+    --accent: #0d6efd;
+    --accent-hover: #0b5ed7;
+    --accent-pressed: #0a58ca;
+
+    /* Surfaces and text. */
+    --panel-bg: #ffffff;
+    --surface: #f8f9fa;
+    --bg: #ecf0f1;
+    --text: #2c3e50;
+    --text-secondary: #495057;
+
+    /* Borders. */
+    --border: #dee2e6;
+    --border-strong: #bdc3c7;
+
+    /* Disabled state. */
+    --disabled-bg: #bdc3c7;
+    --disabled-border: #95a5a6;
+    --disabled-color: #7f8c8d;
+
+    /* Focus outline. */
+    --focus-outline: #85c1e9;
+}
+
+StyledPanel {
+    background-color: var(--panel-bg);
+    border-width: 1dip;
+    border-color: var(--border-strong);
+    border-style: solid;
+    border-radius: 8dip;
+    padding: 16dip;
+}
+
+StyledLabel {
+    color: var(--text);
+    font-size: 16dip;
+    text-align: center;
+}
+
+StyledButton {
+    background-color: var(--primary);
+    color: #ffffff;
+    border-width: 1dip;
+    border-color: var(--primary-hover);
+    border-style: solid;
+    border-radius: 4dip;
+    padding: 8dip 16dip;
+    text-align: center;
+    min-width: 80dip;
+    min-height: 32dip;
+}
+
+StyledButton:hover {
+    background-color: var(--primary-hover);
+}
+
+StyledButton:pressed {
+    background-color: var(--primary-pressed);
+}
+
+StyledButton:focused {
+    outline-width: 2dip;
+    outline-color: var(--focus-outline);
+    outline-offset: 2dip;
+}
+
+StyledButton:disabled {
+    background-color: var(--disabled-bg);
+    border-color: var(--disabled-border);
+    color: var(--disabled-color);
+}
+
+StyledToggleButton {
+    background-color: var(--bg);
+    color: var(--text);
+    border-width: 1dip;
+    border-color: var(--border-strong);
+    border-style: solid;
+    border-radius: 4dip;
+    padding: 8dip 16dip;
+    text-align: center;
+    min-width: 80dip;
+    min-height: 32dip;
+}
+
+StyledToggleButton:hover {
+    background-color: #d0d3d4;
+}
+
+StyledToggleButton:pressed {
+    background-color: #bfc9ca;
+}
+
+StyledToggleButton:checked {
+    background-color: var(--primary);
+    color: #ffffff;
+    border-color: var(--primary-hover);
+}
+
+StyledToggleButton:focused {
+    outline-width: 2dip;
+    outline-color: var(--focus-outline);
+    outline-offset: 2dip;
+}
+
+StyledToggleButton:disabled {
+    background-color: var(--disabled-bg);
+    border-color: var(--disabled-border);
+    color: var(--disabled-color);
+}
+
+StyledCheckBox {
+    color: var(--text);
+    padding: 4dip;
+    spacing: 8dip;
+    text-align: left;
+}
+
+StyledCheckBox::indicator {
+    width: 18dip;
+    height: 18dip;
+    background-color: var(--panel-bg);
+    border-width: 2dip;
+    border-color: var(--border-strong);
+    border-style: solid;
+    border-radius: 3dip;
+}
+
+StyledCheckBox::indicator:hover {
+    border-color: var(--primary);
+}
+
+StyledCheckBox::indicator:checked {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: #ffffff;
+}
+
+StyledCheckBox::indicator:indeterminate {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: #ffffff;
+}
+
+StyledCheckBox::indicator:pressed {
+    background-color: #d6eaf8;
+}
+
+StyledCheckBox:focused {
+    outline-width: 2dip;
+    outline-color: var(--focus-outline);
+    outline-offset: 2dip;
+}
+
+StyledCheckBox:disabled {
+    color: var(--disabled-color);
+}
+
+StyledCheckBox::indicator:disabled {
+    background-color: #e5e8e8;
+    border-color: var(--disabled-border);
+}
+
+StyledCheckBox::indicator:disabled:checked,
+StyledCheckBox::indicator:disabled:indeterminate {
+    background-color: #aed6f1;
+    border-color: var(--focus-outline);
+    color: #ffffff;
+}
+
+StyledRadioButton {
+    color: var(--text);
+    padding: 4dip;
+    spacing: 8dip;
+    text-align: left;
+}
+
+StyledRadioButton::indicator {
+    width: 18dip;
+    height: 18dip;
+    background-color: var(--panel-bg);
+    border-width: 2dip;
+    border-color: var(--border-strong);
+    border-style: solid;
+    border-radius: 50%;
+}
+
+StyledRadioButton::indicator:hover {
+    border-color: var(--primary);
+}
+
+StyledRadioButton::indicator:checked {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+StyledRadioButton::indicator:pressed {
+    background-color: #d6eaf8;
+}
+
+StyledRadioButton:focused {
+    outline-width: 2dip;
+    outline-color: var(--focus-outline);
+    outline-offset: 2dip;
+}
+
+StyledRadioButton:disabled {
+    color: var(--disabled-color);
+}
+
+StyledRadioButton::indicator:disabled {
+    background-color: #e5e8e8;
+    border-color: var(--disabled-border);
+}
+
+StyledRadioButton::indicator:disabled:checked {
+    border-color: var(--focus-outline);
+    color: #aed6f1;
+}
+
+StyledLineEdit {
+    background-color: var(--panel-bg);
+    color: var(--text);
+    border-width: 1dip;
+    border-color: var(--border-strong);
+    border-style: solid;
+    border-radius: 4dip;
+    padding: 6dip 8dip;
+    font-size: 12dip;
+    min-width: 120dip;
+    min-height: 24dip;
+}
+
+StyledLineEdit:hover {
+    border-color: var(--primary);
+}
+
+StyledLineEdit:focused {
+    border-color: var(--primary);
+    outline-width: 2dip;
+    outline-color: var(--focus-outline);
+    outline-offset: 2dip;
+}
+
+StyledLineEdit:disabled {
+    background-color: var(--bg);
+    border-color: var(--border-strong);
+    color: var(--disabled-color);
+}
+
+StyledLineEdit:read-only {
+    background-color: #f4f6f7;
+    color: var(--disabled-color);
+}
+
+StyledComboBox {
+    background-color: var(--panel-bg);
+    color: var(--text);
+    border-width: 1dip;
+    border-color: var(--border-strong);
+    border-style: solid;
+    border-radius: 4dip;
+    padding: 6dip 4dip 6dip 8dip;
+    font-size: 12dip;
+    text-align: left;
+    min-width: 120dip;
+    min-height: 24dip;
+}
+
+StyledComboBox:hover {
+    border-color: var(--primary);
+}
+
+StyledComboBox:focused {
+    border-color: var(--primary);
+    outline-width: 2dip;
+    outline-color: var(--focus-outline);
+    outline-offset: 2dip;
+}
+
+StyledComboBox:disabled {
+    background-color: var(--bg);
+    border-color: var(--border-strong);
+    color: var(--disabled-color);
+}
+
+StyledComboBox::drop-down {
+    width: 20dip;
+    background-color: transparent;
+}
+
+StyledComboBox::down-arrow {
+    color: var(--disabled-color);
+    /* border-width controls the thickness of the chevron lines. */
+    border-width: 2dip;
+}
+
+StyledComboBox::item {
+    background-color: var(--panel-bg);
+    color: var(--text);
+    padding: 6dip 8dip;
+    text-align: left;
+}
+
+StyledComboBox::item:hover {
+    background-color: #eaf2f8;
+}
+
+StyledComboBox::item:selected {
+    background-color: var(--primary);
+    color: #ffffff;
+}
+
+StyledSlider {
+    min-height: 32dip;
+}
+
+StyledSlider::groove {
+    background-color: var(--border);
+    border-radius: 3dip;
+    height: 6dip;
+}
+
+StyledSlider::sub-page {
+    background-color: var(--accent);
+    border-radius: 3dip;
+}
+
+StyledSlider::handle {
+    width: 18dip;
+    height: 18dip;
+    background-color: var(--accent);
+    border-radius: 50%;
+}
+
+StyledSlider::handle:hover {
+    background-color: var(--accent-hover);
+}
+
+StyledSlider::handle:pressed {
+    background-color: var(--accent-pressed);
+}
+
+StyledSlider:focused {
+    outline-width: 2dip;
+    outline-color: rgba(13, 110, 253, 0.5);
+    outline-offset: 2dip;
+}
+
+StyledSlider:disabled {
+    opacity: 0.65;
+}
+
+StyledProgressBar {
+    min-height: 24dip;
+    color: var(--text);
+    font-size: 10dip;
+    font-weight: bold;
+}
+
+StyledProgressBar::groove {
+    background-color: #e9ecef;
+    border-radius: 4dip;
+    height: 16dip;
+}
+
+StyledProgressBar::chunk {
+    background-color: var(--accent);
+    border-radius: 4dip;
+}
+
+StyledProgressBar:disabled {
+    opacity: 0.65;
+}
+
+StyledGroupBox {
+    border-width: 1dip;
+    border-color: var(--border-strong);
+    border-style: solid;
+    border-radius: 4dip;
+    padding: 0dip 12dip 12dip 12dip;
+}
+
+StyledGroupBox::title {
+    color: var(--primary);
+    font-size: 12dip;
+    font-weight: bold;
+    padding: 0dip 6dip;
+}
+
+StyledMessageDialog {
+    background-color: var(--panel-bg);
+    color: var(--text);
+    border-width: 1dip;
+    border-color: var(--border-strong);
+    border-style: solid;
+    border-radius: 8dip;
+    padding: 24dip;
+    font-size: 12dip;
+    spacing: 16dip;
+}
+
+/* StyledTabWidget styles (Bootstrap 5 nav-tabs look).
+   Inactive tabs are borderless links; the selected tab is white, bordered on
+   top/left/right with rounded top corners and covers the tab bar baseline. */
+StyledTabWidget::tab-bar {
+    border-bottom-width: 1dip;
+    border-color: var(--border);
+    border-style: solid;
+    padding: 0dip;
+}
+
+StyledTabWidget::pane {
+    background-color: var(--panel-bg);
+    padding: 0dip;
+}
+
+StyledTabWidget::tab {
+    color: var(--accent);
+    padding: 8dip 16dip;
+    border-width: 1dip;
+    border-color: transparent;
+    border-style: solid;
+    border-radius: 6dip;
+    text-align: center;
+    min-width: 80dip;
+    min-height: 32dip;
+}
+
+StyledTabWidget::tab:hover {
+    color: var(--accent-pressed);
+    background-color: #f1f3f5;
+}
+
+StyledTabWidget::tab:pressed {
+    color: var(--accent-pressed);
+    background-color: #e9ecef;
+}
+
+StyledTabWidget::tab:selected {
+    background-color: var(--panel-bg);
+    color: var(--text-secondary);
+    border-color: var(--border);
+}
+
+StyledTabWidget::tab:disabled {
+    color: var(--disabled-color);
+}
+
+StyledTabWidget:focused {
+    outline-width: 2dip;
+    outline-color: var(--focus-outline);
+    outline-offset: 2dip;
+}

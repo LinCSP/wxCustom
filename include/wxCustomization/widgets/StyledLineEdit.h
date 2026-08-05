@@ -34,6 +34,9 @@ public:
 
     void SetSelection(long from, long to);
     void SelectAll();
+    /// Return the selection range in @p from/@p to (equal when nothing is
+    /// selected), like wxTextCtrl::GetSelection.
+    void GetSelection(long* from, long* to) const;
     long GetInsertionPoint() const { return m_caretPos; }
     void SetInsertionPoint(long pos);
 

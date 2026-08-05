@@ -116,6 +116,7 @@ bool GetReadOnly() const;
 
 void SetSelection(long from, long to);
 void SelectAll();
+void GetSelection(long* from, long* to) const; // равны, если выделения нет
 long GetInsertionPoint() const;
 void SetInsertionPoint(long pos);
 ```

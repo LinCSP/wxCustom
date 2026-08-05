@@ -96,6 +96,16 @@ void StyledLineEdit::SelectAll()
     SetSelection(0, static_cast<long>(m_text.length()));
 }
 
+void StyledLineEdit::GetSelection(long* from, long* to) const
+{
+    if (from != nullptr) {
+        *from = m_selectionStart;
+    }
+    if (to != nullptr) {
+        *to = m_selectionEnd;
+    }
+}
+
 void StyledLineEdit::SetInsertionPoint(long pos)
 {
     const long len = static_cast<long>(m_text.length());

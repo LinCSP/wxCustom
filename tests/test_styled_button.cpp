@@ -60,6 +60,64 @@ TEST(StyledButton, ResolvesHoverState)
     EXPECT_EQ(button->GetCurrentStyle().backgroundColor, wxColour(0, 0, 0));
 }
 
+TEST(StyledButton, ResolvesPressedAndFocusedStates)
+{
+    StyleSheet sheet;
+    ASSERT_TRUE(sheet.LoadFromString(
+        "StyledButton { background-color: #ffffff; }\n"
+        "StyledButton:pressed { background-color: #111111; }\n"
+        "StyledButton:focused { outline-width: 3px; outline-color: #222222; }"));
+
+    StyledButton* button = new StyledButton(gTestFrame, wxID_ANY, "Test");
+    button->SetStyleSheet(&sheet);
+
+    button->ApplyStyle("pressed");
+    EXPECT_EQ(button->GetCurrentStyle().backgroundColor, wxColour(0x11, 0x11, 0x11));
+
+    button->ApplyStyle("focused");
+    EXPECT_EQ(button->GetCurrentStyle().outlineWidth, 3);
+    EXPECT_EQ(button->GetCurrentStyle().outlineColor, wxColour(0x22, 0x22, 0x22));
+}
+
+TEST(StyledButton, ClickGeneratesButtonEvent)
+{
+    TestButton* button = new TestButton(gTestFrame, wxID_ANY, "Click me");
+    button->SetSize(0, 0, 100, 40);
+    EventCatcher catcher;
+    button->Bind(wxEVT_BUTTON, &EventCatcher::OnClick, &catcher);
+
+    const wxPoint center(50, 20);
+    wxMouseEvent enterEvent(wxEVT_ENTER_WINDOW);
+    button->GetEventHandler()->ProcessEvent(enterEvent);
+
+    wxMouseEvent downEvent(wxEVT_LEFT_DOWN);
+    downEvent.SetPosition(center);
+    button->GetEventHandler()->ProcessEvent(downEvent);
+
+    wxMouseEvent upEvent(wxEVT_LEFT_UP);
+    upEvent.SetPosition(center);
+    button->GetEventHandler()->ProcessEvent(upEvent);
+
+    EXPECT_EQ(catcher.clickCount, 1);
+}
+
+TEST(StyledButton, SpaceAndEnterGenerateButtonEvent)
+{
+    TestButton* button = new TestButton(gTestFrame, wxID_ANY, "Click me");
+    EventCatcher catcher;
+    button->Bind(wxEVT_BUTTON, &EventCatcher::OnClick, &catcher);
+
+    wxKeyEvent spaceEvent(wxEVT_CHAR);
+    spaceEvent.m_keyCode = WXK_SPACE;
+    button->GetEventHandler()->ProcessEvent(spaceEvent);
+
+    wxKeyEvent enterEvent(wxEVT_CHAR);
+    enterEvent.m_keyCode = WXK_RETURN;
+    button->GetEventHandler()->ProcessEvent(enterEvent);
+
+    EXPECT_EQ(catcher.clickCount, 2);
+}
+
 TEST(StyledButton, DisabledState)
 {
     StyleSheet sheet;

@@ -437,6 +437,11 @@ popup.PopupAt(ClientToScreen(pt)); // выбор придёт как wxEVT_MENU 
 
 Стилизованное диалоговое окно. Как и `StyledFrame`, рисуется без нативных декораций: сверху — `StyledTitleBar` с заголовком и одной кнопкой закрытия (диалог можно перетаскивать за шапку). Кнопка закрытия эквивалентна Cancel.
 
+Диалог не «сливается» с основным окном:
+
+- тело рисуется карточкой с рамкой (`StyledMessageDialog`: `border-width`, `border-color`, `border-radius`);
+- при модальном показе родительское окно затемняется полупрозрачной подложкой (scrim) — реализовано собственными окнами библиотеки, поэтому работает одинаково на всех платформах, без композиторных эффектов.
+
 ```cpp
 wxCustomization::StyledMessageDialog::Show(
     parent, "Message", "Title", wxOK | wxICON_INFORMATION, styleSheet);

@@ -299,7 +299,7 @@ static int Show(wxWindow* parent, const wxString& message,
                 StyleSheet* sheet = nullptr);
 ```
 
-Стилизованная замена `wxMessageBox`: диалог без нативных декораций, сверху `StyledTitleBar` с заголовком и одной кнопкой закрытия (эквивалентна Cancel). Перетаскивается за шапку; Enter — OK, Escape — Cancel.
+Стилизованная замена `wxMessageBox`: диалог без нативных декораций, сверху `StyledTitleBar` с заголовком и одной кнопкой закрытия (эквивалентна Cancel). Тело — карточка с рамкой; при модальном показе родитель затемняется scrim-подложкой (кроссплатформенно). Перетаскивается за шапку; Enter — OK, Escape — Cancel.
 
 ## События
 

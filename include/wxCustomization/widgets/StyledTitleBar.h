@@ -7,6 +7,8 @@ class wxTopLevelWindow;
 
 namespace wxCustomization {
 
+class StyledMenu;
+
 /// A styled window title bar used by StyledFrame (client-side decorations).
 ///
 /// Draws the window title (sub-control `::title`) and the caption buttons
@@ -100,6 +102,7 @@ protected:
     std::vector<MenuEntry> m_menus;
     int m_hoveredMenuButton = -1;
     int m_openMenuButton = -1;
+    StyledMenu* m_menuPopup = nullptr;
 
 private:
     wxTopLevelWindow* GetTopLevelWindow() const;

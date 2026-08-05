@@ -45,6 +45,7 @@ add_library(wxCustomization
     include/wxCustomization/widgets/StyledTabWidget.h
     include/wxCustomization/widgets/StyledTitleBar.h
     include/wxCustomization/widgets/StyledFrame.h
+    include/wxCustomization/widgets/StyledMenu.h
     src/dummy.cpp
     src/Length.cpp
     src/Color.cpp
@@ -72,6 +73,7 @@ add_library(wxCustomization
     src/widgets/StyledTabWidget.cpp
     src/widgets/StyledTitleBar.cpp
     src/widgets/StyledFrame.cpp
+    src/widgets/StyledMenu.cpp
 )
 
 add_library(wxCustomization::wxCustomization ALIAS wxCustomization)

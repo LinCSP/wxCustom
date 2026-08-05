@@ -318,7 +318,7 @@ frame->Show();
 
 ### Меню в шапке окна
 
-Меню размещаются в левой части шапки, как в VSCode. Кнопка меню рисуется виджетом (под-контрол `::menu-button` с состояниями `:hover`, `:pressed`, `:disabled`), по нажатию открывается нативный `wxMenu` (`PopupMenu` под кнопкой). Пункты меню приходят обычными событиями `wxEVT_MENU`:
+Меню размещаются в левой части шапки, как в VSCode. Кнопка меню рисуется виджетом (под-контрол `::menu-button` с состояниями `:hover`, `:pressed`, `:disabled`), по нажатию открывается **стилизованное выпадающее меню `StyledMenu`** под кнопкой. Пункты меню приходят обычными событиями `wxEVT_MENU`:
 
 ```cpp
 auto* fileMenu = new wxMenu();
@@ -343,7 +343,44 @@ StyledTitleBar::menu-button:pressed {
 }
 ```
 
-Нативный `wxMenu` рисуется системой, а не QSS; стилизованный popup — отдельный планируемый виджет.
+## StyledMenu
+
+Стилизованное выпадающее меню (замена нативному `wxMenu`-попапу, который рисуется системой и не подчиняется теме). Модель строится из существующего `wxMenu` — текст, шорткаты, enabled/checked, разделители — поэтому код приложения не меняется. Выбор пункта генерирует обычный `wxEVT_MENU` с id пункта на окне-владельце. Поддерживает навигацию мышью и клавиатурой (стрелки, Home/End, Enter, Escape).
+
+Селекторы: `StyledMenu` (фон, рамка, padding), `StyledMenu::item` (`:hover`, `:disabled`), `StyledMenu::separator`.
+
+```css
+StyledMenu {
+    background-color: var(--panel-bg);
+    color: var(--text);
+    border-width: 1dip;
+    border-color: var(--border);
+    border-style: solid;
+    border-radius: 6dip;
+    padding: 4dip;
+}
+
+StyledMenu::item {
+    color: var(--text);
+    padding: 5dip 12dip;
+    font-size: 12dip;
+}
+
+StyledMenu::item:hover {
+    background-color: var(--primary);
+    color: #ffffff;
+}
+
+StyledMenu::item:disabled {
+    color: var(--disabled-color);
+}
+
+StyledMenu::separator {
+    background-color: var(--border);
+}
+```
+
+Ограничение v1: подменю рисуются со стрелкой, но не открываются. При отсутствии stylesheet шапка откатывается на нативный `PopupMenu`.
 
 ```css
 StyledTitleBar {

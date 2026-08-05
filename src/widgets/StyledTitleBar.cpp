@@ -1,6 +1,7 @@
 #include "wxCustomization/widgets/StyledTitleBar.h"
 
 #include "wxCustomization/Painter.h"
+#include "wxCustomization/widgets/StyledMenu.h"
 
 #include <wx/dcbuffer.h>
 #include <wx/menu.h>
@@ -336,14 +337,13 @@ void StyledTitleBar::OnLeftDown(wxMouseEvent& evt)
         return;
     }
 
-    // Menus open on mouse press, like in a regular menu bar.
+    // Menus open on mouse press, like in a regular menu bar. The pressed
+    // state is cleared when the menu closes (by ShowMenu/dismiss handler).
     const int menu = HitTestMenuButton(evt.GetPosition());
     if (menu >= 0) {
         m_openMenuButton = menu;
         Refresh();
         ShowMenu(menu);
-        m_openMenuButton = -1;
-        Refresh();
         return;
     }
 
@@ -475,11 +475,27 @@ void StyledTitleBar::ShowMenu(int index)
         return;
     }
 
-    // Popup below the button, aligned with its left edge. PopupMenu() is
-    // modal: it returns when the menu is dismissed, and the caller clears
-    // the pressed state then.
-    const wxRect rect = GetMenuButtonRect(index);
-    PopupMenu(menu, rect.x, rect.y + rect.height);
+    if (m_styleSheet == nullptr) {
+        // No theme: fall back to the native popup (modal), then clear the
+        // pressed state right away.
+        const wxRect rect = GetMenuButtonRect(index);
+        PopupMenu(menu, rect.x, rect.y + rect.height);
+        m_openMenuButton = -1;
+        Refresh();
+        return;
+    }
+
+    // Styled popup (non-modal): the pressed state is cleared by the dismiss
+    // handler when the menu closes.
+    if (m_menuPopup == nullptr) {
+        m_menuPopup = new StyledMenu(this, m_styleSheet);
+        m_menuPopup->SetDismissHandler([this]() {
+            m_openMenuButton = -1;
+            Refresh();
+        });
+    }
+    m_menuPopup->BuildFromMenu(menu);
+    m_menuPopup->PopupAt(ClientToScreen(GetMenuButtonRect(index).GetBottomLeft()));
 }
 
 } // namespace wxCustomization

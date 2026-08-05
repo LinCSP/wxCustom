@@ -265,7 +265,20 @@ void AddMenu(const wxString& label, wxMenu* menu);
 size_t GetMenuCount() const;
 ```
 
-Кнопки меню стилизуются под-контролом `::menu-button` (состояния `:hover`, `:pressed`, `:disabled`); выпадающее меню — нативный `wxMenu`, события пунктов — обычные `wxEVT_MENU`.
+Кнопки меню стилизуются под-контролом `::menu-button` (состояния `:hover`, `:pressed`, `:disabled`); выпадающее меню — `StyledMenu`, события пунктов — обычные `wxEVT_MENU`.
+
+## StyledMenu
+
+```cpp
+StyledMenu(wxWindow* owner, StyleSheet* sheet);
+
+void BuildFromMenu(const wxMenu* menu);   // модель из wxMenu, владение не передаётся
+void PopupAt(const wxPoint& screenPos);
+void SetDismissHandler(std::function<void()> handler);
+size_t GetItemCount() const;
+```
+
+Стилизованный popup-меню: строит модель из `wxMenu` (текст, шорткаты, enabled/checked, разделители), выбор пункта шлёт `wxEVT_MENU` на owner-окно. Селекторы: `StyledMenu`, `StyledMenu::item` (`:hover`, `:disabled`), `StyledMenu::separator`. Ограничение: подменю не открываются (v1).
 
 ## События
 

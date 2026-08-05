@@ -286,6 +286,63 @@ StyledGroupBox::title {
 }
 ```
 
+## StyledFrame и StyledTitleBar
+
+Окно с client-side decorations: без нативной шапки и рамки — шапку рисует виджет `StyledTitleBar`, полностью стилизуемый через QSS (единый стиль с приложением, как в VSCode/Bruno). Контент размещается в клиентской панели.
+
+```cpp
+class MyFrame : public wxCustomization::StyledFrame {
+public:
+    MyFrame() : StyledFrame(nullptr, wxID_ANY, "My App") {}
+};
+
+auto* frame = new MyFrame();
+frame->SetStyleSheet(sheet);
+
+// Контент — в клиентской панели:
+auto* content = new wxCustomization::StyledPanel(frame->GetClientPanel(), wxID_ANY);
+// ...
+
+frame->Show();
+```
+
+`StyledTitleBar` поддерживает:
+
+- заголовок окна по центру (`::title`), синхронизируется с `SetTitle()`;
+- кнопки свернуть/развернуть/закрыть (`::minimize-button`, `::maximize-button`, `::close-button`, общий `::caption-button`);
+- перетаскивание окна за шапку;
+- двойной клик по шапке — maximize/restore.
+
+```css
+StyledTitleBar {
+    background-color: var(--surface);
+    color: var(--text);
+    min-height: 32dip;
+    padding: 0dip 0dip 0dip 8dip;
+}
+
+StyledTitleBar::title {
+    color: var(--text-secondary);
+    font-size: 12dip;
+}
+
+StyledTitleBar::caption-button {
+    color: var(--text-secondary);
+    width: 40dip;
+}
+
+StyledTitleBar::caption-button:hover {
+    background-color: #e9ecef;
+    color: var(--text);
+}
+
+/* Красный hover у кнопки закрытия, как в Windows/VSCode. */
+StyledTitleBar::close-button:hover {
+    background-color: #e81123;
+    color: #ffffff;
+}
+```
+
 ## StyledMessageDialog
 
 Стилизованное диалоговое окно.

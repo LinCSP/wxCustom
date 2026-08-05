@@ -229,6 +229,35 @@ int SetSelection(size_t index); // возвращает прежнюю выбр�
 
 Контейнер вкладок: выбранная страница показывается в области `::pane`, остальные скрыты. Переключение — нажатием мыши на вкладку (сразу по нажатию), стрелками Left/Right (когда виджет в фокусе) и Ctrl+Tab / Ctrl+Shift+Tab (маршрутизируется wxWidgets через `HasMultiplePages()`, работает и при фокусе внутри страницы). Под-контролы: `::tab-bar`, `::tab` (состояния `:hover`, `:pressed`, `:selected`, `:disabled`), `::pane`.
 
+## StyledFrame
+
+```cpp
+StyledFrame(wxWindow* parent, wxWindowID id, const wxString& title,
+            const wxPoint& pos = wxDefaultPosition,
+            const wxSize& size = wxDefaultSize,
+            long style = wxDEFAULT_FRAME_STYLE,
+            const wxString& name = wxFrameNameStr);
+
+StyledTitleBar* GetTitleBar() const;
+StyledPanel* GetClientPanel() const;  // сюда размещается контент приложения
+
+void SetStyleSheet(StyleSheet* sheet); // применяет к шапке и клиентской панели
+void SetTitle(const wxString& title) override; // синхронизирует текст шапки
+```
+
+Окно с client-side decorations: создаётся без нативной шапки и рамки (флаги декораций срезаются), шапку рисует `StyledTitleBar`. Поддерживает перетаскивание за шапку и maximize/restore по двойному клику.
+
+## StyledTitleBar
+
+```cpp
+StyledTitleBar(wxWindow* parent, wxWindowID id = wxID_ANY, ...);
+
+void SetTitle(const wxString& title);
+wxString GetTitle() const;
+```
+
+Шапка окна: заголовок (`::title`), кнопки свернуть/развернуть/закрыть (`::minimize-button`, `::maximize-button`, `::close-button`; общий стиль — `::caption-button`, hover у close обычно красный). Фокус с клавиатуры не принимает. Обычно создаётся внутри `StyledFrame`, а не напрямую.
+
 ## События
 
 | Виджет | Событие |

@@ -43,6 +43,8 @@ add_library(wxCustomization
     include/wxCustomization/widgets/StyledProgressBar.h
     include/wxCustomization/widgets/StyledGroupBox.h
     include/wxCustomization/widgets/StyledTabWidget.h
+    include/wxCustomization/widgets/StyledTitleBar.h
+    include/wxCustomization/widgets/StyledFrame.h
     src/dummy.cpp
     src/Length.cpp
     src/Color.cpp
@@ -68,6 +70,8 @@ add_library(wxCustomization
     src/widgets/StyledProgressBar.cpp
     src/widgets/StyledGroupBox.cpp
     src/widgets/StyledTabWidget.cpp
+    src/widgets/StyledTitleBar.cpp
+    src/widgets/StyledFrame.cpp
 )
 
 add_library(wxCustomization::wxCustomization ALIAS wxCustomization)
@@ -96,6 +100,19 @@ target_compile_options(wxCustomization
 
 option(WXC_BUILD_EXAMPLES "Build wxCustomization examples" ON)
 option(WXC_BUILD_TESTS "Build wxCustomization tests" ON)
+
+# The GTK port needs GTK headers for the native window move-drag used by
+# StyledTitleBar (works on Wayland, where wxWindow::Move is a no-op).
+if(UNIX AND NOT APPLE)
+    find_package(PkgConfig)
+    if(PkgConfig_FOUND)
+        pkg_check_modules(GTK3 gtk+-3.0)
+        if(GTK3_FOUND)
+            target_include_directories(wxCustomization PRIVATE ${GTK3_INCLUDE_DIRS})
+            target_link_libraries(wxCustomization PRIVATE ${GTK3_LIBRARIES})
+        endif()
+    endif()
+endif()
 
 if(WXC_BUILD_EXAMPLES)
     add_subdirectory(examples/demo)

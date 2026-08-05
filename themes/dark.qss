@@ -413,6 +413,43 @@ StyledMessageDialog {
     spacing: 16dip;
 }
 
+/* StyledTitleBar (client-side decorations, see StyledFrame). */
+StyledTitleBar {
+    background-color: var(--surface);
+    color: var(--text);
+    padding: 0dip 0dip 0dip 8dip;
+    min-height: 32dip;
+}
+
+StyledTitleBar::title {
+    color: var(--text-secondary);
+    font-size: 12dip;
+}
+
+StyledTitleBar::caption-button {
+    color: var(--text-secondary);
+    width: 46dip;
+}
+
+StyledTitleBar::caption-button:hover {
+    background-color: var(--border);
+    color: var(--text);
+}
+
+StyledTitleBar::caption-button:pressed {
+    background-color: var(--border-strong);
+}
+
+StyledTitleBar::close-button:hover {
+    background-color: #e81123;
+    color: #ffffff;
+}
+
+StyledTitleBar::close-button:pressed {
+    background-color: #c50f1f;
+    color: #ffffff;
+}
+
 /* StyledTabWidget styles (Bootstrap 5 nav-tabs look).
    Inactive tabs are borderless links; the selected tab merges with the pane,
    is bordered on top/left/right and covers the tab bar baseline. */

@@ -20,6 +20,7 @@
 #include "wxCustomization/widgets/StyledProgressBar.h"
 #include "wxCustomization/widgets/StyledGroupBox.h"
 #include "wxCustomization/widgets/StyledTabWidget.h"
+#include "wxCustomization/widgets/StyledFrame.h"
 #include "wxCustomization/wxCustomization.h"
 
 namespace {
@@ -56,16 +57,17 @@ wxCustomization::StyledLabel* CreateHeader(wxWindow* parent,
 
 } // namespace
 
-class DemoFrame : public wxFrame {
+class DemoFrame : public wxCustomization::StyledFrame {
 public:
     DemoFrame(wxCustomization::StyleSheet* styleSheet)
-        : wxFrame(nullptr, wxID_ANY, "wxCustomization Demo",
-                  wxDefaultPosition, wxSize(900, 700))
+        : wxCustomization::StyledFrame(nullptr, wxID_ANY, "wxCustomization Demo",
+                                       wxDefaultPosition, wxSize(900, 700))
         , m_styleSheet(styleSheet)
     {
-        wxCustomization::StyledPanel* rootPanel =
-            new wxCustomization::StyledPanel(this, wxID_ANY);
-        rootPanel->SetStyleSheet(m_styleSheet);
+        SetStyleSheet(m_styleSheet);
+
+        // The content lives in the client panel below the styled title bar.
+        wxCustomization::StyledPanel* rootPanel = GetClientPanel();
 
         wxBoxSizer* rootSizer = new wxBoxSizer(wxVERTICAL);
 

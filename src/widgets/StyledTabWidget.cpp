@@ -222,21 +222,23 @@ void StyledTabWidget::OnPaint(wxPaintEvent& /*evt*/)
 
 Style StyledTabWidget::GetTabStyle(int index) const
 {
-    Style style = GetSubControlStyle("tab");
+    // Strict resolution: the widget's own hover state must not make every
+    // tab match `:hover` — only the actually hovered one does.
+    Style style = GetSubControlStyleStrict("tab", "");
 
     if (!IsEnabled()) {
-        style.Merge(GetSubControlStyle("tab", "disabled"));
+        style.Merge(GetSubControlStyleStrict("tab", "disabled"));
         return style;
     }
     if (index == m_hoveredTab) {
-        style.Merge(GetSubControlStyle("tab", "hover"));
+        style.Merge(GetSubControlStyleStrict("tab", "hover"));
     }
     if (index == m_pressedTab) {
-        style.Merge(GetSubControlStyle("tab", "pressed"));
+        style.Merge(GetSubControlStyleStrict("tab", "pressed"));
     }
     if (index == m_selection) {
         // Selected wins over hover/pressed, like the later QSS rule would.
-        style.Merge(GetSubControlStyle("tab", "selected"));
+        style.Merge(GetSubControlStyleStrict("tab", "selected"));
     }
     return style;
 }

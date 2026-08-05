@@ -19,8 +19,9 @@ enum wxAccRole {
     wxROLE_SYSTEM_GROUPING = 14,
     wxROLE_SYSTEM_PAGETABLIST = 39,
     wxROLE_SYSTEM_TEXT = 42,
+    wxROLE_SYSTEM_PROGRESSBAR = 48,
     wxROLE_SYSTEM_SLIDER = 51,
-    wxROLE_SYSTEM_PROGRESSBAR = 48
+    wxROLE_SYSTEM_TITLEBAR = 52
 };
 #endif
 
@@ -89,6 +90,13 @@ public:
 
     /// Resolve a sub-control style for a specific transient state.
     Style GetSubControlStyle(const wxString& subControl, const wxString& state) const;
+
+    /// Resolve a sub-control style matching pseudo-classes ONLY against
+    /// @p state; the widget's own transient states (hover, pressed, focused,
+    /// checked, ...) are ignored. Use for sub-elements with per-element
+    /// pseudo states (tabs, caption buttons), otherwise e.g. `:hover` would
+    /// match for every sub-element whenever the widget itself is hovered.
+    Style GetSubControlStyleStrict(const wxString& subControl, const wxString& state) const;
 
 protected:
     virtual void OnPaint(wxPaintEvent& evt);

@@ -22,6 +22,8 @@ add_executable(wxCustomization_tests
     test_styled_progressbar.cpp
     test_styled_groupbox.cpp
     test_styled_tabwidget.cpp
+    test_styled_titlebar.cpp
+    test_styled_menu.cpp
     test_theme.cpp
 )
 

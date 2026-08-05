@@ -229,6 +229,78 @@ int SetSelection(size_t index); // возвращает прежнюю выбр�
 
 Контейнер вкладок: выбранная страница показывается в области `::pane`, остальные скрыты. Переключение — нажатием мыши на вкладку (сразу по нажатию), стрелками Left/Right (когда виджет в фокусе) и Ctrl+Tab / Ctrl+Shift+Tab (маршрутизируется wxWidgets через `HasMultiplePages()`, работает и при фокусе внутри страницы). Под-контролы: `::tab-bar`, `::tab` (состояния `:hover`, `:pressed`, `:selected`, `:disabled`), `::pane`.
 
+## StyledFrame
+
+```cpp
+StyledFrame(wxWindow* parent, wxWindowID id, const wxString& title,
+            const wxPoint& pos = wxDefaultPosition,
+            const wxSize& size = wxDefaultSize,
+            long style = wxDEFAULT_FRAME_STYLE,
+            const wxString& name = wxFrameNameStr);
+
+StyledTitleBar* GetTitleBar() const;
+StyledPanel* GetClientPanel() const;  // сюда размещается контент приложения
+
+void SetStyleSheet(StyleSheet* sheet); // применяет к шапке и клиентской панели
+void SetTitle(const wxString& title) override; // синхронизирует текст шапки
+```
+
+Окно с client-side decorations: создаётся без нативной шапки и рамки (флаги декораций срезаются), шапку рисует `StyledTitleBar`. Поддерживает перетаскивание за шапку и maximize/restore по двойному клику. Изменение размера — за края и углы окна (зоны ~6dip, курсоры по 8 направлениям, учитывается `SetMinSize()`, при maximize отключён).
+
+## StyledTitleBar
+
+```cpp
+StyledTitleBar(wxWindow* parent, wxWindowID id = wxID_ANY, ...);
+
+void SetTitle(const wxString& title);
+wxString GetTitle() const;
+```
+
+Шапка окна: заголовок (`::title`), кнопки свернуть/развернуть/закрыть (`::minimize-button`, `::maximize-button`, `::close-button`; общий стиль — `::caption-button`, hover у close обычно красный). Фокус с клавиатуры не принимает. Обычно создаётся внутри `StyledFrame`, а не напрямую.
+
+```cpp
+// Меню в шапке (VSCode-style): кнопка слева, по нажатию — PopupMenu.
+// Владение меню остаётся у приложения.
+void AddMenu(const wxString& label, wxMenu* menu);
+size_t GetMenuCount() const;
+```
+
+Кнопки меню стилизуются под-контролом `::menu-button` (состояния `:hover`, `:pressed`, `:disabled`); выпадающее меню — `StyledMenu`, события пунктов — обычные `wxEVT_MENU`.
+
+## StyledMenu
+
+```cpp
+StyledMenu(wxWindow* owner, StyleSheet* sheet);
+
+void BuildFromMenu(const wxMenu* menu);   // модель из wxMenu, владение не передаётся
+void PopupAt(const wxPoint& screenPos);
+void SetDismissHandler(std::function<void()> handler);
+size_t GetItemCount() const;
+```
+
+Стилизованный popup-меню: строит модель из `wxMenu` (текст, шорткаты, enabled/checked, разделители), выбор пункта шлёт `wxEVT_MENU` на owner-окно. Селекторы: `StyledMenu`, `StyledMenu::item` (`:hover`, `:disabled`), `StyledMenu::separator`. Ограничение: подменю не открываются (v1).
+
+## StyledMessageDialog
+
+```cpp
+StyledMessageDialog(wxWindow* parent,
+                    const wxString& message,
+                    const wxString& caption = wxMessageBoxCaptionStr,
+                    long style = wxOK | wxICON_INFORMATION,
+                    const wxString& name = wxDialogNameStr);
+
+void SetStyleSheet(StyleSheet* sheet);
+StyledTitleBar* GetTitleBar() const;
+
+// Создать, стилизовать и показать модально.
+static int Show(wxWindow* parent, const wxString& message,
+                const wxString& caption = wxMessageBoxCaptionStr,
+                long style = wxOK | wxICON_INFORMATION,
+                StyleSheet* sheet = nullptr);
+```
+
+Стилизованная замена `wxMessageBox`: диалог без нативных декораций, сверху `StyledTitleBar` с заголовком и одной кнопкой закрытия (эквивалентна Cancel). Тело — карточка с рамкой; при модальном показе родитель затемняется scrim-подложкой (кроссплатформенно). Перетаскивается за шапку; Enter — OK, Escape — Cancel.
+
 ## События
 
 | Виджет | Событие |

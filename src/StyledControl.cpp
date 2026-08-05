@@ -12,8 +12,12 @@ namespace {
 /// Adapts a StyledControl to the StyleResolverContext interface.
 class StyledControlContext : public StyleResolverContext {
 public:
-    StyledControlContext(const StyledControl* control, const wxString& state)
-        : m_control(control), m_state(state)
+    /// With strictState=true pseudo-classes match only against the explicit
+    /// state string; the widget's own transient states are ignored (used for
+    /// sub-elements with per-element pseudo states: tabs, caption buttons).
+    StyledControlContext(const StyledControl* control, const wxString& state,
+                         bool strictState = false)
+        : m_control(control), m_state(state), m_strictState(strictState)
     {
     }
 
@@ -34,6 +38,9 @@ public:
 
     bool HasPseudoState(const wxString& s) const override
     {
+        if (m_strictState) {
+            return s == m_state;
+        }
         if (s == m_state) {
             return true;
         }
@@ -77,6 +84,7 @@ public:
 private:
     const StyledControl* m_control;
     wxString m_state;
+    bool m_strictState;
 };
 
 wxString CurrentState(const StyledControl* control)
@@ -134,6 +142,7 @@ StyleSheet* StyledControl::GetStyleSheet() const
 void StyledControl::ApplyStyle(const wxString& state)
 {
     m_currentState = state;
+    m_subControlStyleCache.clear();
 
     if (m_styleSheet != nullptr) {
         StyledControlContext context(this, state);
@@ -386,9 +395,37 @@ Style StyledControl::GetSubControlStyle(const wxString& subControl, const wxStri
         return Style();
     }
 
+    const SubControlStyleKey key{subControl, state, false};
+    auto it = m_subControlStyleCache.find(key);
+    if (it != m_subControlStyleCache.end()) {
+        return it->second;
+    }
+
     StyledControlContext context(this, state);
     StyleResolver resolver;
-    return resolver.Resolve(*m_styleSheet, context, subControl, state);
+    Style style = resolver.Resolve(*m_styleSheet, context, subControl, state);
+    m_subControlStyleCache.emplace(key, style);
+    return style;
+}
+
+Style StyledControl::GetSubControlStyleStrict(const wxString& subControl,
+                                              const wxString& state) const
+{
+    if (m_styleSheet == nullptr) {
+        return Style();
+    }
+
+    const SubControlStyleKey key{subControl, state, true};
+    auto it = m_subControlStyleCache.find(key);
+    if (it != m_subControlStyleCache.end()) {
+        return it->second;
+    }
+
+    StyledControlContext context(this, state, true);
+    StyleResolver resolver;
+    Style style = resolver.Resolve(*m_styleSheet, context, subControl, state);
+    m_subControlStyleCache.emplace(key, style);
+    return style;
 }
 
 wxSize StyledControl::DoGetBestSize() const

@@ -19,8 +19,9 @@ enum wxAccRole {
     wxROLE_SYSTEM_GROUPING = 14,
     wxROLE_SYSTEM_PAGETABLIST = 39,
     wxROLE_SYSTEM_TEXT = 42,
+    wxROLE_SYSTEM_PROGRESSBAR = 48,
     wxROLE_SYSTEM_SLIDER = 51,
-    wxROLE_SYSTEM_PROGRESSBAR = 48
+    wxROLE_SYSTEM_TITLEBAR = 52
 };
 #endif
 
@@ -85,10 +86,19 @@ public:
     const Style& GetCurrentStyle() const { return m_currentStyle; }
 
     /// Resolve a sub-control style (e.g. `::indicator`) from the current stylesheet.
+    /// Results are cached per (subControl, state) until ApplyStyle() runs, so
+    /// painting does not re-run the resolver every frame.
     Style GetSubControlStyle(const wxString& subControl) const;
 
     /// Resolve a sub-control style for a specific transient state.
     Style GetSubControlStyle(const wxString& subControl, const wxString& state) const;
+
+    /// Resolve a sub-control style matching pseudo-classes ONLY against
+    /// @p state; the widget's own transient states (hover, pressed, focused,
+    /// checked, ...) are ignored. Use for sub-elements with per-element
+    /// pseudo states (tabs, caption buttons), otherwise e.g. `:hover` would
+    /// match for every sub-element whenever the widget itself is hovered.
+    Style GetSubControlStyleStrict(const wxString& subControl, const wxString& state) const;
 
 protected:
     virtual void OnPaint(wxPaintEvent& evt);
@@ -138,6 +148,28 @@ protected:
 
     wxString m_accessibleLabel;
     wxAccRole m_accessibleRole = wxROLE_SYSTEM_CLIENT;
+
+private:
+    /// Cache of resolved sub-control styles, keyed by (subControl, state,
+    /// strict). Cleared by ApplyStyle(), which runs on every change that can
+    /// affect resolution (state, classes, dynamic properties, stylesheet).
+    struct SubControlStyleKey {
+        wxString subControl;
+        wxString state;
+        bool strict;
+
+        bool operator<(const SubControlStyleKey& other) const
+        {
+            if (subControl != other.subControl) {
+                return subControl < other.subControl;
+            }
+            if (state != other.state) {
+                return state < other.state;
+            }
+            return strict < other.strict;
+        }
+    };
+    mutable std::map<SubControlStyleKey, Style> m_subControlStyleCache;
 
     wxDECLARE_EVENT_TABLE();
 };

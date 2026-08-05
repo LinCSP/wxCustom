@@ -409,6 +409,87 @@ StyledMessageDialog {
     spacing: 16dip;
 }
 
+/* StyledMenu: styled popup menu (used by StyledTitleBar menus). */
+StyledMenu {
+    background-color: var(--panel-bg);
+    color: var(--text);
+    border-width: 1dip;
+    border-color: var(--border);
+    border-style: solid;
+    border-radius: 6dip;
+    padding: 4dip;
+}
+
+StyledMenu::item {
+    color: var(--text);
+    padding: 5dip 12dip;
+    font-size: 12dip;
+}
+
+StyledMenu::item:hover {
+    background-color: var(--primary);
+    color: #ffffff;
+}
+
+StyledMenu::item:disabled {
+    color: var(--disabled-color);
+}
+
+StyledMenu::separator {
+    background-color: var(--border);
+}
+
+/* StyledTitleBar (client-side decorations, see StyledFrame). */
+StyledTitleBar {
+    background-color: var(--surface);
+    color: var(--text);
+    padding: 0dip 0dip 0dip 8dip;
+    min-height: 32dip;
+}
+
+StyledTitleBar::title {
+    color: var(--text-secondary);
+    font-size: 12dip;
+}
+
+StyledTitleBar::caption-button {
+    color: var(--text-secondary);
+    width: 46dip;
+}
+
+StyledTitleBar::menu-button {
+    color: var(--text);
+    padding: 0dip 10dip;
+}
+
+StyledTitleBar::menu-button:hover {
+    background-color: #ced4da;
+}
+
+StyledTitleBar::menu-button:pressed {
+    background-color: var(--border-strong);
+    color: var(--text);
+}
+
+StyledTitleBar::caption-button:hover {
+    background-color: #ced4da;
+    color: var(--text);
+}
+
+StyledTitleBar::caption-button:pressed {
+    background-color: var(--border-strong);
+}
+
+StyledTitleBar::close-button:hover {
+    background-color: #e81123;
+    color: #ffffff;
+}
+
+StyledTitleBar::close-button:pressed {
+    background-color: #c50f1f;
+    color: #ffffff;
+}
+
 /* StyledTabWidget styles (Bootstrap 5 nav-tabs look).
    Inactive tabs are borderless links; the selected tab is white, bordered on
    top/left/right with rounded top corners and covers the tab bar baseline. */

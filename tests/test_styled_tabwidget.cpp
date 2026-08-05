@@ -40,6 +40,8 @@ public:
     using StyledTabWidget::GetTabRect;
     using StyledTabWidget::GetTabStyle;
     using StyledTabWidget::HitTestTab;
+
+    void SetHoveredTab(int index) { m_hoveredTab = index; }
 };
 
 struct PageChangedCatcher {
@@ -172,6 +174,29 @@ TEST(StyledTabWidget, ResolvesSubControlStyles)
     const Style paneStyle = tabs->GetSubControlStyle("pane");
     EXPECT_EQ(paneStyle.backgroundColor, wxColour(0x60, 0x60, 0x60));
     EXPECT_EQ(paneStyle.paddingLeft, 12);
+}
+
+TEST(StyledTabWidget, OnlyHoveredTabUsesHoverStyle)
+{
+    StyleSheet sheet;
+    ASSERT_TRUE(sheet.LoadFromString(
+        "StyledTabWidget::tab { background-color: #202020; }\n"
+        "StyledTabWidget::tab:hover { background-color: #909090; }\n"
+        "StyledTabWidget::tab:selected { background-color: #404040; }"));
+
+    TestTabWidget* tabs = CreateWithPages(gTestFrame, 3);
+    tabs->SetStyleSheet(&sheet);
+    tabs->SetSize(0, 0, 400, 200);
+
+    // Mouse is over the widget (hovering tab 1): the widget-level hover must
+    // not turn every tab's `:hover` style on.
+    wxMouseEvent enterEvent(wxEVT_ENTER_WINDOW);
+    tabs->GetEventHandler()->ProcessEvent(enterEvent);
+    tabs->SetHoveredTab(1);
+
+    EXPECT_EQ(tabs->GetTabStyle(0).backgroundColor, wxColour(0x40, 0x40, 0x40)); // selected
+    EXPECT_EQ(tabs->GetTabStyle(1).backgroundColor, wxColour(0x90, 0x90, 0x90)); // hovered
+    EXPECT_EQ(tabs->GetTabStyle(2).backgroundColor, wxColour(0x20, 0x20, 0x20)); // plain
 }
 
 TEST(StyledTabWidget, SelectedTabUsesSelectedStateStyle)

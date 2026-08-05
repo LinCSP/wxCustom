@@ -286,9 +286,161 @@ StyledGroupBox::title {
 }
 ```
 
+## StyledFrame и StyledTitleBar
+
+Окно с client-side decorations: без нативной шапки и рамки — шапку рисует виджет `StyledTitleBar`, полностью стилизуемый через QSS (единый стиль с приложением, как в VSCode/Bruno). Контент размещается в клиентской панели.
+
+```cpp
+class MyFrame : public wxCustomization::StyledFrame {
+public:
+    MyFrame() : StyledFrame(nullptr, wxID_ANY, "My App") {}
+};
+
+auto* frame = new MyFrame();
+frame->SetStyleSheet(sheet);
+
+// Контент — в клиентской панели:
+auto* content = new wxCustomization::StyledPanel(frame->GetClientPanel(), wxID_ANY);
+// ...
+
+frame->Show();
+```
+
+`StyledTitleBar` поддерживает:
+
+- заголовок окна по центру (`::title`), синхронизируется с `SetTitle()`;
+- кнопки свернуть/развернуть/закрыть (`::minimize-button`, `::maximize-button`, `::close-button`, общий `::caption-button`);
+- перетаскивание окна за шапку;
+- двойной клик по шапке — maximize/restore;
+- **меню в шапке** (`AddMenu(label, wxMenu*)`, кнопки `::menu-button` слева).
+
+Кроме того, `StyledFrame` сам реализует **изменение размера окна за края и углы**: зоны ~6dip по периметру окна с курсорами resize по 8 направлениям. Учитывается `SetMinSize()`; при развёрнутом окне resize отключён. На GTK перетаскивание границы выполняет композитор (через `gtk_window_begin_resize_drag` — работает и на Wayland), на остальных платформах геометрия меняется вручную.
+
+```css
+StyledTitleBar {
+    background-color: var(--surface);
+    color: var(--text);
+    min-height: 32dip;
+    padding: 0dip 0dip 0dip 8dip;
+}
+
+StyledTitleBar::title {
+    color: var(--text-secondary);
+    font-size: 12dip;
+}
+
+StyledTitleBar::caption-button {
+    color: var(--text-secondary);
+    width: 46dip;
+}
+
+StyledTitleBar::caption-button:hover {
+    background-color: #ced4da;
+    color: var(--text);
+}
+
+/* Красный hover у кнопки закрытия, как в Windows/VSCode. */
+StyledTitleBar::close-button:hover {
+    background-color: #e81123;
+    color: #ffffff;
+}
+```
+
+Выбор отображаемых кнопок — `SetCaptionButtons()` (например, диалогам хватит одной кнопки закрытия):
+
+```cpp
+titleBar->SetCaptionButtons(1 << wxCustomization::StyledTitleBar::BtnClose);
+```
+
+### Меню в шапке окна
+
+Меню размещаются в левой части шапки, как в VSCode. Кнопка меню рисуется виджетом (под-контрол `::menu-button` с состояниями `:hover`, `:pressed`, `:disabled`), по нажатию открывается **стилизованное выпадающее меню `StyledMenu`** под кнопкой. Пункты меню приходят обычными событиями `wxEVT_MENU`:
+
+```cpp
+auto* fileMenu = new wxMenu();
+fileMenu->Append(wxID_EXIT, "Quit\tCtrl+Q");
+
+frame->GetTitleBar()->AddMenu("File", fileMenu); // меню остаётся во владении приложения
+frame->Bind(wxEVT_MENU, &MyFrame::OnQuit, frame, wxID_EXIT);
+```
+
+```css
+StyledTitleBar::menu-button {
+    color: var(--text);
+    padding: 0dip 10dip;
+}
+
+StyledTitleBar::menu-button:hover {
+    background-color: #ced4da;
+}
+
+StyledTitleBar::menu-button:pressed {
+    background-color: var(--border-strong);
+}
+```
+
+## StyledMenu
+
+Стилизованное выпадающее меню (замена нативному `wxMenu`-попапу, который рисуется системой и не подчиняется теме). Модель строится из существующего `wxMenu` — текст, шорткаты, enabled/checked, разделители — поэтому код приложения не меняется. Выбор пункта генерирует обычный `wxEVT_MENU` с id пункта на окне-владельце. Поддерживает навигацию мышью и клавиатурой (стрелки, Home/End, Enter, Escape).
+
+Селекторы: `StyledMenu` (фон, рамка, padding), `StyledMenu::item` (`:hover`, `:disabled`), `StyledMenu::separator`.
+
+```css
+StyledMenu {
+    background-color: var(--panel-bg);
+    color: var(--text);
+    border-width: 1dip;
+    border-color: var(--border);
+    border-style: solid;
+    border-radius: 6dip;
+    padding: 4dip;
+}
+
+StyledMenu::item {
+    color: var(--text);
+    padding: 5dip 12dip;
+    font-size: 12dip;
+}
+
+StyledMenu::item:hover {
+    background-color: var(--primary);
+    color: #ffffff;
+}
+
+StyledMenu::item:disabled {
+    color: var(--disabled-color);
+}
+
+StyledMenu::separator {
+    background-color: var(--border);
+}
+```
+
+Ограничение v1: подменю рисуются со стрелкой, но не открываются. При отсутствии stylesheet шапка откатывается на нативный `PopupMenu`.
+
+`StyledMenu` можно использовать и отдельно от шапки — например, для контекстного меню:
+
+```cpp
+wxCustomization::StyledMenu popup(this, styleSheet);
+
+wxMenu model;
+model.Append(wxID_COPY, "Copy\tCtrl+C");
+model.Append(wxID_PASTE, "Paste\tCtrl+V");
+model.AppendSeparator();
+model.Append(wxID_DELETE, "Delete");
+popup.BuildFromMenu(&model);
+
+popup.PopupAt(ClientToScreen(pt)); // выбор придёт как wxEVT_MENU на this
+```
+
 ## StyledMessageDialog
 
-Стилизованное диалоговое окно.
+Стилизованное диалоговое окно. Как и `StyledFrame`, рисуется без нативных декораций: сверху — `StyledTitleBar` с заголовком и одной кнопкой закрытия (диалог можно перетаскивать за шапку). Кнопка закрытия эквивалентна Cancel.
+
+Диалог не «сливается» с основным окном:
+
+- тело рисуется карточкой с рамкой (`StyledMessageDialog`: `border-width`, `border-color`, `border-radius`);
+- при модальном показе родительское окно затемняется полупрозрачной подложкой (scrim) — реализовано собственными окнами библиотеки, поэтому работает одинаково на всех платформах, без композиторных эффектов.
 
 ```cpp
 wxCustomization::StyledMessageDialog::Show(

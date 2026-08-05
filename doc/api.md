@@ -229,6 +229,46 @@ int SetSelection(size_t index); // возвращает прежнюю выбр�
 
 Контейнер вкладок: выбранная страница показывается в области `::pane`, остальные скрыты. Переключение — нажатием мыши на вкладку (сразу по нажатию), стрелками Left/Right (когда виджет в фокусе) и Ctrl+Tab / Ctrl+Shift+Tab (маршрутизируется wxWidgets через `HasMultiplePages()`, работает и при фокусе внутри страницы). Под-контролы: `::tab-bar`, `::tab` (состояния `:hover`, `:pressed`, `:selected`, `:disabled`), `::pane`.
 
+## StyledTable
+
+```cpp
+struct StyledTableColumn {
+    wxString title;
+    int widthDip = 80;        // ширина колонки в dip
+    int align = wxALIGN_LEFT; // wxALIGN_LEFT / wxALIGN_RIGHT / wxALIGN_CENTRE
+    bool sortable = true;     // реагирует ли заголовок на клик
+};
+
+StyledTable(wxWindow* parent, wxWindowID id = wxID_ANY,
+            const wxPoint& pos = wxDefaultPosition,
+            const wxSize& size = wxDefaultSize,
+            long style = 0,
+            const wxString& name = wxControlNameStr);
+
+void SetColumns(const std::vector<StyledTableColumn>& cols);
+const std::vector<StyledTableColumn>& GetColumns() const;
+int GetColumnCount() const;
+
+// Виртуальные данные: таблица ничего не хранит.
+void SetCellProvider(std::function<wxString(int row, int col)> provider);
+void SetRowCount(int count);
+int GetRowCount() const;
+void RefreshRows();           // перерисовка после изменения данных
+
+void SetSelectedRow(int row); // -1 снимает выбор
+int GetSelectedRow() const;   // -1, если выбора нет
+void SetOnSelectionChanged(std::function<void(int row)> callback);
+
+void SetOnHeaderClick(std::function<void(int col)> callback);
+void SetSortIndicator(int col, bool ascending); // -1 убирает стрелку
+int GetSortColumn() const;
+bool IsSortAscending() const;
+
+void EnsureRowVisible(int row);
+```
+
+Owner-drawn таблица с виртуальными строками и фиксированной высотой строки. Выбор строки — мышью и клавишами Up/Down, PageUp/PageDown, Home/End; при смене выбора генерируется `wxEVT_STYLED_TABLE_SELECTION` (`wxCommandEvent::GetInt()` — индекс строки). Клик по заголовку sortable-колонки вызывает колбэк `SetOnHeaderClick`; сортировку данных выполняет приложение, виджет только рисует стрелку из `SetSortIndicator`. Под-контролы: `::header` (состояния `:hover`, `:pressed` по колонкам), `::row` (`:hover`, `:selected`, `:alternate` — «зебра»), `::scroll-bar` (трек; `width`/`height` — толщина полос), `::scroll-thumb` (ползунок). Цвет grid-линий — `border-color` виджета.
+
 ## StyledFrame
 
 ```cpp
@@ -315,6 +355,7 @@ static int Show(wxWindow* parent, const wxString& message,
 | `StyledProgressBar` | — |
 | `StyledGroupBox` | — |
 | `StyledTabWidget` | `wxEVT_NOTEBOOK_PAGE_CHANGED` (класс `wxBookCtrlEvent`: `GetSelection()` — новая вкладка, `GetOldSelection()` — прежняя) |
+| `StyledTable` | `wxEVT_STYLED_TABLE_SELECTION` (класс `wxCommandEvent`: `GetInt()` — выбранная строка, -1 при снятии выбора) |
 
 ## Theme
 

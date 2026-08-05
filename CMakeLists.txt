@@ -43,6 +43,7 @@ add_library(wxCustomization
     include/wxCustomization/widgets/StyledProgressBar.h
     include/wxCustomization/widgets/StyledGroupBox.h
     include/wxCustomization/widgets/StyledTabWidget.h
+    include/wxCustomization/widgets/StyledTable.h
     include/wxCustomization/widgets/StyledTitleBar.h
     include/wxCustomization/widgets/StyledFrame.h
     include/wxCustomization/widgets/StyledMenu.h
@@ -71,6 +72,7 @@ add_library(wxCustomization
     src/widgets/StyledProgressBar.cpp
     src/widgets/StyledGroupBox.cpp
     src/widgets/StyledTabWidget.cpp
+    src/widgets/StyledTable.cpp
     src/widgets/StyledTitleBar.cpp
     src/widgets/StyledFrame.cpp
     src/widgets/StyledMenu.cpp

@@ -542,3 +542,66 @@ StyledTabWidget:focused {
     outline-color: var(--focus-outline);
     outline-offset: 2dip;
 }
+
+/* StyledTable styles. Grid lines pick up the widget's border-color. */
+StyledTable {
+    background-color: var(--panel-bg);
+    color: var(--text);
+    border-width: 1dip;
+    border-color: var(--border);
+    border-style: solid;
+}
+
+StyledTable:focused {
+    outline-width: 2dip;
+    outline-color: var(--focus-outline);
+    outline-offset: 2dip;
+}
+
+StyledTable::header {
+    background-color: var(--surface);
+    color: var(--text);
+    padding: 6dip 8dip;
+    text-align: left;
+    border-bottom-width: 1dip;
+    border-color: var(--border-strong);
+    border-style: solid;
+}
+
+StyledTable::header:hover {
+    background-color: #f1f3f5;
+}
+
+StyledTable::header:pressed {
+    background-color: #e9ecef;
+}
+
+StyledTable::row {
+    color: var(--text);
+    padding: 4dip 8dip;
+    text-align: left;
+}
+
+StyledTable::row:alternate {
+    background-color: var(--surface);
+}
+
+StyledTable::row:hover {
+    background-color: #f1f3f5;
+}
+
+StyledTable::row:selected {
+    background-color: var(--primary);
+    color: #ffffff;
+}
+
+StyledTable::scroll-bar {
+    background-color: var(--panel-bg);
+    width: 8dip;
+    height: 8dip;
+}
+
+StyledTable::scroll-thumb {
+    background-color: var(--border-strong);
+    border-radius: 4dip;
+}

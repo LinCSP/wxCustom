@@ -510,3 +510,88 @@ StyledTabWidget::pane {
 `padding` у `::pane` задаёт отступ страницы от краёв области содержимого; `padding` у `::tab-bar` — отступы полосы вкладок (слева/справа — перед первой и после последней вкладки, сверху/снизу — увеличивают высоту полосы). Ширина `border-bottom-width` у `::tab-bar` — это «базовая линия», на которой сидят вкладки; выбранная вкладка перекрывает её, неактивные останавливаются над ней.
 
 > **Совет:** держите `border-width` у `::tab` одинаковым во всех состояниях (невидимая рамка через `border-color: transparent`), чтобы ширина вкладок не менялась при наведении/выборе.
+
+## StyledTable
+
+Owner-drawn таблица с виртуальными строками (замена лёгкого `wxDataViewListCtrl`/`wxGrid` для сценариев «список с колонками»). Виджет не хранит данные: приложение задаёт колонки (`SetColumns`), число строк (`SetRowCount`) и провайдер текста ячеек (`SetCellProvider`), а после изменения данных вызывает `RefreshRows()`. Строки фиксированной высоты (шрифт + `padding` из стиля `::row`), поддерживаются одиночный выбор строки (мышь и клавиши Up/Down, PageUp/PageDown, Home/End), прокрутка колесом мыши и тонкие owner-drawn полосы прокрутки (вертикальная — при переполнении по высоте, горизонтальная — когда суммарная ширина колонок больше клиентской ширины; ползунки перетаскиваются мышью).
+
+Клик по заголовку sortable-колонки вызывает колбэк `SetOnHeaderClick` — сама сортировка данных остаётся на приложении; виджет лишь рисует стрелку направления, установленную через `SetSortIndicator()`.
+
+При смене выбранной строки генерируется `wxEVT_STYLED_TABLE_SELECTION` (класс `wxCommandEvent`: `GetInt()` — индекс строки, -1 при снятии выбора) и вызывается колбэк `SetOnSelectionChanged`.
+
+```cpp
+auto* table = new wxCustomization::StyledTable(parent, wxID_ANY);
+table->SetStyleSheet(sheet);
+
+table->SetColumns({
+    { "Name",  160, wxALIGN_LEFT,  true  },
+    { "Size",  80,  wxALIGN_RIGHT, true  },
+    { "Notes", 240, wxALIGN_LEFT,  false },
+});
+
+std::vector<Record> rows = LoadRows();
+table->SetCellProvider([&rows](int row, int col) -> wxString {
+    const Record& r = rows[row];
+    switch (col) {
+        case 0: return r.name;
+        case 1: return wxString::Format("%d", r.size);
+        default: return r.notes;
+    }
+});
+table->SetRowCount(static_cast<int>(rows.size()));
+
+// Сортировка — забота приложения.
+table->SetOnHeaderClick([table, &rows](int col) {
+    SortRows(rows, col);
+    table->SetSortIndicator(col, /*ascending=*/true);
+    table->RefreshRows();
+});
+
+table->Bind(wxEVT_STYLED_TABLE_SELECTION, [](wxCommandEvent& evt) {
+    // evt.GetInt() — выбранная строка.
+});
+```
+
+Под-контролы: `::header` (полоса заголовков; состояния `:hover`, `:pressed` срабатывают по колонкам), `::row` (строка; состояния `:hover`, `:selected`, `:alternate` — последнее задаёт «зебру» для нечётных строк и применяется, только если определено в стиле), `::scroll-bar` (трек полос прокрутки; `width`/`height` задают толщину вертикальной/горизонтальной полосы) и `::scroll-thumb` (ползунок, поддерживает `border-radius`). Цвет линий сетки берётся из `border-color` самого `StyledTable`, высота строки — из шрифта и `padding` стиля `::row` (либо явный `height`/`min-height` у `::row`), высота заголовка — аналогично из `::header`:
+
+```css
+StyledTable {
+    background-color: #ffffff;
+    color: #2c3e50;
+    border-width: 1dip;
+    border-color: #dee2e6;   /* заодно цвет grid-линий */
+    border-style: solid;
+}
+
+StyledTable::header {
+    background-color: #f8f9fa;
+    padding: 6dip 8dip;
+    border-bottom-width: 1dip;
+    border-color: #bdc3c7;
+    border-style: solid;
+}
+
+StyledTable::header:hover {
+    background-color: #f1f3f5;
+}
+
+StyledTable::row {
+    padding: 4dip 8dip;
+}
+
+StyledTable::row:alternate {
+    background-color: #f8f9fa;
+}
+
+StyledTable::row:selected {
+    background-color: #3498db;
+    color: #ffffff;
+}
+
+StyledTable::scroll-thumb {
+    background-color: #bdc3c7;
+    border-radius: 4dip;
+}
+```
+
+Ширины колонок задаются в dip в `StyledTableColumn::widthDip` (через QSS не настраиваются); выравнивание текста в ячейках и заголовках — полем `StyledTableColumn::align` (`wxALIGN_LEFT`/`wxALIGN_RIGHT`/`wxALIGN_CENTRE`).

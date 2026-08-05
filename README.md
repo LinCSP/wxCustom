@@ -9,7 +9,7 @@ wxCustomization предоставляет собственные виджеты
 ## Возможности
 
 - CSS/QSS-подобный язык стилей с переменными, псевдо-состояниями и sub-control'ами.
-- Полностью кастомизируемые виджеты: Panel, Label, Button, ToggleButton, CheckBox, RadioButton, LineEdit, ComboBox, Slider, ProgressBar, GroupBox, TabWidget и другие.
+- Полностью кастомизируемые виджеты: Panel, Label, Button, ToggleButton, CheckBox, RadioButton, LineEdit, ComboBox, Slider, ProgressBar, GroupBox, TabWidget, Table и другие.
 - Client-side decorations: `StyledFrame` и `StyledTitleBar` — окно целиком в едином стиле (шапка, кнопки, resize, **меню в шапке**), как в VSCode/Bruno.
 - Стилизованные выпадающие меню (`StyledMenu`) и диалоги (`StyledMessageDialog`) без нативных декораций.
 - Готовые светлая и тёмная темы (`themes/default.qss`, `themes/dark.qss`), менеджер тем `Theme` с hot-reload.

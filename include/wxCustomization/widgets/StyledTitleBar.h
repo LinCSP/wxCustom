@@ -2,6 +2,7 @@
 
 #include "wxCustomization/StyledControl.h"
 
+class wxMenu;
 class wxTopLevelWindow;
 
 namespace wxCustomization {
@@ -15,8 +16,9 @@ namespace wxCustomization {
 /// double-click. The caption buttons act on the top-level window the bar
 /// belongs to (Iconize/Maximize/Close).
 ///
-/// The bar is a plain container: custom widgets (menus, tool buttons) can be
-/// added as children on the left side via a sizer (see StyledFrame).
+/// Menus can be embedded on the left side of the bar (VSCode-style):
+/// AddMenu() adds a drawn menu button (sub-control `::menu-button`) which
+/// opens its wxMenu on click.
 class StyledTitleBar : public StyledControl {
 public:
     StyledTitleBar(wxWindow* parent,
@@ -28,6 +30,14 @@ public:
 
     void SetTitle(const wxString& title);
     wxString GetTitle() const { return m_title; }
+
+    /// Add a menu button with the given @p label on the left side of the bar.
+    /// The @p menu is shown via PopupMenu() when the button is clicked.
+    /// The bar does not take ownership of the menu.
+    void AddMenu(const wxString& label, wxMenu* menu);
+
+    /// Number of embedded menus.
+    size_t GetMenuCount() const { return m_menus.size(); }
 
     wxString GetStyledControlType() const override { return "StyledTitleBar"; }
 
@@ -62,21 +72,42 @@ protected:
     wxRect GetCaptionButtonRect(int index) const;
     Style GetCaptionButtonStyle(int index) const;
 
+    /// Return the menu button at @p pt (client coords) or -1.
+    int HitTestMenuButton(const wxPoint& pt) const;
+    wxRect GetMenuButtonRect(int index) const;
+    Style GetMenuButtonStyle(int index) const;
+
     /// Action for a caption button; virtual so tests can intercept it.
     virtual void ActivateCaptionButton(int index);
+
+    /// Open the popup menu for the menu button @p index. The default
+    /// implementation shows the native wxMenu below the button; virtual so
+    /// tests can intercept it.
+    virtual void ShowMenu(int index);
 
     static wxString CaptionButtonKind(int index);
 
 protected:
+    struct MenuEntry {
+        wxString label;
+        wxMenu* menu;
+    };
+
     wxString m_title;
     int m_hoveredButton = -1;
     int m_pressedButton = -1;
+
+    std::vector<MenuEntry> m_menus;
+    int m_hoveredMenuButton = -1;
+    int m_openMenuButton = -1;
 
 private:
     wxTopLevelWindow* GetTopLevelWindow() const;
     wxFont GetTitleFont() const;
     int GetCaptionButtonsWidth() const;
+    int GetMenuButtonsWidth() const;
     void DrawCaptionButton(wxDC& dc, int index);
+    void DrawMenuButton(wxDC& dc, int index);
 
     bool m_dragging = false;
     wxPoint m_dragOffset;

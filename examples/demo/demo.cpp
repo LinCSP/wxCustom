@@ -1,9 +1,12 @@
 #include <wx/wx.h>
 #include <wx/file.h>
 #include <wx/filename.h>
+#include <wx/menu.h>
 #include <wx/sizer.h>
 #include <wx/stdpaths.h>
 #include <wx/tglbtn.h>
+
+#include <memory>
 
 #include "wxCustomization/StyleSheet.h"
 #include "wxCustomization/StyledControl.h"
@@ -21,6 +24,7 @@
 #include "wxCustomization/widgets/StyledGroupBox.h"
 #include "wxCustomization/widgets/StyledTabWidget.h"
 #include "wxCustomization/widgets/StyledFrame.h"
+#include "wxCustomization/widgets/StyledTitleBar.h"
 #include "wxCustomization/wxCustomization.h"
 
 namespace {
@@ -66,6 +70,17 @@ public:
     {
         SetStyleSheet(m_styleSheet);
         SetMinSize(wxSize(640, 480));
+
+        // Menus embedded in the title bar (VSCode-style).
+        m_fileMenu.reset(new wxMenu());
+        m_fileMenu->Append(wxID_EXIT, "Quit\tCtrl+Q");
+        m_helpMenu.reset(new wxMenu());
+        m_helpMenu->Append(wxID_ABOUT, "About wxCustomization");
+        GetTitleBar()->AddMenu("File", m_fileMenu.get());
+        GetTitleBar()->AddMenu("Help", m_helpMenu.get());
+
+        Bind(wxEVT_MENU, &DemoFrame::OnQuit, this, wxID_EXIT);
+        Bind(wxEVT_MENU, &DemoFrame::OnAbout, this, wxID_ABOUT);
 
         // The content lives in the client panel below the styled title bar.
         wxCustomization::StyledPanel* rootPanel = GetClientPanel();
@@ -325,6 +340,20 @@ private:
             wxOK | wxICON_INFORMATION, m_styleSheet);
     }
 
+    void OnQuit(wxCommandEvent& /*evt*/)
+    {
+        Close();
+    }
+
+    void OnAbout(wxCommandEvent& /*evt*/)
+    {
+        wxCustomization::StyledMessageDialog::Show(
+            this,
+            wxString::Format("wxCustomization %s\nDemo application with a styled title bar.",
+                             wxCustomization::GetVersionString()),
+            "About", wxOK | wxICON_INFORMATION, m_styleSheet);
+    }
+
     void OnToggle(wxCommandEvent& evt)
     {
         const bool value = evt.GetInt() != 0;
@@ -417,6 +446,9 @@ private:
     }
 
     wxCustomization::StyleSheet* m_styleSheet;
+
+    std::unique_ptr<wxMenu> m_fileMenu;
+    std::unique_ptr<wxMenu> m_helpMenu;
 
     wxCustomization::StyledPanel* m_buttonsPage = nullptr;
     wxCustomization::StyledPanel* m_inputPage = nullptr;

@@ -258,6 +258,15 @@ wxString GetTitle() const;
 
 Шапка окна: заголовок (`::title`), кнопки свернуть/развернуть/закрыть (`::minimize-button`, `::maximize-button`, `::close-button`; общий стиль — `::caption-button`, hover у close обычно красный). Фокус с клавиатуры не принимает. Обычно создаётся внутри `StyledFrame`, а не напрямую.
 
+```cpp
+// Меню в шапке (VSCode-style): кнопка слева, по нажатию — PopupMenu.
+// Владение меню остаётся у приложения.
+void AddMenu(const wxString& label, wxMenu* menu);
+size_t GetMenuCount() const;
+```
+
+Кнопки меню стилизуются под-контролом `::menu-button` (состояния `:hover`, `:pressed`, `:disabled`); выпадающее меню — нативный `wxMenu`, события пунктов — обычные `wxEVT_MENU`.
+
 ## События
 
 | Виджет | Событие |

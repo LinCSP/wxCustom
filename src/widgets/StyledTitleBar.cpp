@@ -3,6 +3,7 @@
 #include "wxCustomization/Painter.h"
 
 #include <wx/dcbuffer.h>
+#include <wx/menu.h>
 #include <wx/settings.h>
 #include <wx/toplevel.h>
 
@@ -39,6 +40,13 @@ void StyledTitleBar::SetTitle(const wxString& title)
     Refresh();
 }
 
+void StyledTitleBar::AddMenu(const wxString& label, wxMenu* menu)
+{
+    m_menus.push_back({label, menu});
+    InvalidateBestSize();
+    Refresh();
+}
+
 wxString StyledTitleBar::CaptionButtonKind(int index)
 {
     switch (index) {
@@ -66,6 +74,65 @@ int StyledTitleBar::GetCaptionButtonsWidth() const
         width += GetCaptionButtonRect(i).width;
     }
     return width;
+}
+
+int StyledTitleBar::GetMenuButtonsWidth() const
+{
+    int width = 0;
+    for (size_t i = 0; i < m_menus.size(); ++i) {
+        width += GetMenuButtonRect(static_cast<int>(i)).width;
+    }
+    return width;
+}
+
+wxRect StyledTitleBar::GetMenuButtonRect(int index) const
+{
+    const wxRect content = GetContentRect();
+    const Style menuStyle = GetSubControlStyleStrict("menu-button", "");
+
+    wxFont font = menuStyle.font.IsOk() ? menuStyle.font : GetTitleFont();
+    int textWidth = 0;
+    int textHeight = 0;
+    GetTextExtent(m_menus[index].label, &textWidth, &textHeight, nullptr, nullptr,
+                  &font);
+
+    const int width = textWidth + menuStyle.paddingLeft + menuStyle.paddingRight;
+
+    // Menu buttons are laid out left to right from the content origin.
+    int x = content.x;
+    for (int i = 0; i < index; ++i) {
+        x += GetMenuButtonRect(i).width;
+    }
+    return wxRect(x, content.y, width, content.height);
+}
+
+int StyledTitleBar::HitTestMenuButton(const wxPoint& pt) const
+{
+    for (size_t i = 0; i < m_menus.size(); ++i) {
+        if (GetMenuButtonRect(static_cast<int>(i)).Contains(pt)) {
+            return static_cast<int>(i);
+        }
+    }
+    return -1;
+}
+
+Style StyledTitleBar::GetMenuButtonStyle(int index) const
+{
+    // Strict resolution, like for the caption buttons: the bar's own hover
+    // state must not make every menu button match `:hover`.
+    Style style = GetSubControlStyleStrict("menu-button", "");
+
+    if (!IsEnabled()) {
+        style.Merge(GetSubControlStyleStrict("menu-button", "disabled"));
+        return style;
+    }
+    if (index == m_hoveredMenuButton) {
+        style.Merge(GetSubControlStyleStrict("menu-button", "hover"));
+    }
+    if (index == m_openMenuButton) {
+        style.Merge(GetSubControlStyleStrict("menu-button", "pressed"));
+    }
+    return style;
 }
 
 wxRect StyledTitleBar::GetCaptionButtonRect(int index) const
@@ -184,6 +251,23 @@ void StyledTitleBar::DrawCaptionButton(wxDC& dc, int index)
     }
 }
 
+void StyledTitleBar::DrawMenuButton(wxDC& dc, int index)
+{
+    const wxRect rect = GetMenuButtonRect(index);
+    Style style = GetMenuButtonStyle(index);
+
+    Painter painter;
+    painter.DrawBackground(dc, rect, style);
+
+    if (!style.font.IsOk()) {
+        style.font = GetTitleFont();
+    }
+    if (!style.color.IsOk() && GetCurrentStyle().color.IsOk()) {
+        style.color = GetCurrentStyle().color;
+    }
+    painter.DrawText(dc, rect, m_menus[index].label, style);
+}
+
 void StyledTitleBar::DrawTitleBar(wxDC& dc, const wxRect& rect)
 {
     const Style& style = GetCurrentStyle();
@@ -202,6 +286,10 @@ void StyledTitleBar::DrawTitleBar(wxDC& dc, const wxRect& rect)
         }
         const wxRect content = GetContentRect();
         painter.DrawText(dc, content, m_title, titleStyle);
+    }
+
+    for (size_t i = 0; i < m_menus.size(); ++i) {
+        DrawMenuButton(dc, static_cast<int>(i));
     }
 
     for (int i = 0; i < BtnCount; ++i) {
@@ -223,7 +311,8 @@ wxSize StyledTitleBar::DoGetBestSize() const
     size.y = textHeight + style.borderTopWidth + style.borderBottomWidth
              + style.paddingTop + style.paddingBottom;
     size.x = textWidth + style.borderLeftWidth + style.borderRightWidth
-             + style.paddingLeft + style.paddingRight + GetCaptionButtonsWidth();
+             + style.paddingLeft + style.paddingRight + GetCaptionButtonsWidth()
+             + GetMenuButtonsWidth();
 
     if (style.IsSet(Property::MinWidth) && size.x < style.minWidth) {
         size.x = style.minWidth;
@@ -243,6 +332,17 @@ void StyledTitleBar::OnLeftDown(wxMouseEvent& evt)
     const int btn = HitTestCaptionButton(evt.GetPosition());
     if (btn >= 0) {
         m_pressedButton = btn;
+        Refresh();
+        return;
+    }
+
+    // Menus open on mouse press, like in a regular menu bar.
+    const int menu = HitTestMenuButton(evt.GetPosition());
+    if (menu >= 0) {
+        m_openMenuButton = menu;
+        Refresh();
+        ShowMenu(menu);
+        m_openMenuButton = -1;
         Refresh();
         return;
     }
@@ -305,9 +405,21 @@ void StyledTitleBar::OnMotion(wxMouseEvent& evt)
         return;
     }
 
+    bool changed = false;
+
     const int btn = HitTestCaptionButton(evt.GetPosition());
     if (btn != m_hoveredButton) {
         m_hoveredButton = btn;
+        changed = true;
+    }
+
+    const int menu = HitTestMenuButton(evt.GetPosition());
+    if (menu != m_hoveredMenuButton) {
+        m_hoveredMenuButton = menu;
+        changed = true;
+    }
+
+    if (changed) {
         Refresh();
     }
     evt.Skip();
@@ -317,6 +429,7 @@ void StyledTitleBar::OnMouseLeave(wxMouseEvent& evt)
 {
     m_hoveredButton = -1;
     m_pressedButton = -1;
+    m_hoveredMenuButton = -1;
     StyledControl::OnMouseLeave(evt);
 }
 
@@ -350,6 +463,23 @@ void StyledTitleBar::ActivateCaptionButton(int index)
         default:
             break;
     }
+}
+
+void StyledTitleBar::ShowMenu(int index)
+{
+    if (index < 0 || index >= static_cast<int>(m_menus.size())) {
+        return;
+    }
+    wxMenu* menu = m_menus[index].menu;
+    if (menu == nullptr) {
+        return;
+    }
+
+    // Popup below the button, aligned with its left edge. PopupMenu() is
+    // modal: it returns when the menu is dismissed, and the caller clears
+    // the pressed state then.
+    const wxRect rect = GetMenuButtonRect(index);
+    PopupMenu(menu, rect.x, rect.y + rect.height);
 }
 
 } // namespace wxCustomization

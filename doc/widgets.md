@@ -311,9 +311,39 @@ frame->Show();
 - заголовок окна по центру (`::title`), синхронизируется с `SetTitle()`;
 - кнопки свернуть/развернуть/закрыть (`::minimize-button`, `::maximize-button`, `::close-button`, общий `::caption-button`);
 - перетаскивание окна за шапку;
-- двойной клик по шапке — maximize/restore.
+- двойной клик по шапке — maximize/restore;
+- **меню в шапке** (`AddMenu(label, wxMenu*)`, кнопки `::menu-button` слева).
 
 Кроме того, `StyledFrame` сам реализует **изменение размера окна за края и углы**: зоны ~6dip по периметру окна с курсорами resize по 8 направлениям. Учитывается `SetMinSize()`; при развёрнутом окне resize отключён. На GTK перетаскивание границы выполняет композитор (через `gtk_window_begin_resize_drag` — работает и на Wayland), на остальных платформах геометрия меняется вручную.
+
+### Меню в шапке окна
+
+Меню размещаются в левой части шапки, как в VSCode. Кнопка меню рисуется виджетом (под-контрол `::menu-button` с состояниями `:hover`, `:pressed`, `:disabled`), по нажатию открывается нативный `wxMenu` (`PopupMenu` под кнопкой). Пункты меню приходят обычными событиями `wxEVT_MENU`:
+
+```cpp
+auto* fileMenu = new wxMenu();
+fileMenu->Append(wxID_EXIT, "Quit\tCtrl+Q");
+
+frame->GetTitleBar()->AddMenu("File", fileMenu); // меню остаётся во владении приложения
+frame->Bind(wxEVT_MENU, &MyFrame::OnQuit, frame, wxID_EXIT);
+```
+
+```css
+StyledTitleBar::menu-button {
+    color: var(--text);
+    padding: 0dip 10dip;
+}
+
+StyledTitleBar::menu-button:hover {
+    background-color: #ced4da;
+}
+
+StyledTitleBar::menu-button:pressed {
+    background-color: var(--border-strong);
+}
+```
+
+Нативный `wxMenu` рисуется системой, а не QSS; стилизованный popup — отдельный планируемый виджет.
 
 ```css
 StyledTitleBar {

@@ -431,6 +431,20 @@ StyledTitleBar::caption-button {
     width: 46dip;
 }
 
+StyledTitleBar::menu-button {
+    color: var(--text);
+    padding: 0dip 10dip;
+}
+
+StyledTitleBar::menu-button:hover {
+    background-color: var(--border);
+}
+
+StyledTitleBar::menu-button:pressed {
+    background-color: var(--border-strong);
+    color: var(--text);
+}
+
 StyledTitleBar::caption-button:hover {
     background-color: var(--border);
     color: var(--text);

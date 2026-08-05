@@ -4,6 +4,7 @@
 #include <wx/dcmemory.h>
 #include <wx/frame.h>
 #include <wx/image.h>
+#include <wx/menu.h>
 
 #include "wxCustomization/StyleSheet.h"
 #include "wxCustomization/widgets/StyledFrame.h"
@@ -38,14 +39,21 @@ public:
     using StyledTitleBar::DrawTitleBar;
     using StyledTitleBar::GetCaptionButtonRect;
     using StyledTitleBar::GetCaptionButtonStyle;
+    using StyledTitleBar::GetMenuButtonRect;
+    using StyledTitleBar::GetMenuButtonStyle;
     using StyledTitleBar::HitTestCaptionButton;
+    using StyledTitleBar::HitTestMenuButton;
 
     bool TestAcceptsFocus() const { return AcceptsFocus(); }
     bool TestAcceptsFocusFromKeyboard() const { return AcceptsFocusFromKeyboard(); }
     void SetHoveredButton(int index) { m_hoveredButton = index; }
+    void SetHoveredMenuButton(int index) { m_hoveredMenuButton = index; }
 
     void ActivateCaptionButton(int index) override { activated.push_back(index); }
     std::vector<int> activated;
+
+    void ShowMenu(int index) override { shownMenus.push_back(index); }
+    std::vector<int> shownMenus;
 };
 
 void ClickAt(TestTitleBar* bar, const wxPoint& pt)
@@ -182,6 +190,99 @@ TEST(StyledTitleBar, OnlyHoveredButtonUsesHoverStyle)
     bar->SetHoveredButton(TestTitleBar::BtnClose);
     EXPECT_EQ(bar->GetCaptionButtonStyle(TestTitleBar::BtnClose).backgroundColor,
               wxColour(0xe8, 0x11, 0x23));
+}
+
+TEST(StyledTitleBar, AddMenuStoresMenus)
+{
+    TestTitleBar* bar = new TestTitleBar(gTestFrame);
+    wxMenu fileMenu;
+    wxMenu helpMenu;
+
+    bar->AddMenu("File", &fileMenu);
+    bar->AddMenu("Help", &helpMenu);
+
+    EXPECT_EQ(bar->GetMenuCount(), 2u);
+}
+
+TEST(StyledTitleBar, MenuButtonRectsAreLeftAligned)
+{
+    StyleSheet sheet;
+    ASSERT_TRUE(sheet.LoadFromString(
+        "StyledTitleBar { padding: 0px; }\n"
+        "StyledTitleBar::menu-button { padding: 0px 10px; }"));
+
+    TestTitleBar* bar = new TestTitleBar(gTestFrame);
+    bar->SetStyleSheet(&sheet);
+    bar->SetSize(0, 0, 400, 32);
+
+    wxMenu fileMenu;
+    wxMenu helpMenu;
+    bar->AddMenu("File", &fileMenu);
+    bar->AddMenu("Help", &helpMenu);
+
+    const wxRect first = bar->GetMenuButtonRect(0);
+    const wxRect second = bar->GetMenuButtonRect(1);
+
+    EXPECT_EQ(first.x, 0);
+    EXPECT_EQ(second.x, first.x + first.width);
+    EXPECT_GT(first.width, 20); // text + 2*10px padding
+    EXPECT_EQ(first.height, 32);
+}
+
+TEST(StyledTitleBar, HitTestMenuButtonWorks)
+{
+    TestTitleBar* bar = new TestTitleBar(gTestFrame);
+    bar->SetSize(0, 0, 400, 32);
+
+    wxMenu fileMenu;
+    bar->AddMenu("File", &fileMenu);
+
+    const wxRect rect = bar->GetMenuButtonRect(0);
+    EXPECT_EQ(bar->HitTestMenuButton(wxPoint(rect.x + 2, rect.y + 2)), 0);
+    EXPECT_EQ(bar->HitTestMenuButton(wxPoint(300, 5)), -1);
+}
+
+TEST(StyledTitleBar, ClickMenuButtonShowsMenuOnPress)
+{
+    TestTitleBar* bar = new TestTitleBar(gTestFrame);
+    bar->SetSize(0, 0, 400, 32);
+
+    wxMenu fileMenu;
+    bar->AddMenu("File", &fileMenu);
+
+    const wxRect rect = bar->GetMenuButtonRect(0);
+    wxMouseEvent downEvent(wxEVT_LEFT_DOWN);
+    downEvent.SetPosition(wxPoint(rect.x + 3, rect.y + 3));
+    bar->GetEventHandler()->ProcessEvent(downEvent);
+
+    ASSERT_EQ(bar->shownMenus.size(), 1u);
+    EXPECT_EQ(bar->shownMenus[0], 0);
+}
+
+TEST(StyledTitleBar, OnlyHoveredMenuButtonUsesHoverStyle)
+{
+    StyleSheet sheet;
+    ASSERT_TRUE(sheet.LoadFromString(
+        "StyledTitleBar::menu-button { background-color: #000000; }\n"
+        "StyledTitleBar::menu-button:hover { background-color: #444444; }"));
+
+    TestTitleBar* bar = new TestTitleBar(gTestFrame);
+    bar->SetStyleSheet(&sheet);
+    bar->SetSize(0, 0, 400, 32);
+
+    wxMenu fileMenu;
+    wxMenu helpMenu;
+    bar->AddMenu("File", &fileMenu);
+    bar->AddMenu("Help", &helpMenu);
+
+    // Mouse is over the bar (hovering menu 0): the widget-level hover must
+    // not turn every menu button's `:hover` style on.
+    wxMouseEvent enterEvent(wxEVT_ENTER_WINDOW);
+    bar->GetEventHandler()->ProcessEvent(enterEvent);
+    bar->SetHoveredMenuButton(0);
+
+    EXPECT_EQ(bar->GetMenuButtonStyle(0).backgroundColor, wxColour(0x44, 0x44, 0x44));
+    EXPECT_EQ(bar->GetMenuButtonStyle(1).backgroundColor, wxColour(0, 0, 0));
 }
 
 TEST(StyledTitleBar, CloseButtonHoverUsesHoverStyle)

@@ -33,6 +33,12 @@ public:
     void SetTitle(const wxString& title);
     wxString GetTitle() const { return m_title; }
 
+    /// Which caption buttons to show: a mask of `1 << BtnMinimize`,
+    /// `1 << BtnMaximize`, `1 << BtnClose`. Default: all three.
+    /// Dialogs typically show only the close button.
+    void SetCaptionButtons(int mask);
+    int GetCaptionButtons() const { return m_captionMask; }
+
     /// Add a menu button with the given @p label on the left side of the bar.
     /// The @p menu is shown via PopupMenu() when the button is clicked.
     /// The bar does not take ownership of the menu.
@@ -43,11 +49,6 @@ public:
 
     wxString GetStyledControlType() const override { return "StyledTitleBar"; }
 
-    /// The bar itself is not focusable; caption buttons are mouse-driven.
-    bool AcceptsFocus() const override { return false; }
-    bool AcceptsFocusFromKeyboard() const override { return false; }
-
-protected:
     /// Caption button indices; Close is the rightmost one.
     enum CaptionButton {
         BtnMinimize = 0,
@@ -55,6 +56,15 @@ protected:
         BtnClose = 2,
         BtnCount = 3
     };
+
+    /// The bar itself is not focusable; caption buttons are mouse-driven.
+    bool AcceptsFocus() const override { return false; }
+    bool AcceptsFocusFromKeyboard() const override { return false; }
+
+protected:
+    /// Visible caption buttons in left-to-right order (filtered by
+    /// SetCaptionButtons).
+    std::vector<int> GetVisibleCaptionButtons() const;
 
     void OnPaint(wxPaintEvent& evt) override;
     /// Renders the bar into @p rect. Separated from OnPaint so tests can
@@ -98,6 +108,7 @@ protected:
     wxString m_title;
     int m_hoveredButton = -1;
     int m_pressedButton = -1;
+    int m_captionMask = (1 << BtnMinimize) | (1 << BtnMaximize) | (1 << BtnClose);
 
     std::vector<MenuEntry> m_menus;
     int m_hoveredMenuButton = -1;

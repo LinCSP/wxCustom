@@ -1,6 +1,7 @@
 #include "wxCustomization/widgets/StyledMessageDialog.h"
 
 #include "wxCustomization/widgets/StyledButton.h"
+#include "wxCustomization/widgets/StyledTitleBar.h"
 
 #include <wx/artprov.h>
 #include <wx/dc.h>
@@ -104,9 +105,15 @@ StyledMessageDialog::StyledMessageDialog(wxWindow* parent,
                                          const wxString& caption,
                                          long style,
                                          const wxString& name)
+    // No native decorations at all: the dialog's title bar is drawn by the
+    // library (StyledTitleBar with just the close button).
     : wxDialog(parent, wxID_ANY, caption, wxDefaultPosition, wxDefaultSize,
-               wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER, name)
+               wxNO_BORDER, name)
 {
+    m_titleBar = new StyledTitleBar(this, wxID_ANY);
+    m_titleBar->SetTitle(caption);
+    m_titleBar->SetCaptionButtons(1 << StyledTitleBar::BtnClose);
+
     m_content = new ContentPanel(this, message, style);
     m_okButton = new StyledButton(this, wxID_OK, "OK");
     m_okButton->Bind(wxEVT_BUTTON, &StyledMessageDialog::OnOk, this);
@@ -114,6 +121,7 @@ StyledMessageDialog::StyledMessageDialog(wxWindow* parent,
     Bind(wxEVT_CHAR_HOOK, &StyledMessageDialog::OnCharHook, this);
 
     wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
+    mainSizer->Add(m_titleBar, 0, wxEXPAND);
     mainSizer->Add(m_content, 1, wxEXPAND | wxALL, 0);
 
     wxBoxSizer* buttonSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -129,6 +137,7 @@ StyledMessageDialog::StyledMessageDialog(wxWindow* parent,
 
 void StyledMessageDialog::SetStyleSheet(StyleSheet* sheet)
 {
+    m_titleBar->SetStyleSheet(sheet);
     m_content->SetStyleSheet(sheet);
     m_okButton->SetStyleSheet(sheet);
     Layout();

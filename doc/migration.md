@@ -20,8 +20,13 @@
 | `wxGauge` | `StyledProgressBar` |
 | `wxStaticBox` | `StyledGroupBox` |
 | `wxNotebook` | `StyledTabWidget` |
+| `wxMessageBox` / `wxMessageDialog` | `StyledMessageDialog` |
+| `wxMenu` (popup) | `StyledMenu` |
+| `wxFrame` (нативная шапка) | `StyledFrame` + `StyledTitleBar` |
 
 `StyledTabWidget` сохраняет основные привычные точки API `wxNotebook`: страницы создаются как дочерние окна виджета, добавляются через `AddPage()`, а смена вкладки приходит событием `wxEVT_NOTEBOOK_PAGE_CHANGED` с классом `wxBookCtrlEvent` — существующие обработчики переносятся без изменений.
+
+Переход на `StyledFrame` — это переход на client-side decorations: главное окно создаётся без нативной шапки и рамки, шапку рисует библиотека (заголовок, кнопки, меню), drag и resize работают из коробки. Диалоги заменяются на `StyledMessageDialog::Show(...)` — сигнатура близка к `wxMessageBox`. Для выпадающих меню `StyledMenu` строится из существующего `wxMenu`, обработчики `wxEVT_MENU` не меняются.
 
 ## Пример замены
 

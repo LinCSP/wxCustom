@@ -119,6 +119,6 @@ cmake .. -DwxWidgets_CONFIG_EXECUTABLE=/usr/local/bin/wx-config
 cmake .. -DWXC_BUILD_TESTS=OFF
 ```
 
-### Стили в demo не обновляются после правок theme.qss
+### Стили в demo не обновляются после правок темы
 
-Файл `theme.qss` копируется в `build/examples/demo/` через `add_custom_command`. Если изменения не применились, перезапустите `make` — файл будет скопирован автоматически.
+Файлы `default.qss`, `dark.qss` и `demo.qss` копируются в `build/examples/demo/` через `add_custom_command`. Если изменения не применились, перезапустите `make` — файлы будут скопированы автоматически.

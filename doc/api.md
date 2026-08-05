@@ -280,6 +280,27 @@ size_t GetItemCount() const;
 
 Стилизованный popup-меню: строит модель из `wxMenu` (текст, шорткаты, enabled/checked, разделители), выбор пункта шлёт `wxEVT_MENU` на owner-окно. Селекторы: `StyledMenu`, `StyledMenu::item` (`:hover`, `:disabled`), `StyledMenu::separator`. Ограничение: подменю не открываются (v1).
 
+## StyledMessageDialog
+
+```cpp
+StyledMessageDialog(wxWindow* parent,
+                    const wxString& message,
+                    const wxString& caption = wxMessageBoxCaptionStr,
+                    long style = wxOK | wxICON_INFORMATION,
+                    const wxString& name = wxDialogNameStr);
+
+void SetStyleSheet(StyleSheet* sheet);
+StyledTitleBar* GetTitleBar() const;
+
+// Создать, стилизовать и показать модально.
+static int Show(wxWindow* parent, const wxString& message,
+                const wxString& caption = wxMessageBoxCaptionStr,
+                long style = wxOK | wxICON_INFORMATION,
+                StyleSheet* sheet = nullptr);
+```
+
+Стилизованная замена `wxMessageBox`: диалог без нативных декораций, сверху `StyledTitleBar` с заголовком и одной кнопкой закрытия (эквивалентна Cancel). Перетаскивается за шапку; Enter — OK, Escape — Cancel.
+
 ## События
 
 | Виджет | Событие |

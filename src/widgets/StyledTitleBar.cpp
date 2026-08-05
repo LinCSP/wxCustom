@@ -48,6 +48,27 @@ void StyledTitleBar::AddMenu(const wxString& label, wxMenu* menu)
     Refresh();
 }
 
+void StyledTitleBar::SetCaptionButtons(int mask)
+{
+    if (m_captionMask == mask) {
+        return;
+    }
+    m_captionMask = mask;
+    InvalidateBestSize();
+    Refresh();
+}
+
+std::vector<int> StyledTitleBar::GetVisibleCaptionButtons() const
+{
+    std::vector<int> visible;
+    for (int i = 0; i < BtnCount; ++i) {
+        if (m_captionMask & (1 << i)) {
+            visible.push_back(i);
+        }
+    }
+    return visible;
+}
+
 wxString StyledTitleBar::CaptionButtonKind(int index)
 {
     switch (index) {
@@ -71,8 +92,8 @@ wxTopLevelWindow* StyledTitleBar::GetTopLevelWindow() const
 int StyledTitleBar::GetCaptionButtonsWidth() const
 {
     int width = 0;
-    for (int i = 0; i < BtnCount; ++i) {
-        width += GetCaptionButtonRect(i).width;
+    for (int index : GetVisibleCaptionButtons()) {
+        width += GetCaptionButtonRect(index).width;
     }
     return width;
 }
@@ -151,17 +172,24 @@ wxRect StyledTitleBar::GetCaptionButtonRect(int index) const
         width = kindStyle.width;
     }
 
-    // Buttons are anchored to the right edge; Close is rightmost.
-    const int rightSlot = BtnCount - 1 - index;
+    // Buttons are anchored to the right edge in the order of the visible set.
+    const std::vector<int> visible = GetVisibleCaptionButtons();
+    int rightSlot = 0;
+    for (size_t pos = 0; pos < visible.size(); ++pos) {
+        if (visible[pos] == index) {
+            rightSlot = static_cast<int>(visible.size()) - 1 - static_cast<int>(pos);
+            break;
+        }
+    }
     const int x = content.x + content.width - (rightSlot + 1) * width;
     return wxRect(x, content.y, width, content.height);
 }
 
 int StyledTitleBar::HitTestCaptionButton(const wxPoint& pt) const
 {
-    for (int i = 0; i < BtnCount; ++i) {
-        if (GetCaptionButtonRect(i).Contains(pt)) {
-            return i;
+    for (int index : GetVisibleCaptionButtons()) {
+        if (GetCaptionButtonRect(index).Contains(pt)) {
+            return index;
         }
     }
     return -1;
@@ -293,8 +321,8 @@ void StyledTitleBar::DrawTitleBar(wxDC& dc, const wxRect& rect)
         DrawMenuButton(dc, static_cast<int>(i));
     }
 
-    for (int i = 0; i < BtnCount; ++i) {
-        DrawCaptionButton(dc, i);
+    for (int index : GetVisibleCaptionButtons()) {
+        DrawCaptionButton(dc, index);
     }
 }
 

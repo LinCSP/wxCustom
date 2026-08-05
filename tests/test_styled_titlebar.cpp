@@ -8,6 +8,7 @@
 
 #include "wxCustomization/StyleSheet.h"
 #include "wxCustomization/widgets/StyledFrame.h"
+#include "wxCustomization/widgets/StyledMessageDialog.h"
 #include "wxCustomization/widgets/StyledPanel.h"
 #include "wxCustomization/widgets/StyledTitleBar.h"
 
@@ -16,6 +17,7 @@ extern wxFrame* gTestFrame;
 using wxCustomization::Style;
 using wxCustomization::StyleSheet;
 using wxCustomization::StyledFrame;
+using wxCustomization::StyledMessageDialog;
 using wxCustomization::StyledTitleBar;
 
 namespace {
@@ -349,6 +351,49 @@ TEST(StyledFrame, SetStyleSheetReachesTitleBarAndClientPanel)
     EXPECT_EQ(frame->GetClientPanel()->GetStyleSheet(), &sheet);
 
     frame->Destroy();
+}
+
+TEST(StyledTitleBar, CaptionButtonsCanBeLimitedToCloseOnly)
+{
+    StyleSheet sheet;
+    ASSERT_TRUE(sheet.LoadFromString(
+        "StyledTitleBar::caption-button { width: 40px; }"));
+
+    TestTitleBar* bar = new TestTitleBar(gTestFrame);
+    bar->SetStyleSheet(&sheet);
+    bar->SetSize(0, 0, 400, 32);
+
+    bar->SetCaptionButtons(1 << TestTitleBar::BtnClose);
+    EXPECT_EQ(bar->GetCaptionButtons(), 1 << TestTitleBar::BtnClose);
+
+    // Only the close button remains, anchored to the right edge.
+    const wxRect closeRect = bar->GetCaptionButtonRect(TestTitleBar::BtnClose);
+    EXPECT_EQ(closeRect.x + closeRect.width, 400);
+    EXPECT_EQ(closeRect.width, 40);
+
+    // The hidden buttons are not hit-testable anymore.
+    EXPECT_EQ(bar->HitTestCaptionButton(wxPoint(closeRect.x - 10, 5)), -1);
+    EXPECT_EQ(bar->HitTestCaptionButton(wxPoint(closeRect.x + 5, 5)),
+              TestTitleBar::BtnClose);
+}
+
+TEST(StyledMessageDialog, HasStyledTitleBarWithCloseOnly)
+{
+    StyleSheet sheet;
+    ASSERT_TRUE(sheet.LoadFromString(
+        "StyledMessageDialog { background-color: #ffffff; }"));
+
+    StyledMessageDialog dlg(gTestFrame, "Test message", "Test Caption");
+    dlg.SetStyleSheet(&sheet);
+
+    ASSERT_NE(dlg.GetTitleBar(), nullptr);
+    EXPECT_EQ(dlg.GetTitleBar()->GetTitle(), "Test Caption");
+    EXPECT_EQ(dlg.GetTitleBar()->GetCaptionButtons(),
+              1 << StyledTitleBar::BtnClose);
+    EXPECT_EQ(dlg.GetTitleBar()->GetStyleSheet(), &sheet);
+
+    // No native caption.
+    EXPECT_EQ(dlg.GetWindowStyleFlag() & wxCAPTION, 0);
 }
 
 TEST(StyledFrame, HitTestResizeEdges)

@@ -79,6 +79,7 @@ StyledButton[role="danger"] { background-color: #e74c3c; }
 | `:unchecked` | Снято состояние |
 | `:indeterminate` | Неопределённое состояние чекбокса |
 | `:read-only` | Поле только для чтения (LineEdit) |
+| `:selected` | Выбранный элемент (вкладка StyledTabWidget, пункт списка ComboBox) |
 
 ## Sub-control'ы
 
@@ -112,6 +113,17 @@ StyledCheckBox::indicator:checked {
 | `StyledProgressBar` | `::groove` | Дорожка прогресс-бара |
 | `StyledProgressBar` | `::chunk` | Заполненная часть прогресс-бара |
 | `StyledGroupBox` | `::title` | Заголовок группы |
+| `StyledTabWidget` | `::tab-bar` | Полоса вкладок (базовая линия) |
+| `StyledTabWidget` | `::tab` | Одна вкладка (`:hover`, `:pressed`, `:selected`) |
+| `StyledTabWidget` | `::pane` | Область содержимого вкладок |
+| `StyledTitleBar` | `::title` | Заголовок окна |
+| `StyledTitleBar` | `::caption-button` | Общий стиль кнопок шапки |
+| `StyledTitleBar` | `::minimize-button` | Кнопка «свернуть» |
+| `StyledTitleBar` | `::maximize-button` | Кнопка «развернуть» |
+| `StyledTitleBar` | `::close-button` | Кнопка «закрыть» |
+| `StyledTitleBar` | `::menu-button` | Кнопка встроенного меню |
+| `StyledMenu` | `::item` | Пункт меню (`:hover`, `:disabled`) |
+| `StyledMenu` | `::separator` | Разделитель меню |
 
 ## CSS-переменные
 

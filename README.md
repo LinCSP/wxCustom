@@ -9,7 +9,10 @@ wxCustomization предоставляет собственные виджеты
 ## Возможности
 
 - CSS/QSS-подобный язык стилей с переменными, псевдо-состояниями и sub-control'ами.
-- Полностью кастомизируемые виджеты: Panel, Label, Button, ToggleButton, CheckBox, RadioButton, LineEdit, ComboBox, Slider и другие.
+- Полностью кастомизируемые виджеты: Panel, Label, Button, ToggleButton, CheckBox, RadioButton, LineEdit, ComboBox, Slider, ProgressBar, GroupBox, TabWidget и другие.
+- Client-side decorations: `StyledFrame` и `StyledTitleBar` — окно целиком в едином стиле (шапка, кнопки, resize, **меню в шапке**), как в VSCode/Bruno.
+- Стилизованные выпадающие меню (`StyledMenu`) и диалоги (`StyledMessageDialog`) без нативных декораций.
+- Готовые светлая и тёмная темы (`themes/default.qss`, `themes/dark.qss`), менеджер тем `Theme` с hot-reload.
 - Поддержка фона, градиентов, рамок, скруглений, иконок, шрифтов и outline.
 - DPI-независимые размеры (`dip`, `pt`).
 - Unit-тесты на GoogleTest.
@@ -24,7 +27,8 @@ mkdir build && cd build
 cmake ..
 make -j$(nproc)
 ctest --output-on-failure
-./examples/demo/demo
+./examples/demo/demo        # светлая тема
+./examples/demo/demo_dark   # тёмная тема
 ```
 
 ## Системные требования
@@ -51,12 +55,13 @@ ctest --output-on-failure
 ```cpp
 #include <wx/wx.h>
 #include "wxCustomization/StyleSheet.h"
+#include "wxCustomization/widgets/StyledFrame.h"
 #include "wxCustomization/widgets/StyledButton.h"
 
 class MyApp : public wxApp {
 public:
     bool OnInit() override {
-        wxFrame* frame = new wxFrame(nullptr, wxID_ANY, "Demo");
+        auto* frame = new wxCustomization::StyledFrame(nullptr, wxID_ANY, "Demo");
 
         wxCustomization::StyleSheet sheet;
         sheet.LoadFromString(R"(
@@ -70,8 +75,10 @@ public:
             StyledButton:hover { background-color: #2980b9; }
             StyledButton:pressed { background-color: #1c6ea4; }
         )");
+        frame->SetStyleSheet(&sheet);
 
-        auto* button = new wxCustomization::StyledButton(frame, wxID_ANY, "Click me");
+        auto* button = new wxCustomization::StyledButton(
+            frame->GetClientPanel(), wxID_ANY, "Click me");
         button->SetStyleSheet(&sheet);
 
         frame->Show(true);

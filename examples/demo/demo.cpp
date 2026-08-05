@@ -65,6 +65,7 @@ public:
         , m_styleSheet(styleSheet)
     {
         SetStyleSheet(m_styleSheet);
+        SetMinSize(wxSize(640, 480));
 
         // The content lives in the client panel below the styled title bar.
         wxCustomization::StyledPanel* rootPanel = GetClientPanel();

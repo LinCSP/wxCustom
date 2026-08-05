@@ -245,7 +245,7 @@ void SetStyleSheet(StyleSheet* sheet); // применяет к шапке и к
 void SetTitle(const wxString& title) override; // синхронизирует текст шапки
 ```
 
-Окно с client-side decorations: создаётся без нативной шапки и рамки (флаги декораций срезаются), шапку рисует `StyledTitleBar`. Поддерживает перетаскивание за шапку и maximize/restore по двойному клику.
+Окно с client-side decorations: создаётся без нативной шапки и рамки (флаги декораций срезаются), шапку рисует `StyledTitleBar`. Поддерживает перетаскивание за шапку и maximize/restore по двойному клику. Изменение размера — за края и углы окна (зоны ~6dip, курсоры по 8 направлениям, учитывается `SetMinSize()`, при maximize отключён).
 
 ## StyledTitleBar
 

@@ -249,3 +249,35 @@ TEST(StyledFrame, SetStyleSheetReachesTitleBarAndClientPanel)
 
     frame->Destroy();
 }
+
+TEST(StyledFrame, HitTestResizeEdges)
+{
+    const wxSize size(200, 100);
+    const int margin = 6;
+
+    // Edges.
+    EXPECT_EQ(StyledFrame::HitTestResizeEdges(wxPoint(3, 50), size, margin),
+              StyledFrame::ResizeW);
+    EXPECT_EQ(StyledFrame::HitTestResizeEdges(wxPoint(197, 50), size, margin),
+              StyledFrame::ResizeE);
+    EXPECT_EQ(StyledFrame::HitTestResizeEdges(wxPoint(100, 2), size, margin),
+              StyledFrame::ResizeN);
+    EXPECT_EQ(StyledFrame::HitTestResizeEdges(wxPoint(100, 97), size, margin),
+              StyledFrame::ResizeS);
+
+    // Corners.
+    EXPECT_EQ(StyledFrame::HitTestResizeEdges(wxPoint(2, 2), size, margin),
+              StyledFrame::ResizeNW);
+    EXPECT_EQ(StyledFrame::HitTestResizeEdges(wxPoint(198, 2), size, margin),
+              StyledFrame::ResizeNE);
+    EXPECT_EQ(StyledFrame::HitTestResizeEdges(wxPoint(2, 98), size, margin),
+              StyledFrame::ResizeSW);
+    EXPECT_EQ(StyledFrame::HitTestResizeEdges(wxPoint(198, 98), size, margin),
+              StyledFrame::ResizeSE);
+
+    // Outside the zones.
+    EXPECT_EQ(StyledFrame::HitTestResizeEdges(wxPoint(100, 50), size, margin),
+              StyledFrame::ResizeNone);
+    EXPECT_EQ(StyledFrame::HitTestResizeEdges(wxPoint(10, 10), size, margin),
+              StyledFrame::ResizeNone);
+}

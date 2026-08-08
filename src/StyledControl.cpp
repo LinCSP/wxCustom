@@ -4,6 +4,7 @@
 #include "wxCustomization/StyledAccessible.h"
 #include "wxCustomization/StyleResolver.h"
 #include "wxCustomization/StyleResolverContext.h"
+#include "wxCustomization/Theme.h"
 
 namespace wxCustomization {
 
@@ -144,10 +145,14 @@ void StyledControl::ApplyStyle(const wxString& state)
     m_currentState = state;
     m_subControlStyleCache.clear();
 
-    if (m_styleSheet != nullptr) {
+    // Контрол, созданный после Theme::ApplyTo (динамически), своего sheet не
+    // получил — берём глобальный, иначе стиль пустой, а с ним и метрики
+    // (DoGetBestSize считается по шрифту/отступам «не темы»).
+    StyleSheet* sheet = m_styleSheet != nullptr ? m_styleSheet : Theme::GetGlobal();
+    if (sheet != nullptr) {
         StyledControlContext context(this, state);
         StyleResolver resolver;
-        m_currentStyle = resolver.Resolve(*m_styleSheet, context, wxEmptyString, state);
+        m_currentStyle = resolver.Resolve(*sheet, context, wxEmptyString, state);
     } else {
         m_currentStyle = Style();
     }

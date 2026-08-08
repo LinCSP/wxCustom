@@ -14,7 +14,7 @@ namespace wxCustomization {
 namespace {
 
 constexpr int DEFAULT_DROPDOWN_WIDTH_DIP = 24;
-constexpr int MAX_POPUP_HEIGHT_DIP = 200;
+constexpr int MAX_POPUP_HEIGHT_DIP = 400;
 constexpr int ITEM_MIN_HEIGHT_DIP = 24;
 
 wxColour AdjustColour(const wxColour& base, int delta)
@@ -65,12 +65,14 @@ private:
         void SetHoveredFromPoint(const wxPoint& pt);
         void MoveHover(int delta);
         void ConfirmSelection();
+        void EnsureVisible(int index);  // прокрутка списка до строки
 
         int GetTotalHeight() const;
 
     private:
         void OnPaint(wxPaintEvent& evt);
         void OnMouseMove(wxMouseEvent& evt);
+        void OnMouseWheel(wxMouseEvent& evt);
         void OnLeftUp(wxMouseEvent& evt);
         void OnKeyDown(wxKeyEvent& evt);
         void OnKillFocus(wxFocusEvent& evt);
@@ -79,12 +81,15 @@ private:
         int HitTest(const wxPoint& pt) const;
         wxRect GetItemRect(int index) const;
         int GetItemHeight() const;
+        int GetVisibleRowCount() const;
+        int GetMaxFirstVisible() const;
         Style GetItemStyle(const wxString& state) const;
 
         StyledComboBoxPopup* m_popup;
         wxArrayString m_choices;
         int m_selection = -1;
         int m_hovered = -1;
+        int m_firstVisible = 0;  // индекс первой видимой строки (прокрутка)
 
         wxDECLARE_EVENT_TABLE();
     };
@@ -100,6 +105,7 @@ private:
 wxBEGIN_EVENT_TABLE(StyledComboBoxPopup::ListWindow, wxWindow)
     EVT_PAINT(StyledComboBoxPopup::ListWindow::OnPaint)
     EVT_MOTION(StyledComboBoxPopup::ListWindow::OnMouseMove)
+    EVT_MOUSEWHEEL(StyledComboBoxPopup::ListWindow::OnMouseWheel)
     EVT_LEFT_UP(StyledComboBoxPopup::ListWindow::OnLeftUp)
     EVT_KEY_DOWN(StyledComboBoxPopup::ListWindow::OnKeyDown)
     EVT_KILL_FOCUS(StyledComboBoxPopup::ListWindow::OnKillFocus)
@@ -123,6 +129,7 @@ void StyledComboBoxPopup::ListWindow::SetChoices(const wxArrayString& choices)
     if (m_hovered >= static_cast<int>(m_choices.GetCount())) {
         m_hovered = -1;
     }
+    m_firstVisible = std::clamp(m_firstVisible, 0, GetMaxFirstVisible());
     Refresh();
 }
 
@@ -164,6 +171,7 @@ void StyledComboBoxPopup::ListWindow::MoveHover(int delta)
 
     if (hovered != m_hovered) {
         m_hovered = hovered;
+        EnsureVisible(hovered);
         Refresh();
     }
 }
@@ -258,6 +266,51 @@ void StyledComboBoxPopup::ListWindow::OnMouseMove(wxMouseEvent& evt)
     evt.Skip();
 }
 
+void StyledComboBoxPopup::ListWindow::OnMouseWheel(wxMouseEvent& evt)
+{
+    const int maxFirst = GetMaxFirstVisible();
+    if (maxFirst == 0) {
+        return;  // всё помещается — прокрутка не нужна
+    }
+    // Прокрутка строками; вращение вверх — к началу списка.
+    const int lines = std::max(1, evt.GetLinesPerAction());
+    const int delta = (evt.GetWheelRotation() > 0 ? -lines : lines);
+    const int first = std::clamp(m_firstVisible + delta, 0, maxFirst);
+    if (first != m_firstVisible) {
+        m_firstVisible = first;
+        Refresh();
+    }
+}
+
+void StyledComboBoxPopup::ListWindow::EnsureVisible(int index)
+{
+    if (index < 0) {
+        return;
+    }
+    const int visibleRows = GetVisibleRowCount();
+    if (index < m_firstVisible) {
+        m_firstVisible = index;
+    } else if (visibleRows > 0 && index >= m_firstVisible + visibleRows) {
+        m_firstVisible = index - visibleRows + 1;
+    }
+    m_firstVisible = std::clamp(m_firstVisible, 0, GetMaxFirstVisible());
+}
+
+int StyledComboBoxPopup::ListWindow::GetVisibleRowCount() const
+{
+    const int itemHeight = GetItemHeight();
+    if (itemHeight <= 0) {
+        return 0;
+    }
+    return GetClientSize().y / itemHeight;
+}
+
+int StyledComboBoxPopup::ListWindow::GetMaxFirstVisible() const
+{
+    const int count = static_cast<int>(m_choices.GetCount());
+    return std::max(0, count - GetVisibleRowCount());
+}
+
 void StyledComboBoxPopup::ListWindow::OnLeftUp(wxMouseEvent& evt)
 {
     SetHoveredFromPoint(evt.GetPosition());
@@ -282,6 +335,7 @@ void StyledComboBoxPopup::ListWindow::OnKeyDown(wxKeyEvent& evt)
         case WXK_NUMPAD_HOME:
             if (m_hovered != 0) {
                 m_hovered = 0;
+                EnsureVisible(0);
                 Refresh();
             }
             return;
@@ -290,6 +344,7 @@ void StyledComboBoxPopup::ListWindow::OnKeyDown(wxKeyEvent& evt)
         case WXK_NUMPAD_END:
             if (m_hovered != static_cast<int>(m_choices.GetCount()) - 1) {
                 m_hovered = static_cast<int>(m_choices.GetCount()) - 1;
+                EnsureVisible(m_hovered);
                 Refresh();
             }
             return;
@@ -324,7 +379,7 @@ void StyledComboBoxPopup::ListWindow::OnLeaveWindow(wxMouseEvent& /*evt*/)
 
 int StyledComboBoxPopup::ListWindow::HitTest(const wxPoint& pt) const
 {
-    const int index = pt.y / GetItemHeight();
+    const int index = pt.y / GetItemHeight() + m_firstVisible;
     if (index < 0 || index >= static_cast<int>(m_choices.GetCount())) {
         return -1;
     }
@@ -334,7 +389,7 @@ int StyledComboBoxPopup::ListWindow::HitTest(const wxPoint& pt) const
 wxRect StyledComboBoxPopup::ListWindow::GetItemRect(int index) const
 {
     const int itemHeight = GetItemHeight();
-    return wxRect(0, index * itemHeight, GetClientSize().x, itemHeight);
+    return wxRect(0, (index - m_firstVisible) * itemHeight, GetClientSize().x, itemHeight);
 }
 
 int StyledComboBoxPopup::ListWindow::GetItemHeight() const
@@ -405,6 +460,9 @@ void StyledComboBoxPopup::PopupList()
 
     SetSize(width, height);
     m_list->SetSize(width, height);
+
+    // Прокрутка к текущему выбору (список может не помещаться в попап).
+    m_list->EnsureVisible(m_list->GetSelection() >= 0 ? m_list->GetSelection() : 0);
 
     Position(screenPos + wxPoint(0, comboSize.y), wxDefaultSize);
 

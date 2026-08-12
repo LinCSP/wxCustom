@@ -517,7 +517,7 @@ Owner-drawn таблица с виртуальными строками (зам�
 
 Клик по заголовку sortable-колонки вызывает колбэк `SetOnHeaderClick` — сама сортировка данных остаётся на приложении; виджет лишь рисует стрелку направления, установленную через `SetSortIndicator()`.
 
-При смене выбранной строки генерируется `wxEVT_STYLED_TABLE_SELECTION` (класс `wxCommandEvent`: `GetInt()` — индекс строки, -1 при снятии выбора) и вызывается колбэк `SetOnSelectionChanged`.
+При смене выбранной строки генерируется `wxEVT_STYLED_TABLE_SELECTION` (класс `wxCommandEvent`: `GetInt()` — индекс строки, -1 при снятии выбора) и вызывается колбэк `SetOnSelectionChanged`. Двойной клик по строке генерирует `wxEVT_STYLED_TABLE_ACTIVATED` (`GetInt()` — индекс строки) и вызывает колбэк `SetOnRowActivated`.
 
 ```cpp
 auto* table = new wxCustomization::StyledTable(parent, wxID_ANY);

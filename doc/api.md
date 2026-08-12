@@ -260,6 +260,7 @@ int GetSelectedRow() const;   // -1, если выбора нет
 void SetOnSelectionChanged(std::function<void(int row)> callback);
 
 void SetOnHeaderClick(std::function<void(int col)> callback);
+void SetOnRowActivated(std::function<void(int row)> callback); // двойной клик по строке
 void SetSortIndicator(int col, bool ascending); // -1 убирает стрелку
 int GetSortColumn() const;
 bool IsSortAscending() const;
@@ -267,7 +268,7 @@ bool IsSortAscending() const;
 void EnsureRowVisible(int row);
 ```
 
-Owner-drawn таблица с виртуальными строками и фиксированной высотой строки. Выбор строки — мышью и клавишами Up/Down, PageUp/PageDown, Home/End; при смене выбора генерируется `wxEVT_STYLED_TABLE_SELECTION` (`wxCommandEvent::GetInt()` — индекс строки). Клик по заголовку sortable-колонки вызывает колбэк `SetOnHeaderClick`; сортировку данных выполняет приложение, виджет только рисует стрелку из `SetSortIndicator`. Под-контролы: `::header` (состояния `:hover`, `:pressed` по колонкам), `::row` (`:hover`, `:selected`, `:alternate` — «зебра»), `::scroll-bar` (трек; `width`/`height` — толщина полос), `::scroll-thumb` (ползунок). Цвет grid-линий — `border-color` виджета.
+Owner-drawn таблица с виртуальными строками и фиксированной высотой строки. Выбор строки — мышью и клавишами Up/Down, PageUp/PageDown, Home/End; при смене выбора генерируется `wxEVT_STYLED_TABLE_SELECTION` (`wxCommandEvent::GetInt()` — индекс строки). Двойной клик по строке генерирует `wxEVT_STYLED_TABLE_ACTIVATED` и вызывает колбэк `SetOnRowActivated`. Клик по заголовку sortable-колонки вызывает колбэк `SetOnHeaderClick`; сортировку данных выполняет приложение, виджет только рисует стрелку из `SetSortIndicator`. Под-контролы: `::header` (состояния `:hover`, `:pressed` по колонкам), `::row` (`:hover`, `:selected`, `:alternate` — «зебра»), `::scroll-bar` (трек; `width`/`height` — толщина полос), `::scroll-thumb` (ползунок). Цвет grid-линий — `border-color` виджета.
 
 ## StyledFrame
 

@@ -11,6 +11,7 @@
 namespace wxCustomization {
 
 wxDEFINE_EVENT(wxEVT_STYLED_TABLE_SELECTION, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_STYLED_TABLE_ACTIVATED, wxCommandEvent);
 
 namespace {
 
@@ -26,6 +27,7 @@ constexpr int SORT_ARROW_HEIGHT_DIP = 5;
 
 wxBEGIN_EVENT_TABLE(StyledTable, StyledControl)
     EVT_MOUSEWHEEL(StyledTable::OnMouseWheel)
+    EVT_LEFT_DCLICK(StyledTable::OnLeftDClick)
 wxEND_EVENT_TABLE()
 
 StyledTable::StyledTable(wxWindow* parent,
@@ -86,6 +88,11 @@ void StyledTable::SetOnSelectionChanged(std::function<void(int row)> callback)
 void StyledTable::SetOnHeaderClick(std::function<void(int col)> callback)
 {
     m_onHeaderClick = std::move(callback);
+}
+
+void StyledTable::SetOnRowActivated(std::function<void(int row)> callback)
+{
+    m_onRowActivated = std::move(callback);
 }
 
 void StyledTable::SetSortIndicator(int col, bool ascending)
@@ -786,9 +793,29 @@ void StyledTable::OnLeftDown(wxMouseEvent& evt)
     evt.Skip();
 }
 
-void StyledTable::OnLeftUp(wxMouseEvent& evt)
+void StyledTable::OnLeftDClick(wxMouseEvent& evt)
 {
-    if (m_dragMode != DragMode::None) {
+    const Layout layout = GetLayout();
+    const wxPoint pt = evt.GetPosition();
+    if (layout.body.Contains(pt)) {
+        const int row = HitTestRow(pt);
+        if (row >= 0) {
+            SetSelectedRowInternal(row, true);
+            wxCommandEvent event(wxEVT_STYLED_TABLE_ACTIVATED, GetId());
+            event.SetInt(row);
+            event.SetEventObject(this);
+            ProcessWindowEvent(event);
+            if (m_onRowActivated) {
+                m_onRowActivated(row);
+            }
+            return;
+        }
+    }
+    evt.Skip();
+}
+
+void StyledTable::OnLeftUp(wxMouseEvent& evt)
+{    if (m_dragMode != DragMode::None) {
         m_dragMode = DragMode::None;
         if (HasCapture()) {
             ReleaseMouse();

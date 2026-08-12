@@ -12,6 +12,10 @@ namespace wxCustomization {
 /// (-1 when the selection was cleared).
 wxDECLARE_EVENT(wxEVT_STYLED_TABLE_SELECTION, wxCommandEvent);
 
+/// Emitted when a row is activated (left double-click). The row index is in
+/// wxCommandEvent::GetInt().
+wxDECLARE_EVENT(wxEVT_STYLED_TABLE_ACTIVATED, wxCommandEvent);
+
 /// Column description for StyledTable.
 struct StyledTableColumn {
     wxString title;
@@ -86,6 +90,9 @@ public:
     /// SetSortIndicator() and then RefreshRows().
     void SetOnHeaderClick(std::function<void(int col)> callback);
 
+    /// Callback invoked when a row is activated (left double-click).
+    void SetOnRowActivated(std::function<void(int row)> callback);
+
     /// Draw the sort direction arrow on column @p col. Pass -1 to remove
     /// the indicator.
     void SetSortIndicator(int col, bool ascending);
@@ -109,6 +116,7 @@ protected:
 
     void OnLeftDown(wxMouseEvent& evt) override;
     void OnLeftUp(wxMouseEvent& evt) override;
+    void OnLeftDClick(wxMouseEvent& evt);
     void OnMotion(wxMouseEvent& evt) override;
     void OnMouseLeave(wxMouseEvent& evt) override;
     void OnMouseWheel(wxMouseEvent& evt);
@@ -181,6 +189,7 @@ private:
 
     std::function<void(int row)> m_onSelectionChanged;
     std::function<void(int col)> m_onHeaderClick;
+    std::function<void(int row)> m_onRowActivated;
 
     wxDECLARE_EVENT_TABLE();
 };

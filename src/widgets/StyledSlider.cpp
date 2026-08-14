@@ -66,9 +66,11 @@ void StyledSlider::DrawContent(wxDC& dc, const wxRect& rect)
     const wxRect handleRect = GetHandleRect(rect);
 
     // Groove: full track.
+    // NB: фолбэк-цвету нужен и флаг свойства (Set), иначе Painter его пропустит.
     Style grooveStyle = GetSubControlStyle("groove");
     if (!grooveStyle.backgroundColor.IsOk()) {
         grooveStyle.backgroundColor = wxSystemSettings::GetColour(wxSYS_COLOUR_BTNSHADOW);
+        grooveStyle.Set(Property::BackgroundColor);
     }
 
     Painter painter;
@@ -78,6 +80,7 @@ void StyledSlider::DrawContent(wxDC& dc, const wxRect& rect)
     Style subPageStyle = GetSubControlStyle("sub-page");
     if (!subPageStyle.backgroundColor.IsOk()) {
         subPageStyle.backgroundColor = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
+        subPageStyle.Set(Property::BackgroundColor);
     }
 
     painter.Paint(dc, subPageRect, subPageStyle, this);
@@ -93,6 +96,7 @@ void StyledSlider::DrawContent(wxDC& dc, const wxRect& rect)
     Style handleStyle = GetSubControlStyle("handle", handleState);
     if (!handleStyle.backgroundColor.IsOk()) {
         handleStyle.backgroundColor = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
+        handleStyle.Set(Property::BackgroundColor);
     }
 
     painter.Paint(dc, handleRect, handleStyle, this);

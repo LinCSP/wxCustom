@@ -256,29 +256,6 @@ wxFont StyledTabWidget::GetTabFont(int index) const
     return wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
 }
 
-wxColour StyledTabWidget::GetBehindColour(const Style& style) const
-{
-    if (style.IsSet(Property::BackgroundColor) && style.backgroundColor.IsOk()) {
-        return style.backgroundColor;
-    }
-    const Style& widgetStyle = GetCurrentStyle();
-    if (widgetStyle.IsSet(Property::BackgroundColor) && widgetStyle.backgroundColor.IsOk()) {
-        return widgetStyle.backgroundColor;
-    }
-    // Unstyled areas belong visually to the parent, so prefer the parent's
-    // styled background; this guarantees no stale pixels remain there.
-    if (const StyledControl* styledParent = dynamic_cast<const StyledControl*>(GetParent())) {
-        const Style& parentStyle = styledParent->GetCurrentStyle();
-        if (parentStyle.IsSet(Property::BackgroundColor) && parentStyle.backgroundColor.IsOk()) {
-            return parentStyle.backgroundColor;
-        }
-    }
-    if (const wxWindow* parent = GetParent()) {
-        return parent->GetBackgroundColour();
-    }
-    return wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE);
-}
-
 int StyledTabWidget::GetBaselineWidth(const Style& barStyle) const
 {
     if (barStyle.borderStyle == BorderStyle::None || barStyle.borderStyle == BorderStyle::Hidden) {

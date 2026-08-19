@@ -108,6 +108,17 @@ protected:
     virtual void DrawFocusRect(wxDC& dc, const wxRect& rect, const Style& style);
     virtual wxRect GetContentRect() const;
 
+    /// Полная отрисовка контрола в заданный DC: заливка фоном подложки
+    /// (если стиль не задаёт фон), фон/рамка/обводка стиля, затем контент.
+    /// Вызывается из OnPaint; вынесена отдельно для тестируемости.
+    void PaintTo(wxDC& dc);
+
+    /// Цвет «подложки» под контролом: фон стиля (если задан), иначе фон
+    /// стиля самого контрола, фон styled-родителя, фон окна-родителя или
+    /// системный. Нужен, чтобы контрол без явного background не оставлял
+    /// на экране старые пиксели поверхности (wxMSW, wxBG_STYLE_PAINT).
+    wxColour GetBehindColour(const Style& style) const;
+
     virtual void OnMouseEnter(wxMouseEvent& evt);
     virtual void OnMouseLeave(wxMouseEvent& evt);
     virtual void OnLeftDown(wxMouseEvent& evt);

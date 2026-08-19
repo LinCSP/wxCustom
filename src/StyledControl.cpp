@@ -6,6 +6,8 @@
 #include "wxCustomization/StyleResolverContext.h"
 #include "wxCustomization/Theme.h"
 
+#include <wx/settings.h>
+
 namespace wxCustomization {
 
 namespace {
@@ -240,11 +242,50 @@ wxAccRole StyledControl::GetAccessibleRole() const
 void StyledControl::OnPaint(wxPaintEvent& /*evt*/)
 {
     wxAutoBufferedPaintDC dc(this);
+    PaintTo(dc);
+}
+
+void StyledControl::PaintTo(wxDC& dc)
+{
     const wxRect rect = GetClientRect();
+
+    // Стиль без фона: заливаем цветом подложки. Поверхность окна никто не
+    // стирает (wxBG_STYLE_PAINT), поэтому без заливки сквозь контрол на
+    // wxMSW просвечивают старые пиксели (артефакт «призрак» у слайдера).
+    if (!m_currentStyle.IsSet(Property::BackgroundColor)
+        && !m_currentStyle.IsSet(Property::BackgroundGradient)
+        && !m_currentStyle.IsSet(Property::BackgroundImage)) {
+        dc.SetPen(*wxTRANSPARENT_PEN);
+        dc.SetBrush(GetBehindColour(m_currentStyle));
+        dc.DrawRectangle(rect);
+    }
 
     Painter painter;
     painter.Paint(dc, rect, m_currentStyle, this);
     DrawContent(dc, GetContentRect());
+}
+
+wxColour StyledControl::GetBehindColour(const Style& style) const
+{
+    if (style.IsSet(Property::BackgroundColor) && style.backgroundColor.IsOk()) {
+        return style.backgroundColor;
+    }
+    const Style& widgetStyle = GetCurrentStyle();
+    if (widgetStyle.IsSet(Property::BackgroundColor) && widgetStyle.backgroundColor.IsOk()) {
+        return widgetStyle.backgroundColor;
+    }
+    // Нестилизованные области визуально принадлежат родителю: предпочитаем
+    // его styled-фон, это гарантирует отсутствие «грязных» пикселей.
+    if (const StyledControl* styledParent = dynamic_cast<const StyledControl*>(GetParent())) {
+        const Style& parentStyle = styledParent->GetCurrentStyle();
+        if (parentStyle.IsSet(Property::BackgroundColor) && parentStyle.backgroundColor.IsOk()) {
+            return parentStyle.backgroundColor;
+        }
+    }
+    if (const wxWindow* parent = GetParent()) {
+        return parent->GetBackgroundColour();
+    }
+    return wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE);
 }
 
 void StyledControl::DrawContent(wxDC& /*dc*/, const wxRect& /*rect*/)

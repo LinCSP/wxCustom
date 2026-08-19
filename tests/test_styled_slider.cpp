@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 
+#include <wx/dcmemory.h>
 #include <wx/frame.h>
+#include <wx/image.h>
 
 #include "wxCustomization/StyleSheet.h"
 #include "wxCustomization/widgets/StyledSlider.h"
@@ -38,6 +40,8 @@ public:
                        wxDefaultPosition, wxDefaultSize, style)
     {
     }
+
+    void PaintToPublic(wxDC& dc) { PaintTo(dc); }
 };
 
 } // namespace
@@ -155,6 +159,38 @@ TEST(StyledSlider, VerticalOrientation)
 
     const wxSize size = slider->GetBestSize();
     EXPECT_LT(size.x, size.y);
+}
+
+TEST(StyledSlider, PaintCoversWholeSurface)
+{
+    // Регрессия «призрака» на wxMSW: у контрола без background в стиле фон
+    // обязан полностью перекрывать старые пиксели поверхности (их видно
+    // сквозь слайдер под графиком симуляции). Рисуем в DC, заполненный
+    // маркерным цветом: после отрисовки маркера остаться не должно.
+    TestSlider* slider = new TestSlider(gTestFrame, wxID_ANY, 50, 0, 100);
+    slider->SetSize(0, 0, 200, 24);
+
+    const wxColour marker(0xde, 0xad, 0xbe);
+    wxBitmap bmp(200, 24, 24);
+    {
+        wxMemoryDC dc(bmp);
+        dc.SetBackground(wxBrush(marker));
+        dc.Clear();
+        slider->PaintToPublic(dc);
+    }
+
+    const wxImage img = bmp.ConvertToImage();
+    int markerPixels = 0;
+    for (int y = 0; y < img.GetHeight(); ++y) {
+        for (int x = 0; x < img.GetWidth(); ++x) {
+            if (img.GetRed(x, y) == marker.Red()
+                && img.GetGreen(x, y) == marker.Green()
+                && img.GetBlue(x, y) == marker.Blue()) {
+                ++markerPixels;
+            }
+        }
+    }
+    EXPECT_EQ(markerPixels, 0);
 }
 
 TEST(StyledSlider, ResolvesSubControlStyles)

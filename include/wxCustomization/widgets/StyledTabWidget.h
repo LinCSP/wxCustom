@@ -90,9 +90,6 @@ private:
     void LayoutPage();
     wxSize GetTabSize(int index) const;
     wxFont GetTabFont(int index) const;
-    /// Colour behind unstyled areas (pane, tab bar): the style's own
-    /// background, then the widget's, then the parent's.
-    wxColour GetBehindColour(const Style& style) const;
     /// Width of the tab bar's bottom border (the baseline), 0 when not styled.
     int GetBaselineWidth(const Style& barStyle) const;
     void DrawTabBar(wxDC& dc, const wxRect& rect);
